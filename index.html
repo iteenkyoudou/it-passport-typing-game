@@ -2268,7 +2268,6 @@ const startBtn       = document.getElementById('start-btn');
 const retryBtn       = document.getElementById('retry-btn');
 const qNum           = document.getElementById('q-num');
 const qTotal         = document.getElementById('q-total');
-const scoreVal       = document.getElementById('score-val');
 const categoryBadge  = document.getElementById('category-badge');
 const questionText   = document.getElementById('question-text');
 const choicesList    = document.getElementById('choices-list');
@@ -3354,7 +3353,6 @@ function startGame() {
   resetHp();
 
   qTotal.textContent = questions.length;
-  scoreVal.textContent = 0;
   goldVal.textContent = '0';
 
   startScreen.classList.add('hidden');
@@ -3495,7 +3493,6 @@ function handleCorrect(q) {
   feedback.className = 'correct';
   score += 100;
   correctCount++;
-  scoreVal.textContent = score;
 
   const blank = document.getElementById('blank-display');
   if (blank) blank.textContent = q.answer;
@@ -3663,7 +3660,6 @@ function showResult() {
 
   document.getElementById('res-correct').textContent = correctCount;
   document.getElementById('res-wrong').textContent = wrongCount;
-  document.getElementById('res-score').textContent = score;
   document.getElementById('res-gold').textContent = totalGold.toLocaleString();
 
   const rate = correctCount / questions.length;
