@@ -119,6 +119,71 @@
       color: #fff;
     }
 
+    /* ===== 魔法エフェクト（検索時） ===== */
+    #search-side-panel {
+      position: relative;
+    }
+    #magic-effect-container {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      z-index: 20;
+      overflow: hidden;
+    }
+    .magic-particle {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0;
+    }
+    .magic-particle.spark {
+      width: 6px;
+      height: 6px;
+      background: #ffb74d;
+      box-shadow: 0 0 8px 2px rgba(255,183,77,0.8), 0 0 16px 4px rgba(255,183,77,0.4);
+      animation: magicSpark var(--dur) ease-out forwards;
+      animation-delay: var(--delay);
+    }
+    .magic-particle.star {
+      width: 10px;
+      height: 10px;
+      background: transparent;
+      box-shadow: 0 0 6px 2px rgba(160,130,255,0.9), 0 0 20px 6px rgba(160,130,255,0.4);
+      animation: magicStar var(--dur) ease-out forwards;
+      animation-delay: var(--delay);
+    }
+    .magic-particle.ring {
+      width: 12px;
+      height: 12px;
+      background: transparent;
+      border: 2px solid rgba(0,210,255,0.7);
+      box-shadow: 0 0 10px rgba(0,210,255,0.5);
+      animation: magicRing var(--dur) ease-out forwards;
+      animation-delay: var(--delay);
+    }
+    #search-side-panel.magic-glow {
+      animation: panelMagicGlow 0.8s ease-out;
+    }
+    @keyframes magicSpark {
+      0% { opacity: 1; transform: translate(0, 0) scale(1); }
+      100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0); }
+    }
+    @keyframes magicStar {
+      0% { opacity: 0; transform: translate(0, 0) scale(0) rotate(0deg); }
+      20% { opacity: 1; transform: translate(calc(var(--tx) * 0.2), calc(var(--ty) * 0.2)) scale(1.5) rotate(90deg); }
+      100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0) rotate(360deg); }
+    }
+    @keyframes magicRing {
+      0% { opacity: 0.8; transform: translate(0, 0) scale(0.5); }
+      50% { opacity: 1; transform: translate(calc(var(--tx) * 0.5), calc(var(--ty) * 0.5)) scale(1.5); }
+      100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(2.5); }
+    }
+    @keyframes panelMagicGlow {
+      0% { box-shadow: 0 0 0 rgba(160,130,255,0); border-color: rgba(255,255,255,0.1); }
+      30% { box-shadow: 0 0 25px rgba(160,130,255,0.5), inset 0 0 15px rgba(160,130,255,0.15); border-color: rgba(160,130,255,0.6); }
+      100% { box-shadow: 0 0 0 rgba(160,130,255,0); border-color: rgba(255,255,255,0.1); }
+    }
+
     /* ブラウザバー */
     #search-browser-bar {
       display: flex;
@@ -1305,6 +1370,7 @@
 
   <!-- ===== 右: 検索サイドパネル ===== -->
   <div id="search-side-panel">
+    <div id="magic-effect-container"></div>
 
     <!-- パネルヘッダー: 検索チップ -->
     <div id="side-panel-header">
@@ -1746,8 +1812,61 @@ function selectMode(mode) {
 // ---------- 検索機能 ----------
 let currentSearchTerm = '';
 
+// ---------- 魔法エフェクト（検索時） ----------
+const magicContainer = document.getElementById('magic-effect-container');
+
+function showMagicEffect() {
+  magicContainer.innerHTML = '';
+
+  // パネル全体の光演出
+  searchSidePanel.classList.remove('magic-glow');
+  void searchSidePanel.offsetWidth;
+  searchSidePanel.classList.add('magic-glow');
+
+  const types = ['spark', 'star', 'ring'];
+  const count = 25;
+  const panelW = searchSidePanel.offsetWidth;
+  const panelH = searchSidePanel.offsetHeight;
+
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement('div');
+    const type = types[Math.floor(Math.random() * types.length)];
+    p.className = 'magic-particle ' + type;
+
+    // パネル四辺から出現
+    const edge = Math.floor(Math.random() * 4);
+    let startX, startY;
+    if (edge === 0) { startX = Math.random() * panelW; startY = 0; }
+    else if (edge === 1) { startX = Math.random() * panelW; startY = panelH; }
+    else if (edge === 2) { startX = 0; startY = Math.random() * panelH; }
+    else { startX = panelW; startY = Math.random() * panelH; }
+
+    p.style.left = startX + 'px';
+    p.style.top = startY + 'px';
+
+    // 中心方向に向かって飛ぶ
+    const tx = (panelW / 2 - startX) * (0.4 + Math.random() * 0.4);
+    const ty = (panelH / 2 - startY) * (0.4 + Math.random() * 0.4);
+    const dur = 0.5 + Math.random() * 0.6;
+    const delay = Math.random() * 0.3;
+
+    p.style.setProperty('--tx', tx + 'px');
+    p.style.setProperty('--ty', ty + 'px');
+    p.style.setProperty('--dur', dur + 's');
+    p.style.setProperty('--delay', delay + 's');
+
+    magicContainer.appendChild(p);
+  }
+
+  setTimeout(() => {
+    magicContainer.innerHTML = '';
+    searchSidePanel.classList.remove('magic-glow');
+  }, 1200);
+}
+
 function openSearch(term) {
   playSearchBtnSound();
+  showMagicEffect();
   currentSearchTerm = term;
   const searchQuery = term + ' IT用語 とは わかりやすく';
   const googleUrl = 'https://www.google.com/search?igu=1&q=' + encodeURIComponent(searchQuery);
