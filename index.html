@@ -102,7 +102,7 @@
       background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 12px;
-      overflow: visible;
+      overflow: hidden;
     }
 
     /* サイドパネル ヘッダー */
@@ -150,14 +150,10 @@
     }
 
     /* ===== 魔法エフェクト（検索時） ===== */
-    #search-side-panel {
-      position: relative;
-    }
     #magic-effect-container {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
+      position: fixed;
       pointer-events: none;
-      z-index: 20;
+      z-index: 9998;
       overflow: visible;
     }
     .magic-particle {
@@ -1258,6 +1254,7 @@
 <body>
 
 <div id="player-damage-overlay"></div>
+<div id="magic-effect-container"></div>
 
 <header>
   <h1>ITパスポート タイピングゲーム</h1>
@@ -1405,7 +1402,6 @@
 
   <!-- ===== 右: 検索サイドパネル ===== -->
   <div id="search-side-panel">
-    <div id="magic-effect-container"></div>
 
     <!-- パネルヘッダー: 検索チップ -->
     <div id="side-panel-header">
@@ -1894,6 +1890,13 @@ const magicContainer = document.getElementById('magic-effect-container');
 function showMagicEffect() {
   magicContainer.innerHTML = '';
 
+  // パネルの画面上の位置を取得してコンテナを重ねる
+  const rect = searchSidePanel.getBoundingClientRect();
+  magicContainer.style.left = rect.left + 'px';
+  magicContainer.style.top = rect.top + 'px';
+  magicContainer.style.width = rect.width + 'px';
+  magicContainer.style.height = rect.height + 'px';
+
   // パネル全体の光演出
   searchSidePanel.classList.remove('magic-glow');
   void searchSidePanel.offsetWidth;
@@ -1901,8 +1904,8 @@ function showMagicEffect() {
 
   const types = ['spark', 'star', 'ring'];
   const count = 25;
-  const panelW = searchSidePanel.offsetWidth;
-  const panelH = searchSidePanel.offsetHeight;
+  const panelW = rect.width;
+  const panelH = rect.height;
 
   for (let i = 0; i < count; i++) {
     const p = document.createElement('div');
