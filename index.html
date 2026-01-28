@@ -1310,14 +1310,15 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: radial-gradient(circle, rgba(255,215,0,0.4) 0%, rgba(255,215,0,0) 70%);
-      z-index: 999;
+      background: radial-gradient(circle, rgba(255,215,0,0.7) 0%, rgba(255,215,0,0.3) 40%, rgba(0,0,0,0.5) 100%);
+      z-index: 9999;
       pointer-events: none;
-      animation: timeResetFlash 1s ease-out forwards;
+      animation: timeResetFlash 2s ease-out forwards;
     }
     @keyframes timeResetFlash {
       0% { opacity: 0; }
-      20% { opacity: 1; }
+      10% { opacity: 1; }
+      70% { opacity: 1; }
       100% { opacity: 0; }
     }
     .time-reset-effect {
@@ -1325,19 +1326,54 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 4rem;
-      font-weight: bold;
+      font-size: 8rem;
+      font-weight: 900;
       color: #ffd700;
-      text-shadow: 0 0 20px #ffd700, 0 0 40px #ffeb3b, 0 0 60px #fff176;
-      animation: timeResetPop 1.2s ease-out forwards;
-      z-index: 1000;
+      text-shadow:
+        0 0 30px #ffd700,
+        0 0 60px #ffeb3b,
+        0 0 90px #fff176,
+        0 0 120px rgba(255,215,0,0.8),
+        4px 4px 0 #000,
+        -2px -2px 0 #000,
+        2px -2px 0 #000,
+        -2px 2px 0 #000;
+      animation: timeResetPop 2.5s ease-out forwards;
+      z-index: 10000;
       pointer-events: none;
+      white-space: nowrap;
     }
     @keyframes timeResetPop {
-      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
-      20% { opacity: 1; transform: translate(-50%, -50%) scale(1.3); }
-      50% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-      100% { opacity: 0; transform: translate(-50%, -70%) scale(0.8); }
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.2) rotate(-10deg); }
+      15% { opacity: 1; transform: translate(-50%, -50%) scale(1.4) rotate(5deg); }
+      25% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+      75% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+      100% { opacity: 0; transform: translate(-50%, -60%) scale(0.8) rotate(-5deg); }
+    }
+    /* 時計の針が回転するエフェクト */
+    .time-reset-clock {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 200px;
+      height: 200px;
+      z-index: 10001;
+      pointer-events: none;
+      animation: clockSpin 2s ease-out forwards;
+    }
+    .time-reset-clock img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 0 40px rgba(255,215,0,0.9)) drop-shadow(0 0 80px rgba(255,215,0,0.6));
+    }
+    @keyframes clockSpin {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3) rotate(0deg); }
+      20% { opacity: 1; transform: translate(-50%, -50%) scale(1.2) rotate(360deg); }
+      40% { transform: translate(-50%, -50%) scale(1) rotate(720deg); }
+      70% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(720deg); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5) rotate(720deg); }
     }
     /* HP回復演出（画面いっぱい） */
     .heal-overlay {
@@ -2549,18 +2585,25 @@ function useWatch() {
     watchSound.play().catch(() => {});
   }
 
-  // 画面いっぱいのエフェクトオーバーレイ
+  // 画面いっぱいのエフェクトオーバーレイ（金色フラッシュ）
   const timeOverlay = document.createElement('div');
   timeOverlay.className = 'time-reset-overlay';
   document.body.appendChild(timeOverlay);
-  setTimeout(() => timeOverlay.remove(), 1000);
+  setTimeout(() => timeOverlay.remove(), 2000);
 
-  // 時間リセットテキスト演出
+  // 時計が回転するエフェクト
+  const clockEffect = document.createElement('div');
+  clockEffect.className = 'time-reset-clock';
+  clockEffect.innerHTML = '<img src="udedokei_gold.png" alt="時計">';
+  document.body.appendChild(clockEffect);
+  setTimeout(() => clockEffect.remove(), 2000);
+
+  // 時間リセットテキスト演出（大きく表示）
   const timeText = document.createElement('div');
   timeText.className = 'time-reset-effect';
   timeText.textContent = '⏰ 時間リセット!';
   document.body.appendChild(timeText);
-  setTimeout(() => timeText.remove(), 1200);
+  setTimeout(() => timeText.remove(), 2500);
 }
 
 function useWatchFromSlot() {
