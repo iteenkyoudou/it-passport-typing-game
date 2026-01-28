@@ -1163,6 +1163,40 @@
       padding: 16px 0;
     }
 
+    /* ===== 称号一覧 ===== */
+    .title-list table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .title-list th {
+      padding: 6px 8px;
+      font-size: 0.73rem;
+      color: #888;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      text-align: center;
+      position: sticky;
+      top: 0;
+      background: rgba(36,36,62,0.95);
+    }
+    .title-list td {
+      padding: 8px 8px;
+      font-size: 0.82rem;
+      color: #ddd;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+      text-align: center;
+    }
+    .title-list tr.secret td {
+      color: #444;
+      font-style: italic;
+    }
+    .title-list .title-name {
+      font-weight: bold;
+    }
+    .title-list .unlocked-by {
+      font-size: 0.72rem;
+      color: #888;
+    }
+
     /* ===== 名前入力モーダル ===== */
     #name-input-overlay {
       display: none;
@@ -1371,6 +1405,11 @@
         <div class="dashboard-card" id="ranking-card" style="display:none;">
           <h3>本気モード ランキング</h3>
           <div class="dashboard-ranking" id="dashboard-ranking-content"></div>
+        </div>
+        <!-- 称号一覧 -->
+        <div class="dashboard-card" id="title-list-card">
+          <h3>称号一覧</h3>
+          <div class="title-list" id="title-list-content"></div>
         </div>
       </div>
 
@@ -2813,6 +2852,8 @@ function updateDashboard() {
   const rankingCard = document.getElementById('ranking-card');
   const rankingContent = document.getElementById('dashboard-ranking-content');
 
+  updateTitleList();
+
   if (records.length === 0) {
     myBestCard.style.display = 'none';
     rankingCard.style.display = 'none';
@@ -2884,6 +2925,93 @@ function getColorForCss(css) {
   return map[css] || '#ccc';
 }
 
+// ---------- 称号一覧（シークレット方式） ----------
+const TITLE_STORAGE_KEY = 'itpassport_unlocked_titles';
+const TITLE_THRESHOLDS = [
+  { min: 0,   name: 'かけだしタイパー', css: 'rank-beginner' },
+  { min: 10,  name: 'IT見習い',        css: 'rank-bronze' },
+  { min: 20,  name: 'IT冒険者',        css: 'rank-silver' },
+  { min: 30,  name: 'IT騎士',          css: 'rank-gold' },
+  { min: 40,  name: 'IT勇者',          css: 'rank-platinum' },
+  { min: 50,  name: 'IT魔法使い',      css: 'rank-diamond' },
+  { min: 60,  name: 'IT賢者',          css: 'rank-diamond' },
+  { min: 70,  name: 'ITマスター',      css: 'rank-master' },
+  { min: 80,  name: 'IT博士',          css: 'rank-master' },
+  { min: 90,  name: 'ITゴッド',        css: 'rank-legend' },
+  { min: 100, name: 'IT伝説王',       css: 'rank-legend' }
+];
+
+function getUnlockedTitles() {
+  try {
+    const data = localStorage.getItem(TITLE_STORAGE_KEY);
+    if (!data) return {};
+    return JSON.parse(data);
+  } catch {
+    return {};
+  }
+}
+
+function saveUnlockedTitles(titles) {
+  localStorage.setItem(TITLE_STORAGE_KEY, JSON.stringify(titles));
+}
+
+function unlockTitle(streak, playerName) {
+  const unlocked = getUnlockedTitles();
+  let changed = false;
+  TITLE_THRESHOLDS.forEach(t => {
+    const key = String(t.min);
+    if (streak >= t.min && !unlocked[key]) {
+      unlocked[key] = {
+        name: t.name,
+        unlockedBy: playerName || ''
+      };
+      changed = true;
+    }
+  });
+  if (changed) {
+    saveUnlockedTitles(unlocked);
+  }
+}
+
+function updateTitleList() {
+  const content = document.getElementById('title-list-content');
+  const unlocked = getUnlockedTitles();
+
+  // かけだしタイパー（0問）は常に解放済み
+  if (!unlocked['0']) {
+    unlocked['0'] = { name: 'かけだしタイパー', unlockedBy: '' };
+    saveUnlockedTitles(unlocked);
+  }
+
+  let html = `<table>
+    <thead><tr>
+      <th>正解数</th><th>称号</th><th>解放者</th>
+    </tr></thead><tbody>`;
+
+  TITLE_THRESHOLDS.forEach(t => {
+    const key = String(t.min);
+    const info = unlocked[key];
+    if (info) {
+      const color = getColorForCss(t.css);
+      const byName = info.unlockedBy ? escapeHtml(info.unlockedBy) : '';
+      html += `<tr>
+        <td>${t.min}問</td>
+        <td><span class="title-name" style="color:${color};">${t.name}</span></td>
+        <td class="unlocked-by">${byName}</td>
+      </tr>`;
+    } else {
+      html += `<tr class="secret">
+        <td>${t.min}問</td>
+        <td>??? シークレット ???</td>
+        <td>---</td>
+      </tr>`;
+    }
+  });
+
+  html += '</tbody></table>';
+  content.innerHTML = html;
+}
+
 // ---------- 名前入力フロー ----------
 const nameInputOverlay = document.getElementById('name-input-overlay');
 const playerNameInput = document.getElementById('player-name-input');
@@ -2910,6 +3038,7 @@ function finishNameInput(name) {
     pendingRecord.name = getSavedPlayerName() || '';
   }
   saveMissionRecord(pendingRecord);
+  unlockTitle(pendingRecord.streak, pendingRecord.name);
   showMissionResultScreen(pendingRecord);
   pendingRecord = null;
 }
