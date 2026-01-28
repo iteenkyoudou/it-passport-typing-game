@@ -1,0 +1,2059 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ITパスポート タイピングゲーム</title>
+  <style>
+    /* ===== リセット & 基本 ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', 'Hiragino Sans', 'Meiryo', sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ===== ヘッダー ===== */
+    header {
+      text-align: center;
+      padding: 18px 16px 6px;
+      flex-shrink: 0;
+    }
+    header h1 {
+      font-size: 1.6rem;
+      background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    header p {
+      margin-top: 4px;
+      font-size: 0.85rem;
+      color: #aaa;
+    }
+
+    /* ===== メインレイアウト ===== */
+    #main-layout {
+      display: flex;
+      flex: 1;
+      padding: 12px 16px;
+      min-height: 0;
+      position: relative;
+    }
+
+    /* 中央: ゲーム本体 */
+    #game-container {
+      flex: 1;
+      min-width: 0;
+      max-width: 680px;
+      margin: 0 auto;
+      overflow-y: auto;
+    }
+    /* サイドパネル表示時は左右均等に並ぶ */
+    body.panel-open #main-layout {
+      gap: 16px;
+    }
+    body.panel-open #game-container {
+      flex: 6;
+      margin: 0;
+      max-width: none;
+    }
+
+    /* 右: 検索サイドパネル */
+    #search-side-panel {
+      flex: 4;
+      min-width: 0;
+      display: none; /* ゲーム開始時に表示 */
+      flex-direction: column;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    /* サイドパネル ヘッダー */
+    #side-panel-header {
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    #side-panel-header h3 {
+      font-size: 0.85rem;
+      color: #ffb74d;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .search-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .search-chip {
+      padding: 6px 14px;
+      background: rgba(255,183,77,0.1);
+      border: 1px solid rgba(255,183,77,0.3);
+      border-radius: 20px;
+      font-size: 0.82rem;
+      color: #ffb74d;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .search-chip:hover {
+      background: rgba(255,183,77,0.25);
+      border-color: #ffb74d;
+      transform: translateY(-1px);
+    }
+    .search-chip.active {
+      background: rgba(255,183,77,0.3);
+      border-color: #ffb74d;
+      color: #fff;
+    }
+
+    /* ブラウザバー */
+    #search-browser-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: rgba(255,255,255,0.06);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .browser-dots {
+      display: flex;
+      gap: 4px;
+    }
+    .browser-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+    }
+    .browser-dot.red { background: #ff5f56; }
+    .browser-dot.yellow { background: #ffbd2e; }
+    .browser-dot.green { background: #27c93f; }
+    #search-url-bar {
+      flex: 1;
+      padding: 4px 10px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 5px;
+      font-size: 0.72rem;
+      color: #888;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* iframe 表示エリア */
+    #search-content {
+      flex: 1;
+      position: relative;
+      background: #fff;
+      min-height: 0;
+    }
+    #search-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+    #search-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+      padding: 40px 20px;
+      background: rgba(255,255,255,0.02);
+    }
+    #search-placeholder .placeholder-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    #search-placeholder p {
+      font-size: 0.9rem;
+      color: #888;
+      line-height: 1.7;
+    }
+    #search-placeholder .placeholder-sub {
+      font-size: 0.78rem;
+      color: #666;
+      margin-top: 8px;
+    }
+    #search-loading {
+      display: none;
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(26,26,46,0.9);
+      z-index: 2;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #888;
+      font-size: 0.9rem;
+    }
+    .loading-spinner {
+      display: inline-block;
+      width: 28px;
+      height: 28px;
+      border: 3px solid rgba(255,183,77,0.2);
+      border-top-color: #ffb74d;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 10px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* サイドパネル フッター */
+    #side-panel-footer {
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.03);
+      border-top: 1px solid rgba(255,255,255,0.08);
+      text-align: center;
+    }
+    #side-panel-footer .hint-text {
+      font-size: 0.73rem;
+      color: #666;
+    }
+    .google-open-btn {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 6px 16px;
+      background: linear-gradient(135deg, #ffb74d, #ff9800);
+      color: #1a1a2e;
+      font-weight: bold;
+      font-size: 0.78rem;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .google-open-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 3px 10px rgba(255,183,77,0.3);
+    }
+
+    /* ===== スタート画面 ===== */
+    #start-screen {
+      text-align: center;
+      margin-top: 60px;
+    }
+    #start-screen h2 {
+      font-size: 1.4rem;
+      margin-bottom: 16px;
+      color: #ccc;
+    }
+    #start-screen .description {
+      font-size: 0.95rem;
+      color: #aaa;
+      line-height: 1.8;
+      margin-bottom: 32px;
+    }
+    #start-screen .description strong {
+      color: #00d2ff;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 14px 48px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      color: #fff;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,210,255,0.3);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #00d2ff, #3a7bd5);
+    }
+
+    /* ===== HUD (スコア・進捗) ===== */
+    #hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 16px;
+    }
+    #hud span {
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+    #hud .score {
+      font-size: 1.1rem;
+      color: #00d2ff;
+      font-weight: bold;
+    }
+
+    /* ===== 問題エリア ===== */
+    #question-area {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 22px 20px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .category-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      font-size: 0.73rem;
+      border-radius: 20px;
+      background: rgba(0,210,255,0.15);
+      color: #00d2ff;
+      margin-bottom: 10px;
+    }
+    #question-text {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: #e0e0e0;
+    }
+    .blank {
+      display: inline-block;
+      min-width: 100px;
+      border-bottom: 3px solid #00d2ff;
+      color: #00d2ff;
+      font-weight: bold;
+      padding: 2px 8px;
+      margin: 0 4px;
+      letter-spacing: 1px;
+      font-size: 1.1rem;
+    }
+
+    /* ===== 選択肢表示 ===== */
+    #choices-area {
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    #choices-area h3 {
+      font-size: 0.82rem;
+      color: #888;
+      margin-bottom: 8px;
+    }
+    .choices-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+    .choice-chip {
+      padding: 7px 16px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: #ccc;
+      transition: background 0.2s;
+    }
+    .choice-chip.highlight {
+      background: rgba(0,210,255,0.15);
+      border-color: #00d2ff;
+      color: #00d2ff;
+    }
+    .choice-chip.correct-done {
+      background: rgba(76,175,80,0.2);
+      border-color: #4caf50;
+      color: #4caf50;
+    }
+    .choice-chip.wrong-done {
+      background: rgba(244,67,54,0.15);
+      border-color: #f44336;
+      color: #f44336;
+      text-decoration: line-through;
+    }
+
+    /* ===== タイピング入力 ===== */
+    #typing-area {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    #typing-area label {
+      display: block;
+      font-size: 0.82rem;
+      color: #888;
+      margin-bottom: 6px;
+    }
+    #typing-input {
+      width: 100%;
+      max-width: 480px;
+      padding: 12px 18px;
+      font-size: 1.15rem;
+      background: rgba(255,255,255,0.07);
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      color: #fff;
+      outline: none;
+      text-align: center;
+      letter-spacing: 2px;
+      transition: border-color 0.3s;
+    }
+    #typing-input:focus {
+      border-color: #00d2ff;
+    }
+    #typing-input.correct {
+      border-color: #4caf50;
+      background: rgba(76,175,80,0.1);
+    }
+    #typing-input.wrong {
+      border-color: #f44336;
+      background: rgba(244,67,54,0.1);
+      animation: shake 0.4s;
+    }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
+    /* ===== フィードバック・解説 ===== */
+    #feedback {
+      text-align: center;
+      min-height: 22px;
+      font-size: 1rem;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+    #feedback.correct { color: #4caf50; }
+    #feedback.wrong { color: #f44336; }
+
+    #explanation-box {
+      background: rgba(255,255,255,0.05);
+      border-left: 4px solid #ffb74d;
+      border-radius: 0 8px 8px 0;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      display: none;
+    }
+    #explanation-box h4 {
+      color: #ffb74d;
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+    }
+    #explanation-box p {
+      font-size: 0.85rem;
+      line-height: 1.7;
+      color: #ccc;
+    }
+
+    /* ===== 結果画面 ===== */
+    #result-screen {
+      display: none;
+      text-align: center;
+      margin-top: 40px;
+    }
+    #result-screen h2 {
+      font-size: 1.6rem;
+      margin-bottom: 20px;
+      color: #00d2ff;
+    }
+    .result-stats {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin-bottom: 24px;
+    }
+    .stat-box {
+      text-align: center;
+    }
+    .stat-box .num {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #fff;
+    }
+    .stat-box .label {
+      font-size: 0.8rem;
+      color: #888;
+      margin-top: 4px;
+    }
+    .result-message {
+      font-size: 1rem;
+      color: #ccc;
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+
+    /* ===== 「次へ」ボタン ===== */
+    #next-btn-area {
+      text-align: center;
+      margin-top: 16px;
+      display: none;
+    }
+    #next-btn {
+      display: inline-block;
+      padding: 12px 40px;
+      font-size: 1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: #fff;
+      background: linear-gradient(135deg, #00d2ff, #3a7bd5);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    #next-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,210,255,0.3);
+    }
+    #next-btn-hint {
+      display: block;
+      margin-top: 8px;
+      font-size: 0.75rem;
+      color: #666;
+    }
+
+    /* ===== タイマーバー ===== */
+    #timer-bar-container {
+      width: 100%;
+      height: 6px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 3px;
+      margin-bottom: 12px;
+      overflow: hidden;
+      display: none;
+    }
+    #timer-bar {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #4caf50, #8bc34a);
+      border-radius: 3px;
+      transition: width 0.1s linear;
+    }
+    #timer-bar.warning { background: linear-gradient(90deg, #ff9800, #ffb74d); }
+    #timer-bar.danger { background: linear-gradient(90deg, #f44336, #ff5722); }
+
+    #timer-text {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #aaa;
+      margin-bottom: 8px;
+      display: none;
+    }
+    #timer-text.warning { color: #ff9800; }
+    #timer-text.danger { color: #f44336; font-weight: bold; }
+
+    /* ===== ミッションモード選択 ===== */
+    .mode-select {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .mode-card {
+      padding: 16px 24px;
+      border-radius: 12px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+      border: 2px solid transparent;
+      min-width: 180px;
+    }
+    .mode-card.mode-normal {
+      background: rgba(0,210,255,0.08);
+      border-color: rgba(0,210,255,0.2);
+      color: #00d2ff;
+    }
+    .mode-card.mode-normal:hover, .mode-card.mode-normal.selected {
+      background: rgba(0,210,255,0.18);
+      border-color: #00d2ff;
+    }
+    .mode-card.mode-mission {
+      background: rgba(255,183,77,0.08);
+      border-color: rgba(255,183,77,0.2);
+      color: #ffb74d;
+    }
+    .mode-card.mode-mission:hover, .mode-card.mode-mission.selected {
+      background: rgba(255,183,77,0.18);
+      border-color: #ffb74d;
+    }
+    .mode-card .mode-title {
+      font-size: 1rem;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+    .mode-card .mode-desc {
+      font-size: 0.75rem;
+      opacity: 0.8;
+    }
+
+    /* ===== ミッション結果画面 ===== */
+    .mission-result-header {
+      font-size: 1.4rem;
+      margin-bottom: 8px;
+    }
+    .mission-streak {
+      font-size: 3rem;
+      font-weight: bold;
+      color: #ffb74d;
+      margin: 16px 0;
+    }
+    .mission-streak .streak-label {
+      font-size: 0.9rem;
+      color: #aaa;
+      display: block;
+      margin-top: 4px;
+    }
+    .mission-detail-stats {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin: 16px 0 24px;
+      flex-wrap: wrap;
+    }
+    .mission-detail-stats .stat-box .num {
+      font-size: 1.5rem;
+    }
+
+    /* ===== ランキング ===== */
+    .ranking-section {
+      margin-top: 32px;
+      text-align: center;
+    }
+    .ranking-section h3 {
+      font-size: 1rem;
+      color: #ffb74d;
+      margin-bottom: 12px;
+    }
+    .ranking-table {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+      border-collapse: collapse;
+    }
+    .ranking-table th {
+      padding: 8px 12px;
+      font-size: 0.78rem;
+      color: #888;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      text-align: center;
+    }
+    .ranking-table td {
+      padding: 8px 12px;
+      font-size: 0.88rem;
+      color: #ccc;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      text-align: center;
+    }
+    .ranking-table tr.current-record {
+      background: rgba(255,183,77,0.1);
+    }
+    .ranking-table tr.current-record td {
+      color: #ffb74d;
+      font-weight: bold;
+    }
+    .ranking-table .rank-num {
+      font-weight: bold;
+      color: #aaa;
+    }
+    .ranking-table .rank-1 { color: #ffd700; }
+    .ranking-table .rank-2 { color: #c0c0c0; }
+    .ranking-table .rank-3 { color: #cd7f32; }
+
+    /* ===== ゲームオーバー演出 ===== */
+    #game-over-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15,12,41,0.92);
+      z-index: 100;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+    }
+    #game-over-overlay .go-title {
+      font-size: 2rem;
+      color: #f44336;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+    #game-over-overlay .go-reason {
+      font-size: 1rem;
+      color: #ccc;
+      margin-bottom: 24px;
+    }
+
+    /* ===== ダッシュボード ===== */
+    #dashboard {
+      margin-bottom: 28px;
+    }
+    .dashboard-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .dashboard-card h3 {
+      font-size: 0.9rem;
+      color: #ffb74d;
+      margin-bottom: 12px;
+    }
+    .my-best {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .my-best .best-streak {
+      font-size: 2.4rem;
+      font-weight: bold;
+      color: #ffb74d;
+      line-height: 1;
+    }
+    .my-best .best-streak .best-unit {
+      font-size: 0.85rem;
+      color: #aaa;
+      font-weight: normal;
+    }
+    .my-best .best-title-badge {
+      display: inline-block;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+    .my-best-empty {
+      color: #666;
+      font-size: 0.85rem;
+      text-align: center;
+      padding: 8px 0;
+    }
+    .dashboard-ranking {
+      max-height: 240px;
+      overflow-y: auto;
+    }
+    .dashboard-ranking table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .dashboard-ranking th {
+      padding: 6px 8px;
+      font-size: 0.73rem;
+      color: #888;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      text-align: center;
+      position: sticky;
+      top: 0;
+      background: rgba(36,36,62,0.95);
+    }
+    .dashboard-ranking td {
+      padding: 6px 8px;
+      font-size: 0.82rem;
+      color: #ccc;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      text-align: center;
+    }
+    .dashboard-ranking .rank-num { font-weight: bold; color: #aaa; }
+    .dashboard-ranking .rank-1 { color: #ffd700; }
+    .dashboard-ranking .rank-2 { color: #c0c0c0; }
+    .dashboard-ranking .rank-3 { color: #cd7f32; }
+    .dashboard-ranking .name-cell {
+      max-width: 100px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .dashboard-empty {
+      color: #666;
+      font-size: 0.85rem;
+      text-align: center;
+      padding: 16px 0;
+    }
+
+    /* ===== 名前入力モーダル ===== */
+    #name-input-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15,12,41,0.92);
+      z-index: 100;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+    }
+    .name-input-box {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 16px;
+      padding: 32px 28px;
+      max-width: 400px;
+      width: 100%;
+    }
+    .name-input-box h3 {
+      font-size: 1.1rem;
+      color: #ffb74d;
+      margin-bottom: 8px;
+    }
+    .name-input-box p {
+      font-size: 0.85rem;
+      color: #aaa;
+      margin-bottom: 16px;
+    }
+    #player-name-input {
+      width: 100%;
+      max-width: 280px;
+      padding: 10px 16px;
+      font-size: 1rem;
+      background: rgba(255,255,255,0.07);
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      color: #fff;
+      outline: none;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    #player-name-input:focus {
+      border-color: #ffb74d;
+    }
+    .name-btn-row {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+    .name-btn-row button {
+      padding: 10px 28px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: #fff;
+      transition: transform 0.15s;
+    }
+    .name-btn-row button:hover {
+      transform: translateY(-2px);
+    }
+    .name-btn-save {
+      background: linear-gradient(135deg, #ffb74d, #ff9800);
+      color: #1a1a2e !important;
+    }
+    .name-btn-skip {
+      background: rgba(255,255,255,0.1);
+    }
+
+    /* ===== 称号バッジ ===== */
+    .title-badge {
+      display: inline-block;
+      padding: 10px 28px;
+      border-radius: 30px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin: 12px 0 8px;
+      letter-spacing: 1px;
+    }
+    .title-badge.rank-beginner {
+      background: rgba(158,158,158,0.15);
+      border: 2px solid #9e9e9e;
+      color: #bdbdbd;
+    }
+    .title-badge.rank-bronze {
+      background: rgba(205,127,50,0.15);
+      border: 2px solid #cd7f32;
+      color: #cd7f32;
+    }
+    .title-badge.rank-silver {
+      background: rgba(192,192,192,0.15);
+      border: 2px solid #c0c0c0;
+      color: #e0e0e0;
+    }
+    .title-badge.rank-gold {
+      background: rgba(255,215,0,0.12);
+      border: 2px solid #ffd700;
+      color: #ffd700;
+    }
+    .title-badge.rank-platinum {
+      background: rgba(0,210,255,0.12);
+      border: 2px solid #00d2ff;
+      color: #00d2ff;
+    }
+    .title-badge.rank-diamond {
+      background: rgba(185,242,255,0.12);
+      border: 2px solid #b9f2ff;
+      color: #b9f2ff;
+      text-shadow: 0 0 8px rgba(185,242,255,0.5);
+    }
+    .title-badge.rank-master {
+      background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,87,34,0.15));
+      border: 2px solid #ff9800;
+      color: #ffb74d;
+      text-shadow: 0 0 8px rgba(255,183,77,0.4);
+    }
+    .title-badge.rank-legend {
+      background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,0,128,0.15));
+      border: 2px solid #ffd700;
+      color: #ffd700;
+      text-shadow: 0 0 12px rgba(255,215,0,0.6);
+      animation: legendGlow 2s ease-in-out infinite alternate;
+    }
+    @keyframes legendGlow {
+      from { box-shadow: 0 0 8px rgba(255,215,0,0.2); }
+      to { box-shadow: 0 0 20px rgba(255,215,0,0.5); }
+    }
+    .title-sub {
+      font-size: 0.8rem;
+      color: #888;
+      margin-top: 4px;
+    }
+
+    /* ===== 非表示ユーティリティ ===== */
+    .hidden { display: none !important; }
+
+    /* ===== レスポンシブ ===== */
+    @media (max-width: 900px) {
+      #main-layout {
+        padding: 8px 12px;
+      }
+      body.panel-open #main-layout {
+        flex-direction: column;
+      }
+      #game-container {
+        max-width: 100%;
+      }
+      body.panel-open #game-container {
+        padding-bottom: 16px;
+      }
+      #search-side-panel {
+        position: fixed;
+        width: 100%;
+        height: 400px;
+        right: 0;
+        left: 0;
+        top: auto;
+        bottom: 0;
+        border-radius: 12px 12px 0 0;
+        z-index: 10;
+      }
+    }
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.3rem; }
+      #question-area { padding: 16px 12px; }
+      #typing-input { font-size: 1rem; padding: 10px 12px; }
+      .result-stats { gap: 16px; }
+      .stat-box .num { font-size: 1.5rem; }
+      #search-side-panel { height: 350px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>ITパスポート タイピングゲーム</h1>
+  <p>タイピングしながらIT用語を覚えよう！</p>
+</header>
+
+<div id="main-layout">
+
+  <!-- ===== 左: ゲーム本体 ===== -->
+  <div id="game-container">
+
+    <!-- スタート画面 -->
+    <div id="start-screen">
+      <!-- ダッシュボード -->
+      <div id="dashboard">
+        <!-- 自分の最高記録 -->
+        <div class="dashboard-card" id="my-best-card" style="display:none;">
+          <h3>あなたの最高記録</h3>
+          <div class="my-best" id="my-best-content"></div>
+        </div>
+        <!-- ランキング -->
+        <div class="dashboard-card" id="ranking-card" style="display:none;">
+          <h3>ミッションモード ランキング</h3>
+          <div class="dashboard-ranking" id="dashboard-ranking-content"></div>
+        </div>
+      </div>
+
+      <!-- モード選択 -->
+      <div id="mode-select">
+        <p style="color:#aaa;font-size:0.9rem;margin-bottom:10px;">ゲームモードを選んでね</p>
+        <div class="mode-select">
+          <div class="mode-card mode-normal selected" data-mode="normal" onclick="selectMode('normal')">
+            <div class="mode-title">通常モード</div>
+            <div class="mode-desc">10問ランダム出題<br>気軽に練習しよう</div>
+          </div>
+          <div class="mode-card mode-mission" data-mode="mission" onclick="selectMode('mission')">
+            <div class="mode-title">ミッションモード</div>
+            <div class="mode-desc">全問ノーミスチャレンジ<br>1問45秒の制限時間付き</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="category-select">
+        <p style="color:#aaa;font-size:0.9rem;margin-bottom:10px;">出題する分野を選んでね</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px;">
+          <label style="cursor:pointer;padding:8px 18px;background:rgba(0,210,255,0.15);border:1px solid rgba(0,210,255,0.3);border-radius:8px;color:#00d2ff;font-size:0.9rem;">
+            <input type="radio" name="cat" value="all" checked style="margin-right:6px;"> すべて
+          </label>
+          <label style="cursor:pointer;padding:8px 18px;background:rgba(255,183,77,0.1);border:1px solid rgba(255,183,77,0.3);border-radius:8px;color:#ffb74d;font-size:0.9rem;">
+            <input type="radio" name="cat" value="ストラテジ系" style="margin-right:6px;"> ストラテジ系
+          </label>
+          <label style="cursor:pointer;padding:8px 18px;background:rgba(129,199,132,0.1);border:1px solid rgba(129,199,132,0.3);border-radius:8px;color:#81c784;font-size:0.9rem;">
+            <input type="radio" name="cat" value="マネジメント系" style="margin-right:6px;"> マネジメント系
+          </label>
+          <label style="cursor:pointer;padding:8px 18px;background:rgba(159,134,255,0.1);border:1px solid rgba(159,134,255,0.3);border-radius:8px;color:#9f86ff;font-size:0.9rem;">
+            <input type="radio" name="cat" value="テクノロジ系" style="margin-right:6px;"> テクノロジ系
+          </label>
+        </div>
+        <p style="color:#666;font-size:0.8rem;" id="q-count-info">全 -- 問からランダムに10問出題</p>
+      </div>
+
+      <button class="btn btn-primary" id="start-btn">スタート</button>
+    </div>
+
+    <!-- ゲーム画面 -->
+    <div id="game-screen" class="hidden">
+      <div id="hud">
+        <span>問題 <strong id="q-num">1</strong> / <strong id="q-total">10</strong></span>
+        <span class="score">スコア: <span id="score-val">0</span></span>
+      </div>
+
+      <div id="timer-text"></div>
+      <div id="timer-bar-container"><div id="timer-bar"></div></div>
+
+      <div id="question-area">
+        <span class="category-badge" id="category-badge">カテゴリ</span>
+        <div id="question-text"></div>
+      </div>
+
+      <div id="choices-area">
+        <h3>選択肢（この中から正しい答えをタイピング）</h3>
+        <div class="choices-list" id="choices-list"></div>
+      </div>
+
+      <div id="typing-area">
+        <label for="typing-input">答えをローマ字 or 英語でタイピング</label>
+        <input type="text" id="typing-input" autocomplete="off" spellcheck="false" placeholder="ここにタイピング...">
+      </div>
+
+      <div id="feedback"></div>
+
+      <div id="explanation-box">
+        <h4>解説</h4>
+        <p id="explanation-text"></p>
+      </div>
+
+      <div id="next-btn-area">
+        <button id="next-btn">次の問題へ</button>
+        <span id="next-btn-hint">スペースキーでも進めるよ</span>
+      </div>
+    </div>
+
+    <!-- 結果画面 -->
+    <div id="result-screen">
+      <h2>結果発表！</h2>
+      <div class="result-stats">
+        <div class="stat-box">
+          <div class="num" id="res-correct">0</div>
+          <div class="label">正解</div>
+        </div>
+        <div class="stat-box">
+          <div class="num" id="res-wrong">0</div>
+          <div class="label">不正解</div>
+        </div>
+        <div class="stat-box">
+          <div class="num" id="res-score">0</div>
+          <div class="label">スコア</div>
+        </div>
+      </div>
+      <p class="result-message" id="result-message"></p>
+      <button class="btn btn-primary" id="retry-btn">もう一度遊ぶ</button>
+    </div>
+
+  </div>
+
+  <!-- ===== 右: 検索サイドパネル ===== -->
+  <div id="search-side-panel">
+
+    <!-- パネルヘッダー: 検索チップ -->
+    <div id="side-panel-header">
+      <h3>🔍 選択肢を調べよう！（クリックで検索）</h3>
+      <div class="search-chips" id="search-chips"></div>
+    </div>
+
+    <!-- ブラウザバー -->
+    <div id="search-browser-bar">
+      <div class="browser-dots">
+        <span class="browser-dot red"></span>
+        <span class="browser-dot yellow"></span>
+        <span class="browser-dot green"></span>
+      </div>
+      <div id="search-url-bar">選択肢をクリックして検索してね</div>
+    </div>
+
+    <!-- 検索結果表示エリア -->
+    <div id="search-content">
+      <div id="search-placeholder">
+        <div class="placeholder-icon">🔎</div>
+        <p>選択肢をクリックすると<br>ここにGoogle検索結果が表示されるよ！</p>
+        <p class="placeholder-sub">わからない用語はどんどん調べよう</p>
+      </div>
+      <div id="search-loading">
+        <div class="loading-spinner"></div>
+        <p>検索中...</p>
+      </div>
+      <iframe id="search-iframe" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe>
+    </div>
+
+    <!-- パネルフッター -->
+    <div id="side-panel-footer">
+      <div class="hint-text">うまく表示されないときはこちら ↓</div>
+      <a id="google-open-link" class="google-open-btn" href="#" target="_blank" rel="noopener" style="display:none;">Google で開く ↗</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- ゲームオーバーオーバーレイ -->
+<div id="game-over-overlay">
+  <div class="go-title">GAME OVER</div>
+  <div class="go-reason" id="go-reason"></div>
+</div>
+
+<!-- 名前入力オーバーレイ -->
+<div id="name-input-overlay">
+  <div class="name-input-box">
+    <h3>記録をランキングに登録しよう！</h3>
+    <p id="name-input-desc">名前を入力してね</p>
+    <input type="text" id="player-name-input" maxlength="12" placeholder="なまえ（12文字まで）" autocomplete="off">
+    <div class="name-btn-row">
+      <button class="name-btn-save" id="name-save-btn">登録する</button>
+      <button class="name-btn-skip" id="name-skip-btn">スキップ</button>
+    </div>
+  </div>
+</div>
+
+<script src="questions.js"></script>
+<script>
+
+// ---------- ゲーム状態 ----------
+let questions = [];
+let currentIndex = 0;
+let score = 0;
+let correctCount = 0;
+let wrongCount = 0;
+let waitingForNext = false;
+const NORMAL_QUESTIONS = 10;
+
+// ---------- ミッションモード状態 ----------
+let gameMode = 'normal'; // 'normal' or 'mission'
+let missionTimerId = null;
+let missionTimeLeft = 0;
+let missionTimerInterval = null;
+const MISSION_TIME_PER_Q = 45; // 秒
+
+// ---------- DOM要素 ----------
+const startScreen    = document.getElementById('start-screen');
+const gameScreen     = document.getElementById('game-screen');
+const resultScreen   = document.getElementById('result-screen');
+const startBtn       = document.getElementById('start-btn');
+const retryBtn       = document.getElementById('retry-btn');
+const qNum           = document.getElementById('q-num');
+const qTotal         = document.getElementById('q-total');
+const scoreVal       = document.getElementById('score-val');
+const categoryBadge  = document.getElementById('category-badge');
+const questionText   = document.getElementById('question-text');
+const choicesList    = document.getElementById('choices-list');
+const typingInput    = document.getElementById('typing-input');
+const feedback       = document.getElementById('feedback');
+const explanationBox = document.getElementById('explanation-box');
+const explanationTxt = document.getElementById('explanation-text');
+const nextBtnArea    = document.getElementById('next-btn-area');
+const nextBtn        = document.getElementById('next-btn');
+
+// タイマーDOM
+const timerBarContainer = document.getElementById('timer-bar-container');
+const timerBar          = document.getElementById('timer-bar');
+const timerText         = document.getElementById('timer-text');
+
+// ゲームオーバー
+const gameOverOverlay = document.getElementById('game-over-overlay');
+const goReason        = document.getElementById('go-reason');
+
+// 検索サイドパネル
+const searchSidePanel  = document.getElementById('search-side-panel');
+const searchChips      = document.getElementById('search-chips');
+const searchUrlBar     = document.getElementById('search-url-bar');
+const searchIframe     = document.getElementById('search-iframe');
+const searchLoading    = document.getElementById('search-loading');
+const searchPlaceholder = document.getElementById('search-placeholder');
+const googleOpenLink   = document.getElementById('google-open-link');
+
+// ---------- ユーティリティ ----------
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function normalize(str) {
+  return str.trim().toLowerCase().replace(/\s+/g, '');
+}
+
+// ---------- キー入力音 ----------
+const keySoundPool = [];
+const KEY_SOUND_POOL_SIZE = 6;
+for (let i = 0; i < KEY_SOUND_POOL_SIZE; i++) {
+  const a = new Audio('キーボード1.mp3');
+  a.volume = 0.4;
+  keySoundPool.push(a);
+}
+let keySoundIndex = 0;
+
+function playKeySound() {
+  const sound = keySoundPool[keySoundIndex];
+  sound.currentTime = 0;
+  sound.play().catch(() => {});
+  keySoundIndex = (keySoundIndex + 1) % KEY_SOUND_POOL_SIZE;
+}
+
+// ---------- 正解音 ----------
+const correctSound = new Audio('クイズ正解1.mp3');
+correctSound.volume = 0.5;
+
+function playCorrectSound() {
+  correctSound.currentTime = 0;
+  correctSound.play().catch(() => {});
+}
+
+// ---------- 制限時間タイマー音（BGMループ） ----------
+const timerSound = new Audio('制限時間タイマー.mp3');
+timerSound.volume = 0.3;
+timerSound.loop = true;
+
+function startTimerSound() {
+  timerSound.currentTime = 0;
+  timerSound.play().catch(() => {});
+}
+
+function stopTimerSound() {
+  timerSound.pause();
+  timerSound.currentTime = 0;
+}
+
+// タイピング入力欄でキーが押されたら音を鳴らす
+document.getElementById('typing-input').addEventListener('keydown', (e) => {
+  if (!e.ctrlKey && !e.metaKey && !e.altKey && e.key.length === 1) {
+    playKeySound();
+  }
+});
+
+// ---------- モード選択 ----------
+function selectMode(mode) {
+  gameMode = mode;
+  document.querySelectorAll('.mode-card').forEach(card => {
+    card.classList.toggle('selected', card.dataset.mode === mode);
+  });
+  updateQCountInfo();
+}
+
+// ---------- 検索機能 ----------
+let currentSearchTerm = '';
+
+function openSearch(term) {
+  currentSearchTerm = term;
+  const searchQuery = term + ' IT用語 とは わかりやすく';
+  const googleUrl = 'https://www.google.com/search?igu=1&q=' + encodeURIComponent(searchQuery);
+  const directUrl = 'https://www.google.com/search?q=' + encodeURIComponent(searchQuery);
+
+  searchUrlBar.textContent = 'google.com/search?q=' + encodeURIComponent(term + ' IT用語 とは');
+  searchPlaceholder.style.display = 'none';
+  searchLoading.style.display = 'flex';
+  searchIframe.style.display = 'none';
+  searchIframe.src = googleUrl;
+
+  searchIframe.onload = function() {
+    searchLoading.style.display = 'none';
+    searchIframe.style.display = 'block';
+  };
+
+  setTimeout(() => {
+    if (searchLoading.style.display === 'flex') {
+      searchLoading.style.display = 'none';
+      searchIframe.style.display = 'block';
+    }
+  }, 3000);
+
+  googleOpenLink.href = directUrl;
+  googleOpenLink.style.display = 'inline-block';
+  document.querySelectorAll('.search-chip').forEach(chip => {
+    chip.classList.toggle('active', chip.dataset.term === term);
+  });
+}
+
+function resetSearchPanel() {
+  searchPlaceholder.style.display = 'flex';
+  searchLoading.style.display = 'none';
+  searchIframe.style.display = 'none';
+  searchIframe.src = 'about:blank';
+  searchUrlBar.textContent = '選択肢をクリックして検索してね';
+  googleOpenLink.style.display = 'none';
+  document.querySelectorAll('.search-chip').forEach(c => c.classList.remove('active'));
+  currentSearchTerm = '';
+}
+
+// ---------- カテゴリ選択 ----------
+const qCountInfo = document.getElementById('q-count-info');
+
+function getSelectedCategory() {
+  const checked = document.querySelector('input[name="cat"]:checked');
+  return checked ? checked.value : 'all';
+}
+
+function getFilteredQuestions(cat) {
+  if (cat === 'all') return ALL_QUESTIONS;
+  return ALL_QUESTIONS.filter(q => q.category === cat);
+}
+
+function updateQCountInfo() {
+  const cat = getSelectedCategory();
+  const count = getFilteredQuestions(cat).length;
+  if (gameMode === 'mission') {
+    qCountInfo.textContent = `全 ${count} 問にノーミスで挑戦！（1問45秒）`;
+  } else {
+    const numToAsk = Math.min(NORMAL_QUESTIONS, count);
+    qCountInfo.textContent = `全 ${count} 問からランダムに${numToAsk}問出題`;
+  }
+}
+
+document.querySelectorAll('input[name="cat"]').forEach(radio => {
+  radio.addEventListener('change', updateQCountInfo);
+});
+
+updateQCountInfo();
+
+// ---------- タイマー ----------
+function startTimer() {
+  missionTimeLeft = MISSION_TIME_PER_Q;
+  timerBarContainer.style.display = 'block';
+  timerText.style.display = 'block';
+  updateTimerDisplay();
+
+  missionTimerInterval = setInterval(() => {
+    missionTimeLeft -= 0.1;
+    if (missionTimeLeft <= 0) {
+      missionTimeLeft = 0;
+      clearInterval(missionTimerInterval);
+      missionTimerInterval = null;
+      updateTimerDisplay();
+      handleTimeout();
+    } else {
+      updateTimerDisplay();
+    }
+  }, 100);
+}
+
+function stopTimer() {
+  if (missionTimerInterval) {
+    clearInterval(missionTimerInterval);
+    missionTimerInterval = null;
+  }
+}
+
+function hideTimer() {
+  timerBarContainer.style.display = 'none';
+  timerText.style.display = 'none';
+}
+
+function updateTimerDisplay() {
+  const pct = (missionTimeLeft / MISSION_TIME_PER_Q) * 100;
+  timerBar.style.width = pct + '%';
+
+  const sec = Math.ceil(missionTimeLeft);
+  timerText.textContent = `残り ${sec} 秒`;
+
+  // 色の切り替え
+  timerBar.classList.remove('warning', 'danger');
+  timerText.classList.remove('warning', 'danger');
+  if (missionTimeLeft <= 15) {
+    timerBar.classList.add('danger');
+    timerText.classList.add('danger');
+  } else if (missionTimeLeft <= 22) {
+    timerBar.classList.add('warning');
+    timerText.classList.add('warning');
+  }
+}
+
+function handleTimeout() {
+  stopTimerSound();
+  const q = questions[currentIndex];
+  typingInput.disabled = true;
+  typingInput.classList.add('wrong');
+  feedback.textContent = `タイムアウト！正解は「${q.answer}」でした`;
+  feedback.className = 'wrong';
+  wrongCount++;
+
+  const blank = document.getElementById('blank-display');
+  if (blank) {
+    blank.textContent = q.answer;
+    blank.style.borderColor = '#f44336';
+  }
+
+  document.querySelectorAll('.choice-chip').forEach(chip => {
+    chip.classList.remove('highlight');
+    if (normalize(chip.dataset.value) === normalize(q.answer)) {
+      chip.classList.add('correct-done');
+    }
+  });
+
+  showExplanation(q);
+
+  // ミッションモードの場合、ゲームオーバー
+  if (gameMode === 'mission') {
+    showMissionGameOver('タイムアウト');
+  } else {
+    showNextButton();
+  }
+}
+
+// ---------- ゲーム開始 ----------
+function startGame() {
+  const cat = getSelectedCategory();
+  const pool = getFilteredQuestions(cat);
+
+  if (gameMode === 'mission') {
+    questions = shuffle(pool); // 全問出題
+  } else {
+    const numToAsk = Math.min(NORMAL_QUESTIONS, pool.length);
+    questions = shuffle(pool).slice(0, numToAsk);
+  }
+
+  currentIndex = 0;
+  score = 0;
+  correctCount = 0;
+  wrongCount = 0;
+
+  qTotal.textContent = questions.length;
+  scoreVal.textContent = 0;
+
+  startScreen.classList.add('hidden');
+  resultScreen.style.display = 'none';
+  gameScreen.classList.remove('hidden');
+
+  searchSidePanel.style.display = 'flex';
+  document.body.classList.add('panel-open');
+
+  showQuestion();
+}
+
+// ---------- 問題表示 ----------
+function showQuestion() {
+  const q = questions[currentIndex];
+
+  qNum.textContent = currentIndex + 1;
+  categoryBadge.textContent = q.category;
+
+  const htmlQ = q.question.replace('＿＿＿', '<span class="blank" id="blank-display">？？？</span>');
+  questionText.innerHTML = htmlQ;
+
+  choicesList.innerHTML = '';
+  const shuffledChoices = shuffle(q.choices);
+  shuffledChoices.forEach(c => {
+    const chip = document.createElement('div');
+    chip.className = 'choice-chip';
+    chip.textContent = c;
+    chip.dataset.value = c;
+    choicesList.appendChild(chip);
+  });
+
+  searchChips.innerHTML = '';
+  const shuffledSearchChoices = shuffle(q.choices);
+  shuffledSearchChoices.forEach(c => {
+    const chip = document.createElement('span');
+    chip.className = 'search-chip';
+    chip.dataset.term = c;
+    chip.innerHTML = c + ' <span style="opacity:0.6">🔎</span>';
+    chip.addEventListener('click', () => openSearch(c));
+    searchChips.appendChild(chip);
+  });
+
+  resetSearchPanel();
+
+  typingInput.value = '';
+  typingInput.className = '';
+  typingInput.disabled = false;
+  typingInput.placeholder = `「${q.choices.join('」「')}」のどれかをタイピング`;
+  feedback.textContent = '';
+  feedback.className = '';
+  explanationBox.style.display = 'none';
+  hideNextButton();
+
+  // ミッションモードならタイマー開始
+  if (gameMode === 'mission') {
+    startTimer();
+  } else {
+    hideTimer();
+  }
+
+  // タイマーBGM開始
+  startTimerSound();
+
+  typingInput.focus();
+}
+
+// ---------- 入力判定 ----------
+typingInput.addEventListener('input', () => {
+  const q = questions[currentIndex];
+  const inputVal = normalize(typingInput.value);
+  const answerVal = normalize(q.answer);
+
+  document.querySelectorAll('.choice-chip').forEach(chip => {
+    const chipVal = normalize(chip.dataset.value);
+    if (chipVal.startsWith(inputVal) && inputVal.length > 0) {
+      chip.classList.add('highlight');
+    } else {
+      chip.classList.remove('highlight');
+    }
+  });
+
+  if (inputVal === answerVal) {
+    handleCorrect(q);
+  } else {
+    const wrongChoice = q.choices.find(c => normalize(c) === inputVal && normalize(c) !== answerVal);
+    if (wrongChoice) {
+      handleWrong(q, wrongChoice);
+    }
+  }
+});
+
+typingInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    const q = questions[currentIndex];
+    const inputVal = normalize(typingInput.value);
+    const answerVal = normalize(q.answer);
+
+    if (inputVal === answerVal) {
+      handleCorrect(q);
+    } else if (inputVal.length > 0) {
+      const matched = q.choices.find(c => normalize(c) === inputVal);
+      if (matched) {
+        if (normalize(matched) === answerVal) {
+          handleCorrect(q);
+        } else {
+          handleWrong(q, matched);
+        }
+      } else {
+        feedback.textContent = '選択肢の中から正しい答えをタイピングしてね！';
+        feedback.className = 'wrong';
+        typingInput.classList.add('wrong');
+        setTimeout(() => typingInput.classList.remove('wrong'), 400);
+      }
+    }
+  }
+});
+
+function handleCorrect(q) {
+  stopTimer();
+  stopTimerSound();
+  playCorrectSound();
+  typingInput.disabled = true;
+  typingInput.classList.add('correct');
+  feedback.textContent = '正解！すごい！';
+  feedback.className = 'correct';
+  score += 100;
+  correctCount++;
+  scoreVal.textContent = score;
+
+  const blank = document.getElementById('blank-display');
+  if (blank) blank.textContent = q.answer;
+
+  document.querySelectorAll('.choice-chip').forEach(chip => {
+    chip.classList.remove('highlight');
+    if (normalize(chip.dataset.value) === normalize(q.answer)) {
+      chip.classList.add('correct-done');
+    }
+  });
+
+  showExplanation(q);
+  showNextButton();
+}
+
+function handleWrong(q, wrongAnswer) {
+  stopTimer();
+  stopTimerSound();
+  typingInput.disabled = true;
+  typingInput.classList.add('wrong');
+  feedback.textContent = `残念！正解は「${q.answer}」でした`;
+  feedback.className = 'wrong';
+  wrongCount++;
+
+  const blank = document.getElementById('blank-display');
+  if (blank) {
+    blank.textContent = q.answer;
+    blank.style.borderColor = '#f44336';
+  }
+
+  document.querySelectorAll('.choice-chip').forEach(chip => {
+    chip.classList.remove('highlight');
+    if (normalize(chip.dataset.value) === normalize(q.answer)) {
+      chip.classList.add('correct-done');
+    } else if (normalize(chip.dataset.value) === normalize(wrongAnswer)) {
+      chip.classList.add('wrong-done');
+    }
+  });
+
+  showExplanation(q);
+
+  // ミッションモードの場合、ミスでゲームオーバー
+  if (gameMode === 'mission') {
+    showMissionGameOver('不正解');
+  } else {
+    showNextButton();
+  }
+}
+
+function showExplanation(q) {
+  explanationBox.style.display = 'block';
+  explanationTxt.textContent = q.explanation;
+}
+
+// ---------- ミッションモード ゲームオーバー ----------
+function showMissionGameOver(reason) {
+  const reasonText = reason === 'タイムアウト'
+    ? `第${currentIndex + 1}問でタイムアウト！`
+    : `第${currentIndex + 1}問で不正解！`;
+  goReason.textContent = reasonText;
+
+  gameOverOverlay.style.display = 'flex';
+
+  // 2秒後にリザルト画面へ
+  setTimeout(() => {
+    gameOverOverlay.style.display = 'none';
+    showMissionResult();
+  }, 2000);
+}
+
+// ---------- 「次へ」ボタン制御 ----------
+function showNextButton() {
+  waitingForNext = true;
+  if (currentIndex >= questions.length - 1) {
+    nextBtn.textContent = '結果を見る';
+  } else {
+    nextBtn.textContent = '次の問題へ';
+  }
+  nextBtnArea.style.display = 'block';
+  nextBtn.focus();
+}
+
+function hideNextButton() {
+  waitingForNext = false;
+  nextBtnArea.style.display = 'none';
+}
+
+function proceedToNext() {
+  if (!waitingForNext) return;
+  hideNextButton();
+  currentIndex++;
+  if (currentIndex >= questions.length) {
+    if (gameMode === 'mission') {
+      showMissionResult();
+    } else {
+      showResult();
+    }
+  } else {
+    showQuestion();
+  }
+}
+
+nextBtn.addEventListener('click', proceedToNext);
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === ' ' && waitingForNext) {
+    e.preventDefault();
+    proceedToNext();
+  }
+});
+
+// ---------- 通常モード結果画面 ----------
+function showResult() {
+  gameScreen.classList.add('hidden');
+  searchSidePanel.style.display = 'none';
+  document.body.classList.remove('panel-open');
+  hideTimer();
+  resultScreen.style.display = 'block';
+
+  document.getElementById('res-correct').textContent = correctCount;
+  document.getElementById('res-wrong').textContent = wrongCount;
+  document.getElementById('res-score').textContent = score;
+
+  const rate = correctCount / questions.length;
+  let msg = '';
+  if (rate === 1) {
+    msg = 'パーフェクト！IT用語マスターだね！';
+  } else if (rate >= 0.8) {
+    msg = 'すばらしい！ほとんど正解できたね！';
+  } else if (rate >= 0.6) {
+    msg = 'いい調子！もう少しで合格ラインだよ！';
+  } else if (rate >= 0.4) {
+    msg = 'まずまず！繰り返し遊んで覚えよう！';
+  } else {
+    msg = 'もう一度チャレンジしてみよう！\n繰り返すうちにきっと覚えられるよ！';
+  }
+  document.getElementById('result-message').textContent = msg;
+}
+
+// ---------- 称号システム ----------
+function getMissionTitle(streak) {
+  if (streak >= 100) return { name: 'IT伝説王',       css: 'rank-legend',   desc: '全問制覇！ 伝説に名を刻んだ！' };
+  if (streak >= 90)  return { name: 'ITゴッド',        css: 'rank-legend',   desc: 'あと少しで伝説だ！' };
+  if (streak >= 80)  return { name: 'IT博士',          css: 'rank-master',   desc: '誰もが認めるIT博士！' };
+  if (streak >= 70)  return { name: 'ITマスター',      css: 'rank-master',   desc: 'IT用語を極めし者！' };
+  if (streak >= 60)  return { name: 'IT賢者',          css: 'rank-diamond',  desc: '知識が光り輝いている！' };
+  if (streak >= 50)  return { name: 'IT魔法使い',      css: 'rank-diamond',  desc: 'IT用語を自在に操る！' };
+  if (streak >= 40)  return { name: 'IT勇者',          css: 'rank-platinum', desc: 'どんな問題にも立ち向かう勇者！' };
+  if (streak >= 30)  return { name: 'IT騎士',          css: 'rank-gold',     desc: '知識の剣で戦える騎士だ！' };
+  if (streak >= 20)  return { name: 'IT冒険者',        css: 'rank-silver',   desc: 'IT世界の冒険が本格化！' };
+  if (streak >= 10)  return { name: 'IT見習い',        css: 'rank-bronze',   desc: 'IT用語の世界に一歩踏み出した！' };
+  return              { name: 'かけだしタイパー', css: 'rank-beginner', desc: 'まずは10問連続正解を目指そう！' };
+}
+
+// ---------- ミッションモード結果画面 ----------
+function showMissionResult() {
+  gameScreen.classList.add('hidden');
+  searchSidePanel.style.display = 'none';
+  document.body.classList.remove('panel-open');
+  stopTimer();
+  hideTimer();
+
+  // レコード作成（名前はまだ未設定）
+  const record = {
+    streak: correctCount,
+    total: questions.length,
+    category: getSelectedCategory(),
+    date: new Date().toISOString(),
+    name: ''
+  };
+
+  // 名前入力画面を表示 → 入力後にリザルト画面へ
+  showNameInput(record);
+}
+
+function showMissionResultScreen(record) {
+  const records = getMissionRecords();
+
+  resultScreen.style.display = 'block';
+
+  const isAllClear = record.streak === record.total;
+
+  // 次の称号への案内メッセージ
+  let msg = '';
+  if (isAllClear) {
+    msg = '全問制覇おめでとう！ 君はIT伝説王だ！';
+  } else {
+    const nextThresholds = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+    const nextTarget = nextThresholds.find(t => t > record.streak);
+    if (nextTarget) {
+      const nextTitle = getMissionTitle(nextTarget);
+      msg = `次の称号「${nextTitle.name}」まであと ${nextTarget - record.streak} 問！ 挑戦し続けよう！`;
+    } else {
+      msg = 'すごい記録！ さらなる高みを目指そう！';
+    }
+  }
+
+  // ランキングHTML作成
+  let rankingHTML = '';
+  if (records.length > 0) {
+    rankingHTML = `
+      <div class="ranking-section">
+        <h3>ランキング</h3>
+        <table class="ranking-table">
+          <thead>
+            <tr>
+              <th>順位</th>
+              <th>名前</th>
+              <th>連続正解</th>
+              <th>称号</th>
+              <th>日時</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+    records.forEach((r, i) => {
+      const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
+      const isCurrent = r.date === record.date && r.streak === record.streak;
+      const d = new Date(r.date);
+      const dateStr = `${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+      const t = getMissionTitle(r.streak);
+      const name = r.name || '---';
+      rankingHTML += `
+        <tr class="${isCurrent ? 'current-record' : ''}">
+          <td><span class="rank-num ${rankClass}">${i + 1}</span></td>
+          <td style="max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(name)}</td>
+          <td>${r.streak} / ${r.total}</td>
+          <td><span style="color:${getColorForCss(t.css)};font-size:0.78rem;">${t.name}</span></td>
+          <td>${dateStr}</td>
+        </tr>
+      `;
+    });
+    rankingHTML += '</tbody></table></div>';
+  }
+
+  const title = getMissionTitle(record.streak);
+  const streakCount = record.streak;
+  const totalCount = record.total;
+  const wrongNum = totalCount - streakCount;
+  const scoreNum = streakCount * 100;
+
+  resultScreen.innerHTML = `
+    <h2 class="mission-result-header">${isAllClear ? 'ALL CLEAR!' : 'MISSION RESULT'}</h2>
+    <div class="mission-streak">
+      ${streakCount}<span class="streak-label">問連続正解 / 全${totalCount}問</span>
+    </div>
+    <div class="title-badge ${title.css}">${title.name}</div>
+    <div class="title-sub">${title.desc}</div>
+    <div class="mission-detail-stats">
+      <div class="stat-box">
+        <div class="num" style="color:#4caf50;">${streakCount}</div>
+        <div class="label">正解</div>
+      </div>
+      <div class="stat-box">
+        <div class="num" style="color:#f44336;">${wrongNum > 0 ? 1 : 0}</div>
+        <div class="label">不正解</div>
+      </div>
+      <div class="stat-box">
+        <div class="num" style="color:#00d2ff;">${scoreNum}</div>
+        <div class="label">スコア</div>
+      </div>
+    </div>
+    <p class="result-message">${msg}</p>
+    ${rankingHTML}
+    <div style="margin-top:24px;">
+      <button class="btn btn-primary" id="retry-btn-mission">もう一度挑戦する</button>
+    </div>
+  `;
+
+  document.getElementById('retry-btn-mission').addEventListener('click', () => {
+    resultScreen.style.display = 'none';
+    restoreResultScreen();
+    startScreen.classList.remove('hidden');
+    updateDashboard();
+    updateQCountInfo();
+  });
+}
+
+// 通常モードのresult-screenの元のHTMLを保持
+const originalResultHTML = `
+  <h2>結果発表！</h2>
+  <div class="result-stats">
+    <div class="stat-box">
+      <div class="num" id="res-correct">0</div>
+      <div class="label">正解</div>
+    </div>
+    <div class="stat-box">
+      <div class="num" id="res-wrong">0</div>
+      <div class="label">不正解</div>
+    </div>
+    <div class="stat-box">
+      <div class="num" id="res-score">0</div>
+      <div class="label">スコア</div>
+    </div>
+  </div>
+  <p class="result-message" id="result-message"></p>
+  <button class="btn btn-primary" id="retry-btn">もう一度遊ぶ</button>
+`;
+
+function restoreResultScreen() {
+  resultScreen.innerHTML = originalResultHTML;
+  document.getElementById('retry-btn').addEventListener('click', () => {
+    resultScreen.style.display = 'none';
+    startScreen.classList.remove('hidden');
+    updateDashboard();
+    updateQCountInfo();
+  });
+}
+
+// ---------- localStorage記録管理 ----------
+const STORAGE_KEY = 'itpassport_mission_records';
+const PLAYER_NAME_KEY = 'itpassport_player_name';
+
+function getMissionRecords() {
+  try {
+    const data = localStorage.getItem(STORAGE_KEY);
+    if (!data) return [];
+    return JSON.parse(data);
+  } catch {
+    return [];
+  }
+}
+
+function saveMissionRecord(record) {
+  const records = getMissionRecords();
+  records.push(record);
+  records.sort((a, b) => b.streak - a.streak);
+  const top10 = records.slice(0, 10);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(top10));
+}
+
+function getSavedPlayerName() {
+  return localStorage.getItem(PLAYER_NAME_KEY) || '';
+}
+
+function savePlayerName(name) {
+  localStorage.setItem(PLAYER_NAME_KEY, name);
+}
+
+// ---------- ダッシュボード表示 ----------
+function updateDashboard() {
+  const records = getMissionRecords();
+  const myBestCard = document.getElementById('my-best-card');
+  const myBestContent = document.getElementById('my-best-content');
+  const rankingCard = document.getElementById('ranking-card');
+  const rankingContent = document.getElementById('dashboard-ranking-content');
+
+  if (records.length === 0) {
+    myBestCard.style.display = 'none';
+    rankingCard.style.display = 'none';
+    return;
+  }
+
+  // 自分の最高記録（名前が保存されていれば自分の記録、なければ全体1位）
+  const playerName = getSavedPlayerName();
+  let bestRecord = records[0]; // 全体1位
+  if (playerName) {
+    const myRecords = records.filter(r => r.name === playerName);
+    if (myRecords.length > 0) {
+      bestRecord = myRecords[0]; // 自分のベスト
+    }
+  }
+
+  const bestTitle = getMissionTitle(bestRecord.streak);
+  myBestCard.style.display = 'block';
+  myBestContent.innerHTML = `
+    <div class="best-streak">${bestRecord.streak}<span class="best-unit"> 問連続正解</span></div>
+    <span class="best-title-badge title-badge ${bestTitle.css}" style="font-size:0.85rem;padding:5px 14px;margin:0;">${bestTitle.name}</span>
+  `;
+
+  // ランキングテーブル
+  rankingCard.style.display = 'block';
+  let html = `<table>
+    <thead><tr>
+      <th>順位</th><th>名前</th><th>連続正解</th><th>称号</th><th>日時</th>
+    </tr></thead><tbody>`;
+  records.forEach((r, i) => {
+    const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
+    const d = new Date(r.date);
+    const dateStr = `${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+    const t = getMissionTitle(r.streak);
+    const name = r.name || '---';
+    html += `<tr>
+      <td><span class="rank-num ${rankClass}">${i+1}</span></td>
+      <td class="name-cell">${escapeHtml(name)}</td>
+      <td>${r.streak} / ${r.total}</td>
+      <td><span style="color:${getColorForCss(t.css)};font-size:0.78rem;">${t.name}</span></td>
+      <td>${dateStr}</td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  rankingContent.innerHTML = html;
+}
+
+function escapeHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+function getColorForCss(css) {
+  const map = {
+    'rank-beginner': '#9e9e9e',
+    'rank-bronze': '#cd7f32',
+    'rank-silver': '#c0c0c0',
+    'rank-gold': '#ffd700',
+    'rank-platinum': '#00d2ff',
+    'rank-diamond': '#b9f2ff',
+    'rank-master': '#ffb74d',
+    'rank-legend': '#ffd700'
+  };
+  return map[css] || '#ccc';
+}
+
+// ---------- 名前入力フロー ----------
+const nameInputOverlay = document.getElementById('name-input-overlay');
+const playerNameInput = document.getElementById('player-name-input');
+const nameSaveBtn = document.getElementById('name-save-btn');
+const nameSkipBtn = document.getElementById('name-skip-btn');
+let pendingRecord = null;
+
+function showNameInput(record) {
+  pendingRecord = record;
+  const savedName = getSavedPlayerName();
+  playerNameInput.value = savedName;
+  document.getElementById('name-input-desc').textContent =
+    `${record.streak}問連続正解！ 名前を入力してランキングに登録しよう`;
+  nameInputOverlay.style.display = 'flex';
+  playerNameInput.focus();
+}
+
+function finishNameInput(name) {
+  nameInputOverlay.style.display = 'none';
+  if (name) {
+    savePlayerName(name);
+    pendingRecord.name = name;
+  } else {
+    pendingRecord.name = getSavedPlayerName() || '';
+  }
+  saveMissionRecord(pendingRecord);
+  showMissionResultScreen(pendingRecord);
+  pendingRecord = null;
+}
+
+nameSaveBtn.addEventListener('click', () => {
+  const name = playerNameInput.value.trim();
+  if (!name) {
+    playerNameInput.style.borderColor = '#f44336';
+    playerNameInput.focus();
+    return;
+  }
+  finishNameInput(name);
+});
+
+nameSkipBtn.addEventListener('click', () => {
+  finishNameInput('');
+});
+
+playerNameInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    nameSaveBtn.click();
+  }
+  playerNameInput.style.borderColor = 'rgba(255,255,255,0.2)';
+});
+
+// ---------- イベント ----------
+startBtn.addEventListener('click', startGame);
+retryBtn.addEventListener('click', () => {
+  resultScreen.style.display = 'none';
+  startScreen.classList.remove('hidden');
+  updateDashboard();
+  updateQCountInfo();
+});
+
+// 初期ダッシュボード表示
+updateDashboard();
+</script>
+
+</body>
+</html>
