@@ -537,6 +537,39 @@
       100% { transform: scale(1); }
     }
 
+    /* ===== 自分ダメージ演出 ===== */
+    #player-damage-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255, 0, 0, 0.3);
+      z-index: 9999;
+      pointer-events: none;
+    }
+    #player-damage-overlay.show {
+      display: block;
+      animation: playerDamageFlash 0.6s ease-out forwards;
+    }
+    @keyframes playerDamageFlash {
+      0% { opacity: 1; }
+      20% { opacity: 0.1; }
+      40% { opacity: 0.8; }
+      60% { opacity: 0.1; }
+      80% { opacity: 0.5; }
+      100% { opacity: 0; display: none; }
+    }
+    #game-container.player-hit {
+      animation: playerShake 0.4s ease-in-out;
+    }
+    @keyframes playerShake {
+      0%, 100% { transform: translateX(0); }
+      15% { transform: translateX(-10px) translateY(-3px); }
+      30% { transform: translateX(8px) translateY(2px); }
+      45% { transform: translateX(-6px) translateY(-2px); }
+      60% { transform: translateX(6px) translateY(1px); }
+      75% { transform: translateX(-3px); }
+    }
+
     /* ===== お金ドロップ演出 ===== */
     #money-drop-area {
       position: absolute;
@@ -1128,6 +1161,8 @@
 </head>
 <body>
 
+<div id="player-damage-overlay"></div>
+
 <header>
   <h1>ITパスポート タイピングゲーム</h1>
   <p>タイピングしながらIT用語を覚えよう！</p>
@@ -1435,6 +1470,48 @@ function playCorrectSound() {
   correctSound.play().catch(() => {});
 }
 
+// ---------- 不正解音 ----------
+const wrongSound = new Audio('大キック.mp3');
+wrongSound.volume = 0.6;
+
+function playWrongSound() {
+  wrongSound.currentTime = 0;
+  wrongSound.play().catch(() => {});
+}
+
+// ---------- 検索ボタン音 ----------
+const searchBtnSound = new Audio('決定ボタンを押す41.mp3');
+searchBtnSound.volume = 0.4;
+
+function playSearchBtnSound() {
+  searchBtnSound.currentTime = 0;
+  searchBtnSound.play().catch(() => {});
+}
+
+// ---------- 自分ダメージ演出 ----------
+const playerDamageOverlay = document.getElementById('player-damage-overlay');
+const gameContainer = document.getElementById('game-container');
+
+function showPlayerDamage() {
+  playWrongSound();
+
+  // 画面を赤く点滅
+  playerDamageOverlay.className = '';
+  void playerDamageOverlay.offsetWidth;
+  playerDamageOverlay.className = 'show';
+
+  // ゲーム画面を揺らす
+  gameContainer.classList.remove('player-hit');
+  void gameContainer.offsetWidth;
+  gameContainer.classList.add('player-hit');
+
+  setTimeout(() => {
+    playerDamageOverlay.className = '';
+    playerDamageOverlay.style.display = 'none';
+    gameContainer.classList.remove('player-hit');
+  }, 700);
+}
+
 // ---------- BGM（3問ごとに切り替え） ----------
 const BGM_TRACKS = [
   'iwashiro_elevate_perfect.mp3',
@@ -1672,6 +1749,7 @@ function selectMode(mode) {
 let currentSearchTerm = '';
 
 function openSearch(term) {
+  playSearchBtnSound();
   currentSearchTerm = term;
   const searchQuery = term + ' IT用語 とは わかりやすく';
   const googleUrl = 'https://www.google.com/search?igu=1&q=' + encodeURIComponent(searchQuery);
@@ -1798,6 +1876,7 @@ function updateTimerDisplay() {
 function handleTimeout() {
   stopTimerSound();
   fadeOutMonster();
+  showPlayerDamage();
   const q = questions[currentIndex];
   typingInput.disabled = true;
   typingInput.classList.add('wrong');
@@ -2003,6 +2082,7 @@ function handleWrong(q, wrongAnswer) {
   stopTimer();
   stopTimerSound();
   fadeOutMonster();
+  showPlayerDamage();
   typingInput.disabled = true;
   typingInput.classList.add('wrong');
   feedback.textContent = `残念！正解は「${q.answer}」でした`;
