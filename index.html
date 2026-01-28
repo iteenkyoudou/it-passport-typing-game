@@ -3423,32 +3423,10 @@ retryBtn.addEventListener('click', () => {
 
 // ホームに戻る
 function goHome() {
-  // ゲームを中断してホーム画面に戻る
+  // ゲームを中断してホーム画面に戻る（ページをリロード）
   stopBgm();
   stopTimerSound();
-  clearTimeout(questionTimer);
-
-  // 画面切り替え
-  const gameScreen = document.getElementById('game-screen');
-  const resultScreen = document.getElementById('result-screen');
-  const startScreen = document.getElementById('start-screen');
-  const searchSidePanel = document.getElementById('search-side-panel');
-
-  if (gameScreen) gameScreen.classList.add('hidden');
-  if (resultScreen) resultScreen.style.display = 'none';
-  if (startScreen) startScreen.classList.remove('hidden');
-
-  // サイドパネルを非表示
-  if (searchSidePanel) searchSidePanel.style.display = 'none';
-  document.body.classList.remove('panel-open');
-
-  // ボス戦リセット
-  if (typeof hideBossUI === 'function') hideBossUI();
-  isBossBattle = false;
-  bossComboCount = 0;
-
-  // ダッシュボード更新
-  updateDashboard();
+  location.reload();
 }
 
 // ナビゲーション表示/非表示
