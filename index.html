@@ -1078,6 +1078,21 @@
     #dashboard {
       margin-bottom: 28px;
     }
+    #dashboard-columns {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    #dashboard-columns > .dashboard-card {
+      flex: 1;
+      min-width: 0;
+      margin-bottom: 0;
+    }
+    @media (max-width: 700px) {
+      #dashboard-columns {
+        flex-direction: column;
+      }
+    }
     .dashboard-card {
       background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.06);
@@ -1401,15 +1416,16 @@
           <h3>あなたの最高記録</h3>
           <div class="my-best" id="my-best-content"></div>
         </div>
-        <!-- ランキング -->
-        <div class="dashboard-card" id="ranking-card" style="display:none;">
-          <h3>本気モード ランキング</h3>
-          <div class="dashboard-ranking" id="dashboard-ranking-content"></div>
-        </div>
-        <!-- 称号一覧 -->
-        <div class="dashboard-card" id="title-list-card">
-          <h3>称号一覧</h3>
-          <div class="title-list" id="title-list-content"></div>
+        <!-- ランキング＆称号一覧（横並び） -->
+        <div id="dashboard-columns">
+          <div class="dashboard-card" id="ranking-card" style="display:none;">
+            <h3>本気モード ランキング</h3>
+            <div class="dashboard-ranking" id="dashboard-ranking-content"></div>
+          </div>
+          <div class="dashboard-card" id="title-list-card">
+            <h3>称号一覧</h3>
+            <div class="title-list" id="title-list-content"></div>
+          </div>
         </div>
       </div>
 
