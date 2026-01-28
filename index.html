@@ -1013,6 +1013,79 @@
       min-width: 70px;
       text-align: right;
     }
+
+    /* ===== アイテムストック表示（マインクラフト風） ===== */
+    #item-stock-area {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 16px;
+      margin-top: 8px;
+      background: rgba(0,0,0,0.6);
+      border: 2px solid rgba(255,255,255,0.4);
+      border-radius: 8px;
+    }
+    .item-slot {
+      width: 48px;
+      height: 48px;
+      background: rgba(80,80,80,0.8);
+      border: 2px solid #555;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .item-slot.empty {
+      opacity: 0.3;
+    }
+    .item-slot.empty .item-icon {
+      display: none;
+    }
+    .item-icon {
+      width: 36px;
+      height: 36px;
+      image-rendering: pixelated;
+    }
+    #potion-hint {
+      font-size: 0.75rem;
+      color: #aaa;
+      margin-left: 8px;
+    }
+    /* ポーションドロップ演出 */
+    .potion-drop {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      animation: potionFall 1s ease-out forwards;
+      z-index: 100;
+    }
+    @keyframes potionFall {
+      0% { opacity: 1; transform: translateY(-30px) scale(1.2); }
+      60% { opacity: 1; transform: translateY(20px) scale(1); }
+      100% { opacity: 0; transform: translateY(30px) scale(0.8); }
+    }
+    /* HP回復演出 */
+    .heal-effect {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2rem;
+      font-weight: bold;
+      color: #4caf50;
+      text-shadow: 0 0 10px #4caf50, 0 0 20px #66bb6a;
+      animation: healPop 1s ease-out forwards;
+      z-index: 1000;
+      pointer-events: none;
+    }
+    @keyframes healPop {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+      30% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+      100% { opacity: 0; transform: translate(-50%, -60%) scale(1); }
+    }
+
     #critical-hit-text {
       position: fixed;
       top: 50%;
@@ -1703,6 +1776,18 @@
         </div>
         <div id="player-hp-text">100 / 100</div>
       </div>
+
+      <!-- アイテムストック表示（マインクラフト風） -->
+      <div id="item-stock-area" style="display:none;">
+        <div class="item-slot" id="potion-slot-1">
+          <img src="portion_01_lightblue_02.png" alt="ポーション" class="item-icon">
+        </div>
+        <div class="item-slot" id="potion-slot-2">
+          <img src="portion_01_lightblue_02.png" alt="ポーション" class="item-icon">
+        </div>
+        <div id="potion-hint">Pキーでポーション使用</div>
+      </div>
+
       <div id="critical-hit-text" style="display:none;">CRITICAL HIT!</div>
       <div id="damage-number" style="display:none;"></div>
     </div>
@@ -1868,6 +1953,17 @@ const moneyDropArea    = document.getElementById('money-drop-area');
 const goldDropText     = document.getElementById('gold-drop-text');
 const goldVal          = document.getElementById('gold-val');
 const goldDisplay      = document.getElementById('gold-display');
+
+// ポーション関連
+const POTION_DROP_CHANCE = 0.33; // 3回に1回（約33%）
+const POTION_HEAL_MIN = 15;
+const POTION_HEAL_MAX = 30;
+const MAX_POTION_STOCK = 2;
+let potionStock = 0;
+
+// ポーション回復音
+const healSound = new Audio('ゲージ回復1.mp3');
+healSound.volume = 0.5;
 
 // ---------- ユーティリティ ----------
 function shuffle(arr) {
@@ -2039,7 +2135,94 @@ function showHpBar() {
 
 function resetHp() {
   playerHp = PLAYER_MAX_HP;
+  potionStock = 0;
   updateHpBar();
+  updatePotionUI();
+}
+
+// ---------- ポーションシステム ----------
+function updatePotionUI() {
+  const area = document.getElementById('item-stock-area');
+  const slot1 = document.getElementById('potion-slot-1');
+  const slot2 = document.getElementById('potion-slot-2');
+
+  if (gameMode === 'mission') {
+    area.style.display = 'flex';
+    // スロット1
+    if (potionStock >= 1) {
+      slot1.classList.remove('empty');
+    } else {
+      slot1.classList.add('empty');
+    }
+    // スロット2
+    if (potionStock >= 2) {
+      slot2.classList.remove('empty');
+    } else {
+      slot2.classList.add('empty');
+    }
+  } else {
+    area.style.display = 'none';
+  }
+}
+
+function tryDropPotion() {
+  // 3回に1回の確率でポーションドロップ
+  if (Math.random() < POTION_DROP_CHANCE) {
+    // ポーションドロップ演出
+    showPotionDrop();
+
+    // HPが減っていれば即座に回復、満タンならストック
+    if (playerHp < PLAYER_MAX_HP) {
+      usePotion();
+    } else if (potionStock < MAX_POTION_STOCK) {
+      potionStock++;
+      updatePotionUI();
+    }
+    // ストックも満タンなら何もしない
+  }
+}
+
+function showPotionDrop() {
+  const container = document.getElementById('monster-container');
+  const potion = document.createElement('img');
+  potion.src = 'portion_01_lightblue_02.png';
+  potion.className = 'potion-drop';
+  potion.style.left = '50%';
+  potion.style.top = '80%';
+  potion.style.transform = 'translateX(-50%)';
+  container.appendChild(potion);
+  setTimeout(() => potion.remove(), 1000);
+}
+
+function usePotion() {
+  if (playerHp >= PLAYER_MAX_HP) return; // 満タンなら使えない
+
+  const healAmount = Math.floor(Math.random() * (POTION_HEAL_MAX - POTION_HEAL_MIN + 1)) + POTION_HEAL_MIN;
+  const oldHp = playerHp;
+  playerHp = Math.min(PLAYER_MAX_HP, playerHp + healAmount);
+  const actualHeal = playerHp - oldHp;
+
+  // 回復音
+  healSound.currentTime = 0;
+  healSound.play().catch(() => {});
+
+  // 回復演出
+  const healText = document.createElement('div');
+  healText.className = 'heal-effect';
+  healText.textContent = '+' + actualHeal + ' HP';
+  document.body.appendChild(healText);
+  setTimeout(() => healText.remove(), 1000);
+
+  updateHpBar();
+}
+
+function usePotionFromStock() {
+  if (potionStock <= 0) return;
+  if (playerHp >= PLAYER_MAX_HP) return;
+
+  potionStock--;
+  usePotion();
+  updatePotionUI();
 }
 
 function dealDamageToPlayer() {
@@ -2832,6 +3015,8 @@ function handleCorrect(q) {
       endBossBattle(true);
       dropMoney();
       dropMoney(); // ボーナスでもう一回
+      // 本気モードならポーションドロップ判定
+      if (gameMode === 'mission') tryDropPotion();
       showExplanation(q);
       showNextButton();
     } else {
@@ -2846,6 +3031,8 @@ function handleCorrect(q) {
     feedback.textContent = '正解！すごい！';
     defeatMonster();
     dropMoney();
+    // 本気モードならポーションドロップ判定
+    if (gameMode === 'mission') tryDropPotion();
     showExplanation(q);
     showNextButton();
   }
@@ -2958,6 +3145,11 @@ document.addEventListener('keydown', (e) => {
   if (e.key === ' ' && waitingForNext) {
     e.preventDefault();
     proceedToNext();
+  }
+  // Pキーでポーション使用
+  if ((e.key === 'p' || e.key === 'P') && gameMode === 'mission' && !gameScreen.classList.contains('hidden')) {
+    e.preventDefault();
+    usePotionFromStock();
   }
 });
 
