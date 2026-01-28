@@ -73,6 +73,14 @@
       padding: 12px 16px;
       min-height: 0;
       position: relative;
+      gap: 16px;
+    }
+
+    /* 左右サイドバー */
+    .sidebar {
+      width: 240px;
+      flex-shrink: 0;
+      overflow-y: auto;
     }
 
     /* 中央: ゲーム本体 */
@@ -83,9 +91,11 @@
       margin: 0 auto;
       overflow-y: auto;
     }
-    /* サイドパネル表示時は左右均等に並ぶ */
+    /* サイドパネル（検索）表示時 */
     body.panel-open #main-layout {
-      gap: 16px;
+    }
+    body.panel-open .sidebar {
+      display: none;
     }
     body.panel-open #game-container {
       flex: 6;
@@ -1078,21 +1088,6 @@
     #dashboard {
       margin-bottom: 28px;
     }
-    #dashboard-columns {
-      display: flex;
-      gap: 16px;
-      align-items: flex-start;
-    }
-    #dashboard-columns > .dashboard-card {
-      flex: 1;
-      min-width: 0;
-      margin-bottom: 0;
-    }
-    @media (max-width: 700px) {
-      #dashboard-columns {
-        flex-direction: column;
-      }
-    }
     .dashboard-card {
       background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.06);
@@ -1353,9 +1348,17 @@
     .hidden { display: none !important; }
 
     /* ===== レスポンシブ ===== */
+    @media (max-width: 1100px) {
+      .sidebar {
+        width: 200px;
+      }
+    }
     @media (max-width: 900px) {
       #main-layout {
         padding: 8px 12px;
+      }
+      .sidebar {
+        display: none;
       }
       body.panel-open #main-layout {
         flex-direction: column;
@@ -1404,28 +1407,24 @@
 
 <div id="main-layout">
 
-  <!-- ===== 左: ゲーム本体 ===== -->
+  <!-- ===== 左サイドバー: ランキング ===== -->
+  <div id="sidebar-left" class="sidebar">
+    <div class="dashboard-card" id="ranking-card" style="display:none;">
+      <h3>本気モード ランキング</h3>
+      <div class="dashboard-ranking" id="dashboard-ranking-content"></div>
+    </div>
+  </div>
+
+  <!-- ===== 中央: ゲーム本体 ===== -->
   <div id="game-container">
 
     <!-- スタート画面 -->
     <div id="start-screen">
-      <!-- ダッシュボード -->
+      <!-- 自分の最高記録 -->
       <div id="dashboard">
-        <!-- 自分の最高記録 -->
         <div class="dashboard-card" id="my-best-card" style="display:none;">
           <h3>あなたの最高記録</h3>
           <div class="my-best" id="my-best-content"></div>
-        </div>
-        <!-- ランキング＆称号一覧（横並び） -->
-        <div id="dashboard-columns">
-          <div class="dashboard-card" id="ranking-card" style="display:none;">
-            <h3>本気モード ランキング</h3>
-            <div class="dashboard-ranking" id="dashboard-ranking-content"></div>
-          </div>
-          <div class="dashboard-card" id="title-list-card">
-            <h3>称号一覧</h3>
-            <div class="title-list" id="title-list-content"></div>
-          </div>
         </div>
       </div>
 
@@ -1554,7 +1553,15 @@
 
   </div>
 
-  <!-- ===== 右: 検索サイドパネル ===== -->
+  <!-- ===== 右サイドバー: 称号一覧 ===== -->
+  <div id="sidebar-right" class="sidebar">
+    <div class="dashboard-card" id="title-list-card">
+      <h3>称号一覧</h3>
+      <div class="title-list" id="title-list-content"></div>
+    </div>
+  </div>
+
+  <!-- ===== 検索サイドパネル ===== -->
   <div id="search-side-panel">
 
     <!-- パネルヘッダー: 検索チップ -->
