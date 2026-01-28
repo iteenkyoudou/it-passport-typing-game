@@ -1435,19 +1435,58 @@ function playCorrectSound() {
   correctSound.play().catch(() => {});
 }
 
-// ---------- 制限時間タイマー音（BGMループ） ----------
-const timerSound = new Audio('制限時間タイマー.mp3');
-timerSound.volume = 0.3;
-timerSound.loop = true;
+// ---------- BGM（3問ごとに切り替え） ----------
+const BGM_TRACKS = [
+  'iwashiro_elevate_perfect.mp3',
+  'iwashiro_pareidolia.mp3',
+  'iwashiro_shien_no_makutsu_8bit.mp3',
+  'iwashiro_tousoushin1.mp3'
+];
+const BGM_VOLUME = 0.1;
+let currentBgm = null;
+let currentBgmIndex = -1;
+let bgmDefeatCount = 0;
 
+function startBgm() {
+  // 初回 or 3体倒すごとに曲を切り替え
+  const needSwitch = currentBgm === null || bgmDefeatCount >= 3;
+  if (needSwitch) {
+    if (currentBgm) {
+      currentBgm.pause();
+      currentBgm.currentTime = 0;
+    }
+    bgmDefeatCount = 0;
+    currentBgmIndex = (currentBgmIndex + 1) % BGM_TRACKS.length;
+    currentBgm = new Audio(BGM_TRACKS[currentBgmIndex]);
+    currentBgm.volume = BGM_VOLUME;
+    currentBgm.loop = true;
+  }
+  currentBgm.play().catch(() => {});
+}
+
+function stopBgm() {
+  if (currentBgm) {
+    currentBgm.pause();
+  }
+}
+
+function resetBgm() {
+  if (currentBgm) {
+    currentBgm.pause();
+    currentBgm.currentTime = 0;
+  }
+  currentBgm = null;
+  currentBgmIndex = -1;
+  bgmDefeatCount = 0;
+}
+
+// 旧API互換（既存の呼び出し箇所をそのまま使えるように）
 function startTimerSound() {
-  timerSound.currentTime = 0;
-  timerSound.play().catch(() => {});
+  startBgm();
 }
 
 function stopTimerSound() {
-  timerSound.pause();
-  timerSound.currentTime = 0;
+  stopBgm();
 }
 
 // ---------- 打撃音（ダメージエフェクト用） ----------
@@ -1806,6 +1845,7 @@ function startGame() {
   totalGold = 0;
   correctCount = 0;
   wrongCount = 0;
+  resetBgm();
 
   qTotal.textContent = questions.length;
   scoreVal.textContent = 0;
@@ -1933,6 +1973,7 @@ typingInput.addEventListener('keydown', (e) => {
 function handleCorrect(q) {
   stopTimer();
   stopTimerSound();
+  bgmDefeatCount++;
   playCorrectSound();
   defeatMonster();
   dropMoney();
@@ -2061,6 +2102,7 @@ function showResult() {
   searchSidePanel.style.display = 'none';
   document.body.classList.remove('panel-open');
   hideTimer();
+  resetBgm();
   resultScreen.style.display = 'block';
 
   document.getElementById('res-correct').textContent = correctCount;
@@ -2106,6 +2148,7 @@ function showMissionResult() {
   document.body.classList.remove('panel-open');
   stopTimer();
   hideTimer();
+  resetBgm();
 
   // レコード作成（名前はまだ未設定）
   const record = {
