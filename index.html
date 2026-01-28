@@ -1431,15 +1431,29 @@
     @media (max-width: 900px) {
       #main-layout {
         padding: 8px 12px;
+        flex-direction: column;
       }
       .sidebar {
+        display: block;
+        width: 100%;
+        order: 2; /* ゲームコンテナの後に表示 */
+      }
+      #sidebar-left {
+        order: 2;
+      }
+      #sidebar-right {
+        order: 3;
+      }
+      #game-container {
+        order: 1; /* 最初に表示 */
+        max-width: 100%;
+        width: 100%;
+      }
+      body.panel-open .sidebar {
         display: none;
       }
       body.panel-open #main-layout {
         flex-direction: column;
-      }
-      #game-container {
-        max-width: 100%;
       }
       body.panel-open #game-container {
         padding-bottom: 16px;
@@ -3076,7 +3090,8 @@ function getMissionRecords() {
 function saveMissionRecord(record) {
   const records = getMissionRecords();
   records.push(record);
-  records.sort((a, b) => b.streak - a.streak);
+  // 稼いだゴールドでソート（多い順）
+  records.sort((a, b) => (b.gold || 0) - (a.gold || 0));
   const top10 = records.slice(0, 10);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(top10));
 }
@@ -3124,11 +3139,11 @@ function updateDashboard() {
     <span class="best-title-badge title-badge ${bestTitle.css}" style="font-size:0.85rem;padding:5px 14px;margin:0;">${bestTitle.name}</span>
   `;
 
-  // ランキングテーブル
+  // ランキングテーブル（ゴールド順）
   rankingCard.style.display = 'block';
   let html = `<table>
     <thead><tr>
-      <th>順位</th><th>名前</th><th>連続正解</th><th>💰 ゴールド</th><th>称号</th><th>日時</th>
+      <th>順位</th><th>名前</th><th style="color:#ffd700;">💰 ゴールド</th><th>連続正解</th><th>称号</th><th>日時</th>
     </tr></thead><tbody>`;
   records.forEach((r, i) => {
     const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
@@ -3140,8 +3155,8 @@ function updateDashboard() {
     html += `<tr>
       <td><span class="rank-num ${rankClass}">${i+1}</span></td>
       <td class="name-cell">${escapeHtml(name)}</td>
-      <td>${r.streak} / ${r.total}</td>
       <td style="color:#ffd700;font-weight:bold;">${goldStr} G</td>
+      <td>${r.streak} / ${r.total}</td>
       <td><span style="color:${getColorForCss(t.css)};font-size:0.78rem;">${t.name}</span></td>
       <td>${dateStr}</td>
     </tr>`;
