@@ -1480,12 +1480,10 @@ function playWrongSound() {
 }
 
 // ---------- 検索ボタン音 ----------
-const searchBtnSound = new Audio('決定ボタンを押す41.mp3');
-searchBtnSound.volume = 0.4;
-
 function playSearchBtnSound() {
-  searchBtnSound.currentTime = 0;
-  searchBtnSound.play().catch(() => {});
+  const s = new Audio('決定ボタンを押す41.mp3');
+  s.volume = 0.4;
+  s.play().catch(() => {});
 }
 
 // ---------- 自分ダメージ演出 ----------
