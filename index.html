@@ -2575,17 +2575,21 @@ function showWatchDrop() {
 }
 
 function useWatch() {
+  console.log('useWatch() called! Creating effects...');
   // 時間をリセット
   missionTimeLeft = MISSION_TIME_PER_Q;
   updateTimerBar();
+  console.log('Timer reset to:', missionTimeLeft);
 
   // 効果音
   if (!isMutedAll) {
+    console.log('Playing watch sound');
     watchSound.currentTime = 0;
-    watchSound.play().catch(() => {});
+    watchSound.play().catch((e) => console.log('Sound error:', e));
   }
 
   // 画面いっぱいのエフェクトオーバーレイ（金色フラッシュ）
+  console.log('Creating time-reset-overlay');
   const timeOverlay = document.createElement('div');
   timeOverlay.className = 'time-reset-overlay';
   document.body.appendChild(timeOverlay);
@@ -2625,37 +2629,47 @@ function usePotionFromSlot() {
 
 // ---------- アイテムドロップシステム ----------
 function tryDropItem() {
+  console.log('tryDropItem called, potionStock:', potionStock, 'watchStock:', watchStock);
   // アイテムドロップ判定
-  if (Math.random() >= ITEM_DROP_CHANCE) return;
+  if (Math.random() >= ITEM_DROP_CHANCE) {
+    console.log('No item drop (random check failed)');
+    return;
+  }
 
   // ポーションと腕時計のどちらをドロップするか決定
   // どちらかが満タンの場合はもう一方をドロップ
   const potionFull = potionStock >= MAX_POTION_STOCK;
   const watchFull = watchStock >= MAX_WATCH_STOCK;
+  console.log('potionFull:', potionFull, 'watchFull:', watchFull);
 
   if (potionFull && watchFull) {
     // 両方満タンなら何もしない
+    console.log('Both full, no drop');
     return;
   }
 
   if (potionFull) {
     // ポーション満タンなら腕時計をドロップ
     watchStock++;
+    console.log('Dropped WATCH, new watchStock:', watchStock);
     updateWatchUI();
     showWatchDrop();
   } else if (watchFull) {
     // 腕時計満タンならポーションをドロップ
     potionStock++;
+    console.log('Dropped POTION, new potionStock:', potionStock);
     updatePotionUI();
     showPotionDrop();
   } else {
     // どちらも空きがあれば50%の確率でどちらかをドロップ
     if (Math.random() < 0.5) {
       potionStock++;
+      console.log('Dropped POTION (random), new potionStock:', potionStock);
       updatePotionUI();
       showPotionDrop();
     } else {
       watchStock++;
+      console.log('Dropped WATCH (random), new watchStock:', watchStock);
       updateWatchUI();
       showWatchDrop();
     }
