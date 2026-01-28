@@ -22,6 +22,36 @@
       text-align: center;
       padding: 18px 16px 6px;
       flex-shrink: 0;
+      position: relative;
+    }
+    .sound-controls {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      display: flex;
+      gap: 8px;
+    }
+    .sound-btn {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+      color: #ccc;
+      font-size: 0.75rem;
+      padding: 5px 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .sound-btn:hover {
+      background: rgba(255,255,255,0.15);
+      border-color: rgba(255,255,255,0.3);
+    }
+    .sound-btn.off {
+      background: rgba(244,67,54,0.15);
+      border-color: rgba(244,67,54,0.4);
+      color: #f44336;
     }
     header h1 {
       font-size: 1.6rem;
@@ -1231,6 +1261,10 @@
 <header>
   <h1>ITパスポート タイピングゲーム</h1>
   <p>タイピングしながらIT用語を覚えよう！</p>
+  <div class="sound-controls">
+    <button class="sound-btn" id="btn-mute-all" onclick="toggleMuteAll()">🔊 全音</button>
+    <button class="sound-btn" id="btn-mute-bgm" onclick="toggleMuteBgm()">🎵 BGM</button>
+  </div>
 </header>
 
 <div id="main-layout">
@@ -1510,6 +1544,40 @@ function normalize(str) {
   return str.trim().toLowerCase().replace(/\s+/g, '');
 }
 
+// ---------- サウンド制御 ----------
+let isMutedAll = false;
+let isMutedBgm = false;
+
+function toggleMuteAll() {
+  isMutedAll = !isMutedAll;
+  const btn = document.getElementById('btn-mute-all');
+  if (isMutedAll) {
+    btn.textContent = '🔇 全音';
+    btn.classList.add('off');
+    // BGMも停止
+    stopBgm();
+  } else {
+    btn.textContent = '🔊 全音';
+    btn.classList.remove('off');
+    // BGMがミュートでなければ再開
+    if (!isMutedBgm) startBgm();
+  }
+}
+
+function toggleMuteBgm() {
+  isMutedBgm = !isMutedBgm;
+  const btn = document.getElementById('btn-mute-bgm');
+  if (isMutedBgm) {
+    btn.textContent = '🎵 BGM OFF';
+    btn.classList.add('off');
+    stopBgm();
+  } else {
+    btn.textContent = '🎵 BGM';
+    btn.classList.remove('off');
+    if (!isMutedAll) startBgm();
+  }
+}
+
 // ---------- キー入力音 ----------
 const keySoundPool = [];
 const KEY_SOUND_POOL_SIZE = 6;
@@ -1521,6 +1589,7 @@ for (let i = 0; i < KEY_SOUND_POOL_SIZE; i++) {
 let keySoundIndex = 0;
 
 function playKeySound() {
+  if (isMutedAll) return;
   const sound = keySoundPool[keySoundIndex];
   sound.currentTime = 0;
   sound.play().catch(() => {});
@@ -1532,6 +1601,7 @@ const correctSound = new Audio('クイズ正解1.mp3');
 correctSound.volume = 0.5;
 
 function playCorrectSound() {
+  if (isMutedAll) return;
   correctSound.currentTime = 0;
   correctSound.play().catch(() => {});
 }
@@ -1541,12 +1611,14 @@ const wrongSound = new Audio('大キック.mp3');
 wrongSound.volume = 0.6;
 
 function playWrongSound() {
+  if (isMutedAll) return;
   wrongSound.currentTime = 0;
   wrongSound.play().catch(() => {});
 }
 
 // ---------- 検索ボタン音 ----------
 function playSearchBtnSound() {
+  if (isMutedAll) return;
   const s = new Audio('決定ボタンを押す41.mp3');
   s.volume = 0.4;
   s.play().catch(() => {});
@@ -1589,6 +1661,7 @@ let currentBgmIndex = -1;
 let bgmDefeatCount = 0;
 
 function startBgm() {
+  if (isMutedAll || isMutedBgm) return;
   // 初回 or 3体倒すごとに曲を切り替え
   const needSwitch = currentBgm === null || bgmDefeatCount >= 3;
   if (needSwitch) {
@@ -1641,6 +1714,7 @@ for (let i = 0; i < PUNCH_SOUND_POOL_SIZE; i++) {
 let punchSoundIndex = 0;
 
 function playPunchSound() {
+  if (isMutedAll) return;
   const sound = punchSoundPool[punchSoundIndex];
   sound.currentTime = 0;
   sound.play().catch(() => {});
@@ -1727,6 +1801,7 @@ const moneySound = new Audio('お金がジャラジャラ.mp3');
 moneySound.volume = 0.5;
 
 function playMoneySound() {
+  if (isMutedAll) return;
   moneySound.currentTime = 0;
   moneySound.play().catch(() => {});
 }
