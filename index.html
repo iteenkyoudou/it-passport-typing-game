@@ -2053,7 +2053,6 @@
       <div id="hud">
         <span>問題 <strong id="q-num">1</strong> / <strong id="q-total">10</strong></span>
         <span class="gold-display" id="gold-display">💰 <span id="gold-val">0</span> G</span>
-        <span class="score">スコア: <span id="score-val">0</span></span>
       </div>
 
       <div id="timer-text"></div>
@@ -2160,10 +2159,6 @@
         <div class="stat-box">
           <div class="num" id="res-wrong">0</div>
           <div class="label">不正解</div>
-        </div>
-        <div class="stat-box">
-          <div class="num" id="res-score">0</div>
-          <div class="label">スコア</div>
         </div>
         <div class="stat-box">
           <div class="num" id="res-gold" style="color:#ffd700;">0</div>
@@ -3793,7 +3788,6 @@ function showMissionResultScreen(record) {
   const streakCount = record.streak;
   const totalCount = record.total;
   const wrongNum = record.wrongCount || 0;
-  const scoreNum = streakCount * 100;
 
   resultScreen.innerHTML = `
     <h2 class="mission-result-header">${isAllClear ? 'ALL CLEAR!' : 'RESULT'}</h2>
@@ -3810,10 +3804,6 @@ function showMissionResultScreen(record) {
       <div class="stat-box">
         <div class="num" style="color:#f44336;">${wrongNum}</div>
         <div class="label">不正解</div>
-      </div>
-      <div class="stat-box">
-        <div class="num" style="color:#00d2ff;">${scoreNum}</div>
-        <div class="label">スコア</div>
       </div>
       <div class="stat-box">
         <div class="num" style="color:#ffd700;">${(record.gold || 0).toLocaleString()}</div>
@@ -3847,10 +3837,6 @@ const originalResultHTML = `
     <div class="stat-box">
       <div class="num" id="res-wrong">0</div>
       <div class="label">不正解</div>
-    </div>
-    <div class="stat-box">
-      <div class="num" id="res-score">0</div>
-      <div class="label">スコア</div>
     </div>
     <div class="stat-box">
       <div class="num" id="res-gold" style="color:#ffd700;">0</div>
