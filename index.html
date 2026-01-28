@@ -1218,6 +1218,127 @@
         transform: translate(-50%, -60%) scale(0.9);
       }
     }
+    /* 腕時計アイテムスロット */
+    .watch-slot {
+      width: 52px;
+      height: 52px;
+      background: linear-gradient(135deg, rgba(80,80,80,0.9) 0%, rgba(50,50,50,0.9) 100%);
+      border: 3px solid #ffd700;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.5), 0 0 8px rgba(255,215,0,0.3);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .watch-slot:hover:not(.empty) {
+      transform: scale(1.1);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.5), 0 0 15px rgba(255,215,0,0.6);
+    }
+    .watch-slot.empty {
+      opacity: 0.5;
+      border-color: #555;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+      cursor: default;
+    }
+    .watch-slot.empty .item-icon {
+      opacity: 0.3;
+      filter: grayscale(100%);
+    }
+    /* 腕時計ドロップ演出（画面中央） */
+    #watch-drop-display {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      z-index: 10000;
+      pointer-events: none;
+      opacity: 0;
+    }
+    #watch-drop-display.show {
+      animation: watchDropPop 3.5s ease-out forwards;
+    }
+    #watch-drop-display img {
+      width: 150px;
+      height: 150px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 30px rgba(255,215,0,0.9)) drop-shadow(0 0 60px rgba(255,215,0,0.6));
+    }
+    #watch-drop-display .watch-drop-text {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #ffd700;
+      text-shadow:
+        3px 3px 0 #000,
+        -2px -2px 0 #000,
+        2px -2px 0 #000,
+        -2px 2px 0 #000,
+        0 0 30px rgba(255,215,0,0.9);
+      white-space: nowrap;
+    }
+    @keyframes watchDropPop {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.2);
+      }
+      10% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.3);
+      }
+      20% {
+        transform: translate(-50%, -50%) scale(1);
+      }
+      80% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -60%) scale(0.9);
+      }
+    }
+    /* 腕時計使用演出（時間リセット） */
+    .time-reset-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle, rgba(255,215,0,0.4) 0%, rgba(255,215,0,0) 70%);
+      z-index: 999;
+      pointer-events: none;
+      animation: timeResetFlash 1s ease-out forwards;
+    }
+    @keyframes timeResetFlash {
+      0% { opacity: 0; }
+      20% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    .time-reset-effect {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 4rem;
+      font-weight: bold;
+      color: #ffd700;
+      text-shadow: 0 0 20px #ffd700, 0 0 40px #ffeb3b, 0 0 60px #fff176;
+      animation: timeResetPop 1.2s ease-out forwards;
+      z-index: 1000;
+      pointer-events: none;
+    }
+    @keyframes timeResetPop {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+      20% { opacity: 1; transform: translate(-50%, -50%) scale(1.3); }
+      50% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -70%) scale(0.8); }
+    }
     /* HP回復演出（画面いっぱい） */
     .heal-overlay {
       position: fixed;
@@ -1800,6 +1921,10 @@
   <img src="portion_01_lightblue_02.png" alt="ポーション">
   <div class="potion-drop-text">ポーション GET!</div>
 </div>
+<div id="watch-drop-display">
+  <img src="udedokei_gold.png" alt="腕時計">
+  <div class="watch-drop-text">腕時計 GET!</div>
+</div>
 <div id="critical-flash-overlay"></div>
 <div id="magic-effect-container"></div>
 
@@ -1947,14 +2072,20 @@
           <div id="item-stock-area" class="status-box">
             <span id="item-stock-label">💊 アイテム</span>
             <div class="item-slots-row">
-              <div class="item-slot" id="potion-slot-1">
+              <div class="item-slot" id="potion-slot-1" onclick="usePotionFromSlot()" title="クリックで使用（HP回復）">
                 <img src="portion_01_lightblue_02.png" alt="ポーション" class="item-icon">
               </div>
-              <div class="item-slot" id="potion-slot-2">
+              <div class="item-slot" id="potion-slot-2" onclick="usePotionFromSlot()" title="クリックで使用（HP回復）">
                 <img src="portion_01_lightblue_02.png" alt="ポーション" class="item-icon">
+              </div>
+              <div class="watch-slot empty" id="watch-slot-1" onclick="useWatchFromSlot()" title="クリックで使用（時間リセット）">
+                <img src="udedokei_gold.png" alt="腕時計" class="item-icon">
+              </div>
+              <div class="watch-slot empty" id="watch-slot-2" onclick="useWatchFromSlot()" title="クリックで使用（時間リセット）">
+                <img src="udedokei_gold.png" alt="腕時計" class="item-icon">
               </div>
             </div>
-            <div id="potion-hint">[P]で回復</div>
+            <div id="potion-hint">クリックで使用</div>
           </div>
         </div>
 
@@ -1962,7 +2093,7 @@
         <div id="nav-guide-box">
           <p>⚔️ <strong>敵が現れた！</strong> 正しい答えをタイピングして撃退しろ！</p>
           <p>🔍 分からなかったら右の <strong>検索ボタン</strong> をクリックして調べろ！</p>
-          <p>💊 ポーションを持っていたら <strong>Pキー</strong> でいつでも回復できるぞ！</p>
+          <p>💊 アイテムは <strong>クリック</strong> で使用！💊=HP回復 ⏰=時間リセット</p>
         </div>
       </div>
 
@@ -2145,15 +2276,25 @@ const goldVal          = document.getElementById('gold-val');
 const goldDisplay      = document.getElementById('gold-display');
 
 // ポーション関連
-const POTION_DROP_CHANCE = 1.0; // 100%ドロップ
 const POTION_HEAL_MIN = 15;
 const POTION_HEAL_MAX = 30;
 const MAX_POTION_STOCK = 2;
 let potionStock = 0;
 
+// 腕時計関連
+const MAX_WATCH_STOCK = 2;
+let watchStock = 0;
+
+// アイテムドロップ確率（100%で何かドロップ、50%でポーション、50%で腕時計）
+const ITEM_DROP_CHANCE = 1.0;
+
 // ポーション回復音
 const healSound = new Audio('ゲージ回復1.mp3');
 healSound.volume = 0.5;
+
+// 腕時計使用音
+const watchSound = new Audio('重力魔法1.mp3');
+watchSound.volume = 0.5;
 
 // ---------- ユーティリティ ----------
 function shuffle(arr) {
@@ -2326,8 +2467,10 @@ function showHpBar() {
 function resetHp() {
   playerHp = PLAYER_MAX_HP;
   potionStock = 0;
+  watchStock = 0;
   updateHpBar();
   updatePotionUI();
+  updateWatchUI();
 }
 
 // ---------- ポーションシステム ----------
@@ -2349,17 +2492,117 @@ function updatePotionUI() {
   }
 }
 
-function tryDropPotion() {
-  // 3回に1回の確率でポーションドロップ
-  if (Math.random() < POTION_DROP_CHANCE) {
-    if (potionStock < MAX_POTION_STOCK) {
-      // ストックに追加
+// ---------- 腕時計システム ----------
+function updateWatchUI() {
+  const slot1 = document.getElementById('watch-slot-1');
+  const slot2 = document.getElementById('watch-slot-2');
+
+  // スロット1
+  if (watchStock >= 1) {
+    slot1.classList.remove('empty');
+  } else {
+    slot1.classList.add('empty');
+  }
+  // スロット2
+  if (watchStock >= 2) {
+    slot2.classList.remove('empty');
+  } else {
+    slot2.classList.add('empty');
+  }
+}
+
+function showWatchDrop() {
+  // 画面中央に腕時計獲得表示
+  const display = document.getElementById('watch-drop-display');
+  display.classList.remove('show');
+  void display.offsetWidth;
+  display.classList.add('show');
+
+  // ドロップ時も効果音を鳴らす
+  if (!isMutedAll) {
+    watchSound.currentTime = 0;
+    watchSound.play().catch(() => {});
+  }
+
+  // 3.5秒後に非表示（アニメーションと同期）
+  setTimeout(() => {
+    display.classList.remove('show');
+  }, 3500);
+}
+
+function useWatch() {
+  // 時間をリセット
+  missionTimeLeft = MISSION_TIME_PER_Q;
+  updateTimerBar();
+
+  // 効果音
+  if (!isMutedAll) {
+    watchSound.currentTime = 0;
+    watchSound.play().catch(() => {});
+  }
+
+  // 画面いっぱいのエフェクトオーバーレイ
+  const timeOverlay = document.createElement('div');
+  timeOverlay.className = 'time-reset-overlay';
+  document.body.appendChild(timeOverlay);
+  setTimeout(() => timeOverlay.remove(), 1000);
+
+  // 時間リセットテキスト演出
+  const timeText = document.createElement('div');
+  timeText.className = 'time-reset-effect';
+  timeText.textContent = '⏰ 時間リセット!';
+  document.body.appendChild(timeText);
+  setTimeout(() => timeText.remove(), 1200);
+}
+
+function useWatchFromSlot() {
+  if (watchStock <= 0) return;
+
+  watchStock--;
+  useWatch();
+  updateWatchUI();
+}
+
+function usePotionFromSlot() {
+  usePotionFromStock();
+}
+
+// ---------- アイテムドロップシステム ----------
+function tryDropItem() {
+  // アイテムドロップ判定
+  if (Math.random() >= ITEM_DROP_CHANCE) return;
+
+  // ポーションと腕時計のどちらをドロップするか決定
+  // どちらかが満タンの場合はもう一方をドロップ
+  const potionFull = potionStock >= MAX_POTION_STOCK;
+  const watchFull = watchStock >= MAX_WATCH_STOCK;
+
+  if (potionFull && watchFull) {
+    // 両方満タンなら何もしない
+    return;
+  }
+
+  if (potionFull) {
+    // ポーション満タンなら腕時計をドロップ
+    watchStock++;
+    updateWatchUI();
+    showWatchDrop();
+  } else if (watchFull) {
+    // 腕時計満タンならポーションをドロップ
+    potionStock++;
+    updatePotionUI();
+    showPotionDrop();
+  } else {
+    // どちらも空きがあれば50%の確率でどちらかをドロップ
+    if (Math.random() < 0.5) {
       potionStock++;
       updatePotionUI();
-      // ポーションドロップ演出
       showPotionDrop();
+    } else {
+      watchStock++;
+      updateWatchUI();
+      showWatchDrop();
     }
-    // ストック満タンなら何もしない
   }
 }
 
@@ -3211,7 +3454,7 @@ function handleCorrect(q) {
       dropMoney();
       dropMoney(); // ボーナスでもう一回
       // 本気モードならポーションドロップ判定
-      if (gameMode === 'mission') tryDropPotion();
+      if (gameMode === 'mission') tryDropItem();
       showExplanation(q);
       showNextButton();
     } else {
@@ -3227,7 +3470,7 @@ function handleCorrect(q) {
     defeatMonster();
     dropMoney();
     // 本気モードならポーションドロップ判定
-    if (gameMode === 'mission') tryDropPotion();
+    if (gameMode === 'mission') tryDropItem();
     showExplanation(q);
     showNextButton();
   }
@@ -3341,11 +3584,7 @@ document.addEventListener('keydown', (e) => {
     e.preventDefault();
     proceedToNext();
   }
-  // Pキーでポーション使用
-  if ((e.key === 'p' || e.key === 'P') && gameMode === 'mission' && !gameScreen.classList.contains('hidden')) {
-    e.preventDefault();
-    usePotionFromStock();
-  }
+  // アイテム使用はクリックのみに変更（キー入力と被るため）
 });
 
 // ---------- 練習モード結果画面 ----------
