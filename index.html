@@ -2497,6 +2497,12 @@ function updateWatchUI() {
   const slot1 = document.getElementById('watch-slot-1');
   const slot2 = document.getElementById('watch-slot-2');
 
+  if (!slot1 || !slot2) {
+    console.error('Watch slots not found!');
+    return;
+  }
+
+  // スロット2から埋める、スロット2から消す（右から左へ）
   // スロット1
   if (watchStock >= 1) {
     slot1.classList.remove('empty');
@@ -2509,6 +2515,8 @@ function updateWatchUI() {
   } else {
     slot2.classList.add('empty');
   }
+
+  console.log('updateWatchUI called, watchStock:', watchStock, 'slot1 empty:', slot1.classList.contains('empty'), 'slot2 empty:', slot2.classList.contains('empty'));
 }
 
 function showWatchDrop() {
@@ -2556,9 +2564,14 @@ function useWatch() {
 }
 
 function useWatchFromSlot() {
-  if (watchStock <= 0) return;
+  console.log('useWatchFromSlot called, watchStock before:', watchStock);
+  if (watchStock <= 0) {
+    console.log('No watch in stock, returning');
+    return;
+  }
 
   watchStock--;
+  console.log('watchStock after decrement:', watchStock);
   useWatch();
   updateWatchUI();
 }
