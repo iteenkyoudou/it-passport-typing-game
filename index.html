@@ -1384,7 +1384,7 @@
           </div>
           <div class="mode-card mode-mission" data-mode="mission" onclick="selectMode('mission')">
             <div class="mode-title">ミッションモード</div>
-            <div class="mode-desc">全問ノーミスチャレンジ<br>1問45秒の制限時間付き</div>
+            <div class="mode-desc">HPがなくなるまで敵を倒して<br>稼ぎまくれ！（1問45秒）</div>
           </div>
         </div>
       </div>
@@ -2181,7 +2181,7 @@ function updateQCountInfo() {
   const cat = getSelectedCategory();
   const count = getFilteredQuestions(cat).length;
   if (gameMode === 'mission') {
-    qCountInfo.textContent = `全 ${count} 問にノーミスで挑戦！（1問45秒）`;
+    qCountInfo.textContent = `全 ${count} 問 ─ HPが尽きるまで敵を倒して稼ぎまくれ！（1問45秒）`;
   } else {
     const numToAsk = Math.min(NORMAL_QUESTIONS, count);
     qCountInfo.textContent = `全 ${count} 問からランダムに${numToAsk}問出題`;
