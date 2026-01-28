@@ -80,8 +80,8 @@
 
     /* 左右サイドバー */
     .sidebar {
-      width: 480px;
-      flex-shrink: 0;
+      flex: 1;
+      min-width: 0;
       overflow-y: auto;
     }
 
@@ -89,8 +89,6 @@
     #game-container {
       flex: 1;
       min-width: 0;
-      max-width: 1360px;
-      margin: 0 auto;
       overflow-y: auto;
     }
     /* サイドパネル（検索）表示時 */
@@ -1350,16 +1348,6 @@
     .hidden { display: none !important; }
 
     /* ===== レスポンシブ ===== */
-    @media (max-width: 1400px) {
-      .sidebar {
-        width: 360px;
-      }
-    }
-    @media (max-width: 1100px) {
-      .sidebar {
-        width: 280px;
-      }
-    }
     @media (max-width: 900px) {
       #main-layout {
         padding: 8px 12px;
