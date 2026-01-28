@@ -657,10 +657,10 @@
     }
     #damage-number {
       position: absolute;
-      top: 10%;
+      top: -30px;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 1.6rem;
+      font-size: 2rem;
       font-weight: 900;
       color: #ff4444;
       text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
@@ -668,9 +668,10 @@
       pointer-events: none;
       z-index: 11;
       font-family: 'Arial Black', sans-serif;
+      white-space: nowrap;
     }
     #damage-number.show {
-      animation: damageNumberFloat 0.7s ease-out forwards;
+      animation: damageNumberFloat 0.8s ease-out forwards;
     }
 
     @keyframes monsterAppear {
@@ -701,9 +702,10 @@
       100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
     }
     @keyframes damageNumberFloat {
-      0% { opacity: 1; transform: translateX(-50%) translateY(0); }
-      50% { opacity: 1; }
-      100% { opacity: 0; transform: translateX(-50%) translateY(-50px); }
+      0% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1.2); }
+      20% { opacity: 1; transform: translateX(-50%) translateY(-10px) scale(1); }
+      70% { opacity: 1; }
+      100% { opacity: 0; transform: translateX(-50%) translateY(-40px); }
     }
 
     /* ===== ゴールド表示（HUD） ===== */
@@ -733,7 +735,7 @@
     }
     #player-damage-overlay.show {
       display: block;
-      animation: playerDamageFlash 0.6s ease-out forwards;
+      animation: playerDamageFlash 0.8s ease-out forwards;
     }
     @keyframes playerDamageFlash {
       0% { opacity: 1; }
@@ -742,6 +744,54 @@
       60% { opacity: 0.1; }
       80% { opacity: 0.5; }
       100% { opacity: 0; display: none; }
+    }
+    /* 自分へのダメージ数値表示 */
+    #player-damage-number {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 10rem;
+      font-weight: 900;
+      color: #ff0000;
+      text-shadow:
+        6px 6px 0 #000,
+        -3px -3px 0 #000,
+        3px -3px 0 #000,
+        -3px 3px 0 #000,
+        0 0 40px rgba(255,0,0,0.9),
+        0 0 80px rgba(255,0,0,0.6),
+        0 0 120px rgba(255,0,0,0.4);
+      z-index: 10000;
+      pointer-events: none;
+      opacity: 0;
+      font-family: 'Arial Black', Impact, sans-serif;
+      letter-spacing: 6px;
+    }
+    #player-damage-number.show {
+      animation: playerDamageNumberPop 3s ease-out forwards;
+    }
+    @keyframes playerDamageNumberPop {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.2);
+      }
+      10% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.4);
+      }
+      20% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+      75% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -60%) scale(0.8);
+      }
     }
     #game-container.player-hit {
       animation: playerShake 0.4s ease-in-out;
@@ -850,17 +900,20 @@
 
     /* ===== ナビゲーションボックス ===== */
     #nav-guide-box {
+      flex: 1;
       background: rgba(0,0,0,0.6);
-      border: 2px solid rgba(255,255,255,0.5);
-      border-radius: 8px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 10px;
       padding: 12px 16px;
-      margin: 0 auto 12px;
-      max-width: 500px;
       text-align: left;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 80px;
     }
     #nav-guide-box p {
-      margin: 6px 0;
-      font-size: 0.9rem;
+      margin: 4px 0;
+      font-size: 0.85rem;
       color: #fff;
       line-height: 1.5;
     }
@@ -868,7 +921,7 @@
       color: #ffb74d;
     }
     #nav-guide-box.hidden {
-      display: none;
+      display: none !important;
     }
 
     /* ===== フィードバック・解説 ===== */
@@ -967,16 +1020,59 @@
       color: #666;
     }
 
-    /* ===== プレイヤーHPゲージ ===== */
-    #player-hp-bar-area {
+    /* ===== ステータス＆ナビゲーション横並びエリア ===== */
+    #status-nav-row {
       display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 16px;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      gap: 12px;
       margin-top: 16px;
-      background: rgba(255,255,255,0.03);
-      border-radius: 8px;
-      border: 1px solid rgba(255,255,255,0.06);
+      margin-bottom: 12px;
+      align-items: stretch;
+      width: 100%;
+    }
+
+    /* ===== プレイヤーステータスエリア（HPバー＋アイテム） ===== */
+    #player-status-container {
+      display: none;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      gap: 12px;
+      align-items: stretch;
+    }
+    #player-status-container.visible {
+      display: flex;
+    }
+    /* ステータスボックスの横幅を均等に */
+    #player-status-container > .status-box {
+      flex: 0 0 auto;
+    }
+    /* ナビが非表示の場合、ステータスが全幅を使う */
+    #player-status-container.full-width {
+      flex: 1;
+    }
+    #player-status-container.full-width #player-hp-box {
+      flex: 1;
+    }
+    #player-status-container.full-width #item-stock-area {
+      flex: 0 0 auto;
+    }
+
+    /* 共通のステータスボックススタイル */
+    .status-box {
+      background: rgba(0,0,0,0.6);
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 10px;
+      padding: 12px 16px;
+    }
+
+    /* ===== プレイヤーHPゲージ ===== */
+    #player-hp-box {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 180px;
+      flex: 1;
     }
     #player-hp-label {
       font-size: 0.85rem;
@@ -985,10 +1081,10 @@
       white-space: nowrap;
     }
     #player-hp-bar-container {
-      flex: 1;
-      height: 18px;
-      background: rgba(255,255,255,0.06);
-      border-radius: 9px;
+      width: 100%;
+      height: 20px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
       overflow: hidden;
       position: relative;
     }
@@ -996,7 +1092,7 @@
       height: 100%;
       width: 100%;
       background: linear-gradient(90deg, #4caf50, #66bb6a);
-      border-radius: 9px;
+      border-radius: 10px;
       transition: width 0.4s ease, background 0.4s ease;
     }
     #player-hp-bar.hp-mid {
@@ -1006,65 +1102,121 @@
       background: linear-gradient(90deg, #f44336, #ff5722);
     }
     #player-hp-text {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: bold;
       color: #fff;
-      white-space: nowrap;
-      min-width: 70px;
-      text-align: right;
+      text-align: center;
     }
 
-    /* ===== アイテムストック表示（マインクラフト風） ===== */
+    /* ===== アイテムストック表示 ===== */
     #item-stock-area {
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      padding: 10px 16px;
-      margin-top: 8px;
-      background: rgba(0,0,0,0.6);
-      border: 2px solid rgba(255,255,255,0.4);
-      border-radius: 8px;
+      min-width: 150px;
+    }
+    #item-stock-label {
+      font-size: 0.85rem;
+      color: #4caf50;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+    .item-slots-row {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
     }
     .item-slot {
-      width: 48px;
-      height: 48px;
-      background: rgba(80,80,80,0.8);
-      border: 2px solid #555;
-      border-radius: 4px;
+      width: 52px;
+      height: 52px;
+      background: linear-gradient(135deg, rgba(80,80,80,0.9) 0%, rgba(50,50,50,0.9) 100%);
+      border: 3px solid #4caf50;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.5), 0 0 8px rgba(76,175,80,0.3);
     }
     .item-slot.empty {
-      opacity: 0.3;
+      opacity: 0.5;
+      border-color: #555;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
     }
     .item-slot.empty .item-icon {
-      display: none;
+      opacity: 0.3;
+      filter: grayscale(100%);
     }
     .item-icon {
-      width: 36px;
-      height: 36px;
-      image-rendering: pixelated;
+      width: 40px;
+      height: 40px;
+      image-rendering: auto;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+      object-fit: contain;
     }
     #potion-hint {
       font-size: 0.75rem;
-      color: #aaa;
-      margin-left: 8px;
+      color: #888;
+      font-weight: normal;
+      white-space: nowrap;
     }
-    /* ポーションドロップ演出 */
-    .potion-drop {
-      position: absolute;
-      width: 40px;
-      height: 40px;
-      animation: potionFall 1s ease-out forwards;
-      z-index: 100;
+    /* ポーションドロップ演出（画面中央） */
+    #potion-drop-display {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      z-index: 10000;
+      pointer-events: none;
+      opacity: 0;
     }
-    @keyframes potionFall {
-      0% { opacity: 1; transform: translateY(-30px) scale(1.2); }
-      60% { opacity: 1; transform: translateY(20px) scale(1); }
-      100% { opacity: 0; transform: translateY(30px) scale(0.8); }
+    #potion-drop-display.show {
+      animation: potionDropPop 3.5s ease-out forwards;
+    }
+    #potion-drop-display img {
+      width: 150px;
+      height: 150px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 30px rgba(76,175,80,0.9)) drop-shadow(0 0 60px rgba(76,175,80,0.6));
+    }
+    #potion-drop-display .potion-drop-text {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #4caf50;
+      text-shadow:
+        3px 3px 0 #000,
+        -2px -2px 0 #000,
+        2px -2px 0 #000,
+        -2px 2px 0 #000,
+        0 0 30px rgba(76,175,80,0.9);
+      white-space: nowrap;
+    }
+    @keyframes potionDropPop {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.2);
+      }
+      10% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.3);
+      }
+      20% {
+        transform: translate(-50%, -50%) scale(1);
+      }
+      80% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -60%) scale(0.9);
+      }
     }
     /* HP回復演出（画面いっぱい） */
     .heal-overlay {
@@ -1408,6 +1560,12 @@
     }
 
     /* ===== 称号一覧 ===== */
+    .title-list-subtitle {
+      font-size: 0.7rem;
+      font-weight: normal;
+      color: #888;
+      font-style: italic;
+    }
     .title-list table {
       width: 100%;
       border-collapse: collapse;
@@ -1637,6 +1795,11 @@
 <body>
 
 <div id="player-damage-overlay"></div>
+<div id="player-damage-number"></div>
+<div id="potion-drop-display">
+  <img src="portion_01_lightblue_02.png" alt="ポーション">
+  <div class="potion-drop-text">ポーション GET!</div>
+</div>
 <div id="critical-flash-overlay"></div>
 <div id="magic-effect-container"></div>
 
@@ -1767,11 +1930,40 @@
         </div>
       </div>
 
-      <!-- ナビゲーションボックス -->
-      <div id="nav-guide-box">
-        <p>⚔️ <strong>敵が現れた！</strong> 正しい答えをタイピングして撃退しろ！</p>
-        <p>🔍 分からなかったら右の <strong>検索ボタン</strong> をクリックして調べろ！</p>
-        <p>💊 ポーションを持っていたら <strong>Pキー</strong> でいつでも回復できるぞ！</p>
+      <!-- ステータス＆ナビゲーション横並びエリア -->
+      <div id="status-nav-row">
+        <!-- 左側：HPとポーション（本気モード時のみ表示） -->
+        <div id="player-status-container">
+          <!-- プレイヤーHPゲージ -->
+          <div id="player-hp-box" class="status-box">
+            <div id="player-hp-label">❤️ HP</div>
+            <div id="player-hp-bar-container">
+              <div id="player-hp-bar"></div>
+            </div>
+            <div id="player-hp-text">100 / 100</div>
+          </div>
+
+          <!-- アイテムストック表示 -->
+          <div id="item-stock-area" class="status-box">
+            <span id="item-stock-label">💊 アイテム</span>
+            <div class="item-slots-row">
+              <div class="item-slot" id="potion-slot-1">
+                <img src="portion_01_lightblue_02.png" alt="ポーション" class="item-icon">
+              </div>
+              <div class="item-slot" id="potion-slot-2">
+                <img src="portion_01_lightblue_02.png" alt="ポーション" class="item-icon">
+              </div>
+            </div>
+            <div id="potion-hint">[P]で回復</div>
+          </div>
+        </div>
+
+        <!-- 右側：ナビゲーションボックス -->
+        <div id="nav-guide-box">
+          <p>⚔️ <strong>敵が現れた！</strong> 正しい答えをタイピングして撃退しろ！</p>
+          <p>🔍 分からなかったら右の <strong>検索ボタン</strong> をクリックして調べろ！</p>
+          <p>💊 ポーションを持っていたら <strong>Pキー</strong> でいつでも回復できるぞ！</p>
+        </div>
       </div>
 
       <div id="feedback"></div>
@@ -1784,26 +1976,6 @@
       <div id="next-btn-area">
         <button id="next-btn">次の問題へ</button>
         <span id="next-btn-hint">スペースキーでも進めるよ</span>
-      </div>
-
-      <!-- プレイヤーHPゲージ（本気モード時のみ表示） -->
-      <div id="player-hp-bar-area" style="display:none;">
-        <div id="player-hp-label">❤️ HP</div>
-        <div id="player-hp-bar-container">
-          <div id="player-hp-bar"></div>
-        </div>
-        <div id="player-hp-text">100 / 100</div>
-      </div>
-
-      <!-- アイテムストック表示（マインクラフト風） -->
-      <div id="item-stock-area" style="display:none;">
-        <div class="item-slot" id="potion-slot-1">
-          <img src="portion_01_lightblue_02.png" alt="ポーション" class="item-icon">
-        </div>
-        <div class="item-slot" id="potion-slot-2">
-          <img src="portion_01_lightblue_02.png" alt="ポーション" class="item-icon">
-        </div>
-        <div id="potion-hint">Pキーでポーション使用</div>
       </div>
 
       <div id="critical-hit-text" style="display:none;">CRITICAL HIT!</div>
@@ -1840,7 +2012,7 @@
   <!-- ===== 右サイドバー: 称号一覧 ===== -->
   <div id="sidebar-right" class="sidebar">
     <div class="dashboard-card" id="title-list-card">
-      <h3>称号一覧</h3>
+      <h3>称号一覧 <span class="title-list-subtitle">- 称号を最初に解放した者の名がここに刻まれる</span></h3>
       <div class="title-list" id="title-list-content"></div>
     </div>
   </div>
@@ -1973,7 +2145,7 @@ const goldVal          = document.getElementById('gold-val');
 const goldDisplay      = document.getElementById('gold-display');
 
 // ポーション関連
-const POTION_DROP_CHANCE = 0.33; // 3回に1回（約33%）
+const POTION_DROP_CHANCE = 1.0; // 100%ドロップ
 const POTION_HEAL_MIN = 15;
 const POTION_HEAL_MAX = 30;
 const MAX_POTION_STOCK = 2;
@@ -2143,11 +2315,11 @@ function updateHpBar() {
 }
 
 function showHpBar() {
-  const area = document.getElementById('player-hp-bar-area');
+  const container = document.getElementById('player-status-container');
   if (gameMode === 'mission') {
-    area.style.display = 'flex';
+    container.classList.add('visible');
   } else {
-    area.style.display = 'none';
+    container.classList.remove('visible');
   }
 }
 
@@ -2160,26 +2332,20 @@ function resetHp() {
 
 // ---------- ポーションシステム ----------
 function updatePotionUI() {
-  const area = document.getElementById('item-stock-area');
   const slot1 = document.getElementById('potion-slot-1');
   const slot2 = document.getElementById('potion-slot-2');
 
-  if (gameMode === 'mission') {
-    area.style.display = 'flex';
-    // スロット1
-    if (potionStock >= 1) {
-      slot1.classList.remove('empty');
-    } else {
-      slot1.classList.add('empty');
-    }
-    // スロット2
-    if (potionStock >= 2) {
-      slot2.classList.remove('empty');
-    } else {
-      slot2.classList.add('empty');
-    }
+  // スロット1
+  if (potionStock >= 1) {
+    slot1.classList.remove('empty');
   } else {
-    area.style.display = 'none';
+    slot1.classList.add('empty');
+  }
+  // スロット2
+  if (potionStock >= 2) {
+    slot2.classList.remove('empty');
+  } else {
+    slot2.classList.add('empty');
   }
 }
 
@@ -2198,15 +2364,22 @@ function tryDropPotion() {
 }
 
 function showPotionDrop() {
-  const container = document.getElementById('monster-container');
-  const potion = document.createElement('img');
-  potion.src = 'portion_01_lightblue_02.png';
-  potion.className = 'potion-drop';
-  potion.style.left = '50%';
-  potion.style.top = '80%';
-  potion.style.transform = 'translateX(-50%)';
-  container.appendChild(potion);
-  setTimeout(() => potion.remove(), 1000);
+  // 画面中央にポーション獲得表示
+  const display = document.getElementById('potion-drop-display');
+  display.classList.remove('show');
+  void display.offsetWidth;
+  display.classList.add('show');
+
+  // ドロップ時も効果音を鳴らす
+  if (!isMutedAll) {
+    healSound.currentTime = 0;
+    healSound.play().catch(() => {});
+  }
+
+  // 3.5秒後に非表示（アニメーションと同期）
+  setTimeout(() => {
+    display.classList.remove('show');
+  }, 3500);
 }
 
 function usePotion() {
@@ -2260,16 +2433,15 @@ function dealDamageToPlayer() {
   playerHp = Math.max(0, playerHp - damage);
   updateHpBar();
 
-  // ダメージ数字表示
-  const dmgNum = document.getElementById('damage-number');
-  dmgNum.textContent = '-' + damage;
-  dmgNum.className = isCritical ? 'critical' : '';
-  dmgNum.style.display = 'block';
-  void dmgNum.offsetWidth;
-  dmgNum.style.animation = 'none';
-  void dmgNum.offsetWidth;
-  dmgNum.style.animation = '';
-  setTimeout(() => { dmgNum.style.display = 'none'; }, 1000);
+  // 画面中央にダメージ数字を大きく表示
+  const playerDmgNum = document.getElementById('player-damage-number');
+  playerDmgNum.textContent = '-' + damage;
+  playerDmgNum.classList.remove('show');
+  void playerDmgNum.offsetWidth;
+  playerDmgNum.classList.add('show');
+  setTimeout(() => {
+    playerDmgNum.classList.remove('show');
+  }, 3000);
 
   // クリティカルヒット演出
   if (isCritical) {
@@ -2294,7 +2466,7 @@ function dealDamageToPlayer() {
       critText.style.display = 'none';
       gameContainer.classList.remove('critical-hit');
       critFlash.classList.remove('show');
-    }, 1000);
+    }, 1200);
   }
 
   return playerHp <= 0;
@@ -3661,17 +3833,20 @@ let isNavVisible = true;
 function toggleNavGuide() {
   const navBox = document.getElementById('nav-guide-box');
   const btn = document.getElementById('btn-toggle-nav');
+  const statusContainer = document.getElementById('player-status-container');
   if (!navBox) return;
 
   isNavVisible = !isNavVisible;
   if (isNavVisible) {
     navBox.classList.remove('hidden');
+    if (statusContainer) statusContainer.classList.remove('full-width');
     if (btn) {
       btn.textContent = '📖 ナビON';
       btn.classList.remove('off');
     }
   } else {
     navBox.classList.add('hidden');
+    if (statusContainer) statusContainer.classList.add('full-width');
     if (btn) {
       btn.textContent = '📖 ナビOFF';
       btn.classList.add('off');
