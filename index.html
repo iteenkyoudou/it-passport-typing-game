@@ -1468,10 +1468,27 @@ function playPunchSound() {
 }
 
 // ---------- モンスター演出（ドラクエ風） ----------
+const MONSTER_IMAGES = [
+  'character_monster_slime_green.png',
+  'character_monster_frankenstein_02_green.png',
+  'character_monster_gargoyle_stone.png',
+  'character_monster_ghost_white.png',
+  'character_monster_golem_brown.png',
+  'character_monster_golem_gray.png',
+  'character_monster_hana_02.png',
+  'character_monster_jackolantern_green.png',
+  'character_monster_kyuketsuki_02_purple.png',
+  'character_monster_mimic_green.png',
+  'character_monster_treant_02_green.png',
+  'character_monster_yeti_02_black.png'
+];
 let monsterDefeated = false;
 
 function showMonster() {
   monsterDefeated = false;
+  // ランダムにモンスターを選択
+  const randomMonster = MONSTER_IMAGES[Math.floor(Math.random() * MONSTER_IMAGES.length)];
+  monsterImg.src = randomMonster;
   monsterImg.style.display = '';
   monsterImg.style.opacity = '1';
   monsterImg.style.transform = '';
