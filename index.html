@@ -672,6 +672,44 @@
       60% { transform: translateX(6px) translateY(1px); }
       75% { transform: translateX(-3px); }
     }
+    #game-container.critical-hit {
+      animation: criticalShake 0.8s ease-in-out;
+    }
+    @keyframes criticalShake {
+      0%, 100% { transform: translateX(0) translateY(0); }
+      5% { transform: translateX(-25px) translateY(-10px); }
+      10% { transform: translateX(25px) translateY(8px); }
+      15% { transform: translateX(-20px) translateY(-8px); }
+      20% { transform: translateX(20px) translateY(6px); }
+      25% { transform: translateX(-18px) translateY(-6px); }
+      30% { transform: translateX(18px) translateY(5px); }
+      40% { transform: translateX(-15px) translateY(-4px); }
+      50% { transform: translateX(12px) translateY(3px); }
+      60% { transform: translateX(-10px) translateY(-2px); }
+      70% { transform: translateX(8px) translateY(2px); }
+      80% { transform: translateX(-5px) translateY(-1px); }
+      90% { transform: translateX(3px); }
+    }
+    #critical-flash-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: #ff0000;
+      pointer-events: none;
+      z-index: 9998;
+      opacity: 0;
+    }
+    #critical-flash-overlay.show {
+      animation: criticalFlash 0.8s ease-out forwards;
+    }
+    @keyframes criticalFlash {
+      0% { opacity: 0.7; }
+      15% { opacity: 0.2; }
+      30% { opacity: 0.6; }
+      45% { opacity: 0.1; }
+      60% { opacity: 0.4; }
+      75% { opacity: 0.1; }
+      100% { opacity: 0; }
+    }
 
     /* ===== お金ドロップ演出 ===== */
     #money-drop-area {
@@ -1390,6 +1428,7 @@
 <body>
 
 <div id="player-damage-overlay"></div>
+<div id="critical-flash-overlay"></div>
 <div id="magic-effect-container"></div>
 
 <header>
@@ -1870,11 +1909,23 @@ function dealDamageToPlayer() {
     critText.style.animation = 'none';
     void critText.offsetWidth;
     critText.style.animation = '';
-    // 画面をより激しく揺らす
-    gameContainer.classList.remove('player-hit');
+
+    // 画面を激しく揺らす（クリティカル専用）
+    gameContainer.classList.remove('player-hit', 'critical-hit');
     void gameContainer.offsetWidth;
-    gameContainer.classList.add('player-hit');
-    setTimeout(() => { critText.style.display = 'none'; }, 1000);
+    gameContainer.classList.add('critical-hit');
+
+    // 赤フラッシュ
+    const critFlash = document.getElementById('critical-flash-overlay');
+    critFlash.classList.remove('show');
+    void critFlash.offsetWidth;
+    critFlash.classList.add('show');
+
+    setTimeout(() => {
+      critText.style.display = 'none';
+      gameContainer.classList.remove('critical-hit');
+      critFlash.classList.remove('show');
+    }, 1000);
   }
 
   return playerHp <= 0;
