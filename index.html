@@ -813,6 +813,94 @@
       color: #666;
     }
 
+    /* ===== プレイヤーHPゲージ ===== */
+    #player-hp-bar-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      margin-top: 16px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    #player-hp-label {
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: #ff6b6b;
+      white-space: nowrap;
+    }
+    #player-hp-bar-container {
+      flex: 1;
+      height: 18px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 9px;
+      overflow: hidden;
+      position: relative;
+    }
+    #player-hp-bar {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #4caf50, #66bb6a);
+      border-radius: 9px;
+      transition: width 0.4s ease, background 0.4s ease;
+    }
+    #player-hp-bar.hp-mid {
+      background: linear-gradient(90deg, #ff9800, #ffb74d);
+    }
+    #player-hp-bar.hp-low {
+      background: linear-gradient(90deg, #f44336, #ff5722);
+    }
+    #player-hp-text {
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: #fff;
+      white-space: nowrap;
+      min-width: 70px;
+      text-align: right;
+    }
+    #critical-hit-text {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 3rem;
+      font-weight: 900;
+      color: #ff0000;
+      text-shadow: 0 0 20px #ff0000, 0 0 40px #ff4444, 2px 2px 0 #000;
+      z-index: 9999;
+      pointer-events: none;
+      animation: criticalPop 1s ease-out forwards;
+    }
+    @keyframes criticalPop {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+      20% { opacity: 1; transform: translate(-50%, -50%) scale(1.3); }
+      40% { transform: translate(-50%, -50%) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -60%) scale(1); }
+    }
+    #damage-number {
+      position: fixed;
+      top: 40%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: #ff4444;
+      text-shadow: 2px 2px 0 #000;
+      z-index: 9998;
+      pointer-events: none;
+      animation: dmgFloat 1s ease-out forwards;
+    }
+    #damage-number.critical {
+      font-size: 3.5rem;
+      color: #ff0000;
+      text-shadow: 0 0 10px #ff0000, 2px 2px 0 #000;
+    }
+    @keyframes dmgFloat {
+      0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+      100% { opacity: 0; transform: translateX(-50%) translateY(-60px); }
+    }
+
     /* ===== タイマーバー ===== */
     #timer-bar-container {
       width: 100%;
@@ -1371,6 +1459,17 @@
         <button id="next-btn">次の問題へ</button>
         <span id="next-btn-hint">スペースキーでも進めるよ</span>
       </div>
+
+      <!-- プレイヤーHPゲージ（ミッションモード時のみ表示） -->
+      <div id="player-hp-bar-area" style="display:none;">
+        <div id="player-hp-label">❤️ HP</div>
+        <div id="player-hp-bar-container">
+          <div id="player-hp-bar"></div>
+        </div>
+        <div id="player-hp-text">100 / 100</div>
+      </div>
+      <div id="critical-hit-text" style="display:none;">CRITICAL HIT!</div>
+      <div id="damage-number" style="display:none;"></div>
     </div>
 
     <!-- 結果画面 -->
@@ -1643,6 +1742,84 @@ function showPlayerDamage() {
     playerDamageOverlay.style.display = 'none';
     gameContainer.classList.remove('player-hit');
   }, 700);
+}
+
+// ---------- HPシステム ----------
+const PLAYER_MAX_HP = 100;
+const DMG_MIN = 15;
+const DMG_MAX = 30;
+const CRIT_DMG_MIN = 40;
+const CRIT_DMG_MAX = 60;
+const CRIT_CHANCE = 0.1; // 10%
+let playerHp = PLAYER_MAX_HP;
+
+function updateHpBar() {
+  const hpBar = document.getElementById('player-hp-bar');
+  const hpText = document.getElementById('player-hp-text');
+  const pct = (playerHp / PLAYER_MAX_HP) * 100;
+  hpBar.style.width = pct + '%';
+  hpText.textContent = playerHp + ' / ' + PLAYER_MAX_HP;
+
+  hpBar.classList.remove('hp-mid', 'hp-low');
+  if (pct <= 25) {
+    hpBar.classList.add('hp-low');
+  } else if (pct <= 50) {
+    hpBar.classList.add('hp-mid');
+  }
+}
+
+function showHpBar() {
+  const area = document.getElementById('player-hp-bar-area');
+  if (gameMode === 'mission') {
+    area.style.display = 'flex';
+  } else {
+    area.style.display = 'none';
+  }
+}
+
+function resetHp() {
+  playerHp = PLAYER_MAX_HP;
+  updateHpBar();
+}
+
+function dealDamageToPlayer() {
+  const isCritical = Math.random() < CRIT_CHANCE;
+  let damage;
+  if (isCritical) {
+    damage = Math.floor(Math.random() * (CRIT_DMG_MAX - CRIT_DMG_MIN + 1)) + CRIT_DMG_MIN;
+  } else {
+    damage = Math.floor(Math.random() * (DMG_MAX - DMG_MIN + 1)) + DMG_MIN;
+  }
+
+  playerHp = Math.max(0, playerHp - damage);
+  updateHpBar();
+
+  // ダメージ数字表示
+  const dmgNum = document.getElementById('damage-number');
+  dmgNum.textContent = '-' + damage;
+  dmgNum.className = isCritical ? 'critical' : '';
+  dmgNum.style.display = 'block';
+  void dmgNum.offsetWidth;
+  dmgNum.style.animation = 'none';
+  void dmgNum.offsetWidth;
+  dmgNum.style.animation = '';
+  setTimeout(() => { dmgNum.style.display = 'none'; }, 1000);
+
+  // クリティカルヒット演出
+  if (isCritical) {
+    const critText = document.getElementById('critical-hit-text');
+    critText.style.display = 'block';
+    critText.style.animation = 'none';
+    void critText.offsetWidth;
+    critText.style.animation = '';
+    // 画面をより激しく揺らす
+    gameContainer.classList.remove('player-hit');
+    void gameContainer.offsetWidth;
+    gameContainer.classList.add('player-hit');
+    setTimeout(() => { critText.style.display = 'none'; }, 1000);
+  }
+
+  return playerHp <= 0;
 }
 
 // ---------- BGM（3問ごとに切り替え） ----------
@@ -2095,9 +2272,14 @@ function handleTimeout() {
 
   showExplanation(q);
 
-  // ミッションモードの場合、ゲームオーバー
+  // ミッションモードの場合、HPダメージ → HP0ならゲームオーバー
   if (gameMode === 'mission') {
-    showMissionGameOver('タイムアウト');
+    const isDead = dealDamageToPlayer();
+    if (isDead) {
+      showMissionGameOver('HP消滅');
+    } else {
+      showNextButton();
+    }
   } else {
     showNextButton();
   }
@@ -2121,6 +2303,7 @@ function startGame() {
   correctCount = 0;
   wrongCount = 0;
   resetBgm();
+  resetHp();
 
   qTotal.textContent = questions.length;
   scoreVal.textContent = 0;
@@ -2133,6 +2316,7 @@ function startGame() {
   searchSidePanel.style.display = 'flex';
   document.body.classList.add('panel-open');
 
+  showHpBar();
   showQuestion();
 }
 
@@ -2302,9 +2486,14 @@ function handleWrong(q, wrongAnswer) {
 
   showExplanation(q);
 
-  // ミッションモードの場合、ミスでゲームオーバー
+  // ミッションモードの場合、HPダメージ → HP0ならゲームオーバー
   if (gameMode === 'mission') {
-    showMissionGameOver('不正解');
+    const isDead = dealDamageToPlayer();
+    if (isDead) {
+      showMissionGameOver('HP消滅');
+    } else {
+      showNextButton();
+    }
   } else {
     showNextButton();
   }
@@ -2317,9 +2506,9 @@ function showExplanation(q) {
 
 // ---------- ミッションモード ゲームオーバー ----------
 function showMissionGameOver(reason) {
-  const reasonText = reason === 'タイムアウト'
-    ? `第${currentIndex + 1}問でタイムアウト！`
-    : `第${currentIndex + 1}問で不正解！`;
+  const reasonText = reason === 'HP消滅'
+    ? `第${currentIndex + 1}問でHPが0に！`
+    : `第${currentIndex + 1}問で敗北！`;
   goReason.textContent = reasonText;
 
   gameOverOverlay.style.display = 'flex';
@@ -2433,7 +2622,8 @@ function showMissionResult() {
     category: getSelectedCategory(),
     date: new Date().toISOString(),
     name: '',
-    gold: totalGold
+    gold: totalGold,
+    wrongCount: wrongCount
   };
 
   // 名前入力画面を表示 → 入力後にリザルト画面へ
@@ -2506,13 +2696,13 @@ function showMissionResultScreen(record) {
   const title = getMissionTitle(record.streak);
   const streakCount = record.streak;
   const totalCount = record.total;
-  const wrongNum = totalCount - streakCount;
+  const wrongNum = record.wrongCount || 0;
   const scoreNum = streakCount * 100;
 
   resultScreen.innerHTML = `
     <h2 class="mission-result-header">${isAllClear ? 'ALL CLEAR!' : 'MISSION RESULT'}</h2>
     <div class="mission-streak">
-      ${streakCount}<span class="streak-label">問連続正解 / 全${totalCount}問</span>
+      ${streakCount}<span class="streak-label">問正解 / 全${totalCount}問</span>
     </div>
     <div class="title-badge ${title.css}">${title.name}</div>
     <div class="title-sub">${title.desc}</div>
@@ -2522,7 +2712,7 @@ function showMissionResultScreen(record) {
         <div class="label">正解</div>
       </div>
       <div class="stat-box">
-        <div class="num" style="color:#f44336;">${wrongNum > 0 ? 1 : 0}</div>
+        <div class="num" style="color:#f44336;">${wrongNum}</div>
         <div class="label">不正解</div>
       </div>
       <div class="stat-box">
