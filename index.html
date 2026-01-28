@@ -22,12 +22,20 @@
       text-align: center;
       padding: 18px 16px 6px;
       flex-shrink: 0;
-      position: relative;
+    }
+    .header-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .header-controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
     }
     .sound-controls {
-      position: absolute;
-      top: 12px;
-      right: 16px;
       display: flex;
       gap: 8px;
     }
@@ -53,6 +61,26 @@
       border-color: rgba(244,67,54,0.4);
       color: #f44336;
     }
+    .home-btn {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 8px;
+      color: #ddd;
+      font-size: 0.75rem;
+      padding: 5px 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: none; /* ゲーム中のみ表示 */
+    }
+    .home-btn:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.2);
+    }
+    body.panel-open .home-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
     header h1 {
       font-size: 1.6rem;
       background: linear-gradient(90deg, #00d2ff, #3a7bd5);
@@ -70,13 +98,12 @@
     #main-layout {
       display: flex;
       flex: 1;
-      padding: 12px 40px;
+      padding: 12px 24px;
       min-height: 0;
       position: relative;
       gap: 24px;
-      max-width: 1280px;
-      margin: 0 auto;
       align-items: flex-start;
+      width: 100%;
     }
     /* ゲーム中は検索パネルを画面いっぱいに伸ばす */
     body.panel-open #main-layout {
@@ -1489,20 +1516,25 @@
 <div id="magic-effect-container"></div>
 
 <header>
-  <h1>ITパスポート タイピングゲーム</h1>
-  <p>タイピングしながらIT用語を覚えよう！</p>
-  <div class="sound-controls">
-    <button class="sound-btn" id="btn-mute-all" onclick="toggleMuteAll()">🔊 全音</button>
-    <button class="sound-btn" id="btn-mute-bgm" onclick="toggleMuteBgm()">🎵 BGM</button>
+  <div class="header-title-row">
+    <h1>ITパスポート タイピングゲーム</h1>
+    <div class="header-controls">
+      <button class="home-btn" id="btn-home" onclick="goHome()">🏠 ホーム</button>
+      <div class="sound-controls">
+        <button class="sound-btn" id="btn-mute-all" onclick="toggleMuteAll()">🔊 全音</button>
+        <button class="sound-btn" id="btn-mute-bgm" onclick="toggleMuteBgm()">🎵 BGM</button>
+      </div>
+    </div>
   </div>
+  <p>タイピングしながらIT用語を覚えよう！</p>
 </header>
 
 <div id="main-layout">
 
   <!-- ===== 左サイドバー: ランキング ===== -->
   <div id="sidebar-left" class="sidebar">
-    <div class="dashboard-card" id="ranking-card" style="display:none;">
-      <h3>本気モード ランキング</h3>
+    <div class="dashboard-card" id="ranking-card">
+      <h3>💰 賞金ランキング</h3>
       <div class="dashboard-ranking" id="dashboard-ranking-content"></div>
     </div>
   </div>
@@ -3111,14 +3143,13 @@ function updateDashboard() {
   const records = getMissionRecords();
   const myBestCard = document.getElementById('my-best-card');
   const myBestContent = document.getElementById('my-best-content');
-  const rankingCard = document.getElementById('ranking-card');
   const rankingContent = document.getElementById('dashboard-ranking-content');
 
   updateTitleList();
 
   if (records.length === 0) {
     myBestCard.style.display = 'none';
-    rankingCard.style.display = 'none';
+    rankingContent.innerHTML = '<p style="color:#888;text-align:center;padding:20px;">まだ記録がありません<br>本気モードで遊んでランクインしよう！</p>';
     return;
   }
 
@@ -3142,7 +3173,6 @@ function updateDashboard() {
   `;
 
   // ランキングテーブル（ゴールド順）
-  rankingCard.style.display = 'block';
   let html = `<table>
     <thead><tr>
       <th>順位</th><th>名前</th><th style="color:#ffd700;">💰 ゴールド</th><th>連続正解</th><th>称号</th><th>日時</th>
@@ -3334,6 +3364,31 @@ retryBtn.addEventListener('click', () => {
   updateDashboard();
   updateQCountInfo();
 });
+
+// ホームに戻る
+function goHome() {
+  // ゲームを中断してホーム画面に戻る
+  stopBgm();
+  stopTimerSound();
+  clearTimeout(questionTimer);
+
+  // 画面切り替え
+  gameScreen.classList.add('hidden');
+  resultScreen.style.display = 'none';
+  startScreen.classList.remove('hidden');
+
+  // サイドパネルを非表示
+  searchSidePanel.style.display = 'none';
+  document.body.classList.remove('panel-open');
+
+  // ボス戦リセット
+  if (typeof hideBossUI === 'function') hideBossUI();
+  isBossBattle = false;
+  bossComboCount = 0;
+
+  // ダッシュボード更新
+  updateDashboard();
+}
 
 // 初期ダッシュボード表示
 updateDashboard();
