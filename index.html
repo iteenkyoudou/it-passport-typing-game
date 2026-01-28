@@ -931,7 +931,7 @@
     #timer-text.warning { color: #ff9800; }
     #timer-text.danger { color: #f44336; font-weight: bold; }
 
-    /* ===== ミッションモード選択 ===== */
+    /* ===== 本気モード選択 ===== */
     .mode-select {
       display: flex;
       gap: 12px;
@@ -1369,7 +1369,7 @@
         </div>
         <!-- ランキング -->
         <div class="dashboard-card" id="ranking-card" style="display:none;">
-          <h3>ミッションモード ランキング</h3>
+          <h3>本気モード ランキング</h3>
           <div class="dashboard-ranking" id="dashboard-ranking-content"></div>
         </div>
       </div>
@@ -1383,7 +1383,7 @@
             <div class="mode-desc">10問ランダム出題<br>気軽に練習しよう</div>
           </div>
           <div class="mode-card mode-mission" data-mode="mission" onclick="selectMode('mission')">
-            <div class="mode-title">ミッションモード</div>
+            <div class="mode-title">本気モード</div>
             <div class="mode-desc">HPがなくなるまで敵を倒して<br>稼ぎまくれ！（1問45秒）</div>
           </div>
         </div>
@@ -1460,7 +1460,7 @@
         <span id="next-btn-hint">スペースキーでも進めるよ</span>
       </div>
 
-      <!-- プレイヤーHPゲージ（ミッションモード時のみ表示） -->
+      <!-- プレイヤーHPゲージ（本気モード時のみ表示） -->
       <div id="player-hp-bar-area" style="display:none;">
         <div id="player-hp-label">❤️ HP</div>
         <div id="player-hp-bar-container">
@@ -1573,7 +1573,7 @@ let wrongCount = 0;
 let waitingForNext = false;
 const NORMAL_QUESTIONS = 10;
 
-// ---------- ミッションモード状態 ----------
+// ---------- 本気モード状態 ----------
 let gameMode = 'normal'; // 'normal' or 'mission'
 let missionTimerId = null;
 let missionTimeLeft = 0;
@@ -2272,7 +2272,7 @@ function handleTimeout() {
 
   showExplanation(q);
 
-  // ミッションモードの場合、HPダメージ → HP0ならゲームオーバー
+  // 本気モードの場合、HPダメージ → HP0ならゲームオーバー
   if (gameMode === 'mission') {
     const isDead = dealDamageToPlayer();
     if (isDead) {
@@ -2362,7 +2362,7 @@ function showQuestion() {
   explanationBox.style.display = 'none';
   hideNextButton();
 
-  // ミッションモードならタイマー開始
+  // 本気モードならタイマー開始
   if (gameMode === 'mission') {
     startTimer();
   } else {
@@ -2486,7 +2486,7 @@ function handleWrong(q, wrongAnswer) {
 
   showExplanation(q);
 
-  // ミッションモードの場合、HPダメージ → HP0ならゲームオーバー
+  // 本気モードの場合、HPダメージ → HP0ならゲームオーバー
   if (gameMode === 'mission') {
     const isDead = dealDamageToPlayer();
     if (isDead) {
@@ -2504,7 +2504,7 @@ function showExplanation(q) {
   explanationTxt.textContent = q.explanation;
 }
 
-// ---------- ミッションモード ゲームオーバー ----------
+// ---------- 本気モード ゲームオーバー ----------
 function showMissionGameOver(reason) {
   const reasonText = reason === 'HP消滅'
     ? `第${currentIndex + 1}問でHPが0に！`
@@ -2606,7 +2606,7 @@ function getMissionTitle(streak) {
   return              { name: 'かけだしタイパー', css: 'rank-beginner', desc: 'まずは10問連続正解を目指そう！' };
 }
 
-// ---------- ミッションモード結果画面 ----------
+// ---------- 本気モード結果画面 ----------
 function showMissionResult() {
   gameScreen.classList.add('hidden');
   searchSidePanel.style.display = 'none';
@@ -2700,7 +2700,7 @@ function showMissionResultScreen(record) {
   const scoreNum = streakCount * 100;
 
   resultScreen.innerHTML = `
-    <h2 class="mission-result-header">${isAllClear ? 'ALL CLEAR!' : 'MISSION RESULT'}</h2>
+    <h2 class="mission-result-header">${isAllClear ? 'ALL CLEAR!' : 'RESULT'}</h2>
     <div class="mission-streak">
       ${streakCount}<span class="streak-label">問正解 / 全${totalCount}問</span>
     </div>
