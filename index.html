@@ -80,7 +80,7 @@
 
     /* 左右サイドバー */
     .sidebar {
-      width: 240px;
+      width: 480px;
       flex-shrink: 0;
       overflow-y: auto;
     }
@@ -1350,9 +1350,14 @@
     .hidden { display: none !important; }
 
     /* ===== レスポンシブ ===== */
+    @media (max-width: 1400px) {
+      .sidebar {
+        width: 360px;
+      }
+    }
     @media (max-width: 1100px) {
       .sidebar {
-        width: 200px;
+        width: 280px;
       }
     }
     @media (max-width: 900px) {
