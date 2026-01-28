@@ -78,6 +78,10 @@
       margin: 0 auto;
       align-items: flex-start;
     }
+    /* ゲーム中は検索パネルを画面いっぱいに伸ばす */
+    body.panel-open #main-layout {
+      align-items: stretch;
+    }
 
     /* 左右サイドバー */
     .sidebar {
@@ -93,8 +97,6 @@
       overflow-y: auto;
     }
     /* サイドパネル（検索）表示時 */
-    body.panel-open #main-layout {
-    }
     body.panel-open .sidebar {
       display: none;
     }
