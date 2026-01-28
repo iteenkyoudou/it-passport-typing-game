@@ -31,9 +31,12 @@
       flex-wrap: wrap;
     }
     .header-controls {
-      display: flex;
+      display: none; /* ゲーム中のみ表示 */
       gap: 8px;
       align-items: center;
+    }
+    body.panel-open .header-controls {
+      display: flex;
     }
     .sound-controls {
       display: flex;
@@ -70,16 +73,13 @@
       padding: 5px 10px;
       cursor: pointer;
       transition: all 0.2s;
-      display: none; /* ゲーム中のみ表示 */
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
     .home-btn:hover {
       background: rgba(255,255,255,0.1);
       border-color: rgba(255,255,255,0.2);
-    }
-    body.panel-open .home-btn {
-      display: flex;
-      align-items: center;
-      gap: 4px;
     }
     header h1 {
       font-size: 1.6rem;
@@ -1866,12 +1866,17 @@ function updateSoundButtons() {
   }
 }
 
+function isGamePlaying() {
+  return document.body.classList.contains('panel-open');
+}
+
 function toggleMuteAll() {
   isMutedAll = !isMutedAll;
   if (isMutedAll) {
     stopBgm();
   } else {
-    if (!isMutedBgm) startBgm();
+    // ゲーム中のみBGMを再生
+    if (!isMutedBgm && isGamePlaying()) startBgm();
   }
   updateSoundButtons();
 }
@@ -1881,7 +1886,8 @@ function toggleMuteBgm() {
   if (isMutedBgm) {
     stopBgm();
   } else {
-    if (!isMutedAll) startBgm();
+    // ゲーム中のみBGMを再生
+    if (!isMutedAll && isGamePlaying()) startBgm();
   }
   updateSoundButtons();
 }
