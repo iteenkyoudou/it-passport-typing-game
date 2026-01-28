@@ -1433,7 +1433,7 @@
         <p style="color:#aaa;font-size:0.9rem;margin-bottom:10px;">ゲームモードを選んでね</p>
         <div class="mode-select">
           <div class="mode-card mode-normal selected" data-mode="normal" onclick="selectMode('normal')">
-            <div class="mode-title">通常モード</div>
+            <div class="mode-title">練習モード</div>
             <div class="mode-desc">10問ランダム出題<br>気軽に練習しよう</div>
           </div>
           <div class="mode-card mode-mission" data-mode="mission" onclick="selectMode('mission')">
@@ -2623,7 +2623,7 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// ---------- 通常モード結果画面 ----------
+// ---------- 練習モード結果画面 ----------
 function showResult() {
   gameScreen.classList.add('hidden');
   searchSidePanel.style.display = 'none';
@@ -2802,7 +2802,7 @@ function showMissionResultScreen(record) {
   });
 }
 
-// 通常モードのresult-screenの元のHTMLを保持
+// 練習モードのresult-screenの元のHTMLを保持
 const originalResultHTML = `
   <h2>結果発表！</h2>
   <div class="result-stats">
