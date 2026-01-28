@@ -526,6 +526,47 @@
       75% { transform: translateX(6px); }
     }
 
+    /* ===== ボスバトルUI ===== */
+    #boss-battle-ui {
+      text-align: center;
+      margin-bottom: 16px;
+      padding: 16px;
+      background: linear-gradient(135deg, rgba(139,0,0,0.3), rgba(75,0,130,0.3));
+      border: 3px solid #ff4444;
+      border-radius: 12px;
+      animation: bossPulse 1.5s ease-in-out infinite;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: opacity 0.3s, transform 0.3s;
+    }
+    #boss-battle-ui.show {
+      opacity: 1;
+      transform: scale(1);
+    }
+    @keyframes bossPulse {
+      0%, 100% { border-color: #ff4444; box-shadow: 0 0 20px rgba(255,68,68,0.5); }
+      50% { border-color: #ff8800; box-shadow: 0 0 30px rgba(255,136,0,0.7); }
+    }
+    #boss-battle-title {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: #ff4444;
+      text-shadow: 0 0 10px #ff4444, 2px 2px 0 #000;
+      letter-spacing: 4px;
+      margin-bottom: 8px;
+      animation: bossTextGlow 1s ease-in-out infinite alternate;
+    }
+    @keyframes bossTextGlow {
+      0% { text-shadow: 0 0 10px #ff4444, 2px 2px 0 #000; }
+      100% { text-shadow: 0 0 20px #ff8800, 0 0 40px #ff4444, 2px 2px 0 #000; }
+    }
+    #boss-combo-display {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #ffd700;
+      text-shadow: 1px 1px 0 #000;
+    }
+
     /* ===== モンスター表示エリア（ドラクエ風） ===== */
     #monster-area {
       text-align: center;
@@ -1526,6 +1567,12 @@
         <input type="text" id="typing-input" autocomplete="off" spellcheck="false" placeholder="ここにタイピング...">
       </div>
 
+      <!-- ボスバトルUI -->
+      <div id="boss-battle-ui" style="display:none;">
+        <div id="boss-battle-title">⚔️ BOSS BATTLE ⚔️</div>
+        <div id="boss-combo-display">連続正解: 0 / 3</div>
+      </div>
+
       <!-- モンスター表示エリア（ドラクエ風） -->
       <div id="monster-area">
         <div id="monster-container">
@@ -2079,6 +2126,89 @@ function fadeOutMonster() {
   damageNumber.className = '';
 }
 
+// ---------- ボスバトルシステム ----------
+const BOSS_IMAGES = [
+  'ボス/character_monster_dragon_01_red.png',      // 10問: IT見習い
+  'ボス/character_monster_dragon_01_white.png',   // 20問: IT冒険者
+  'ボス/character_monster_dragon_02_yellow.png',  // 30問: IT騎士
+  'ボス/character_darkknight_04.png',             // 40問: IT勇者
+  'ボス/character_datenshi_01_01_black.png',      // 50問: IT魔法使い
+  'ボス/character_yosei_01_green.png',            // 60問: IT賢者
+  'ボス/character_hero_red.png',                  // 70問: ITマスター
+  'ボス/character_daitenshi_02_02_brown.png',     // 80問: IT博士
+  'ボス/character_megami_01_pink.png',            // 90問: ITゴッド
+  'ボス/character_daiakuma_01_02_black.png'       // 100問: IT伝説王
+];
+const BOSS_THRESHOLDS = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+const BOSS_COMBO_REQUIRED = 3; // 連続正解数
+let isBossBattle = false;
+let bossComboCount = 0;
+let currentBossIndex = -1;
+let bossBattleStartQuestion = 0;
+
+function isBossQuestion(questionNumber) {
+  return BOSS_THRESHOLDS.includes(questionNumber);
+}
+
+function getBossIndex(questionNumber) {
+  return BOSS_THRESHOLDS.indexOf(questionNumber);
+}
+
+function startBossBattle(bossIndex) {
+  isBossBattle = true;
+  bossComboCount = 0;
+  currentBossIndex = bossIndex;
+  bossBattleStartQuestion = currentIndex;
+  showBossUI();
+  showBoss(bossIndex);
+}
+
+function showBoss(bossIndex) {
+  monsterDefeated = false;
+  monsterImg.src = BOSS_IMAGES[bossIndex];
+  monsterImg.style.display = '';
+  monsterImg.style.opacity = '1';
+  monsterImg.style.transform = 'scale(1.3)';
+  monsterImg.className = 'appear';
+  damageEffect.className = '';
+  damageNumber.className = '';
+  damageNumber.textContent = '';
+}
+
+function showBossUI() {
+  const bossUI = document.getElementById('boss-battle-ui');
+  const bossComboDisplay = document.getElementById('boss-combo-display');
+  bossUI.style.display = 'block';
+  bossComboDisplay.textContent = `連続正解: ${bossComboCount} / ${BOSS_COMBO_REQUIRED}`;
+  bossUI.className = '';
+  void bossUI.offsetWidth;
+  bossUI.className = 'show';
+}
+
+function updateBossCombo() {
+  const bossComboDisplay = document.getElementById('boss-combo-display');
+  bossComboDisplay.textContent = `連続正解: ${bossComboCount} / ${BOSS_COMBO_REQUIRED}`;
+}
+
+function hideBossUI() {
+  const bossUI = document.getElementById('boss-battle-ui');
+  bossUI.style.display = 'none';
+}
+
+function endBossBattle(victory) {
+  isBossBattle = false;
+  currentBossIndex = -1;
+  hideBossUI();
+  if (victory) {
+    defeatMonster();
+  }
+}
+
+function resetBossCombo() {
+  bossComboCount = 0;
+  updateBossCombo();
+}
+
 // ---------- お金ドロップ演出 ----------
 const moneySound = new Audio('お金がジャラジャラ.mp3');
 moneySound.volume = 0.5;
@@ -2362,7 +2492,14 @@ function handleTimeout() {
   const q = questions[currentIndex];
   typingInput.disabled = true;
   typingInput.classList.add('wrong');
-  feedback.textContent = `タイムアウト！正解は「${q.answer}」でした`;
+
+  // ボス戦中ならコンボリセット
+  if (isBossBattle) {
+    resetBossCombo();
+    feedback.textContent = `タイムアウト！コンボが途切れた！正解は「${q.answer}」`;
+  } else {
+    feedback.textContent = `タイムアウト！正解は「${q.answer}」でした`;
+  }
   feedback.className = 'wrong';
   wrongCount++;
 
@@ -2481,8 +2618,15 @@ function showQuestion() {
   // タイマーBGM開始
   startTimerSound();
 
-  // モンスター登場
-  showMonster();
+  // ボス戦判定（本気モードで、正解数が称号しきい値に達した場合）
+  const questionNumber = correctCount + 1;
+  if (gameMode === 'mission' && isBossQuestion(questionNumber) && !isBossBattle) {
+    const bossIndex = getBossIndex(questionNumber);
+    startBossBattle(bossIndex);
+  } else if (!isBossBattle) {
+    // 通常モンスター登場
+    showMonster();
+  }
 
   typingInput.focus();
 }
@@ -2543,11 +2687,9 @@ function handleCorrect(q) {
   stopTimerSound();
   bgmDefeatCount++;
   playCorrectSound();
-  defeatMonster();
-  dropMoney();
+
   typingInput.disabled = true;
   typingInput.classList.add('correct');
-  feedback.textContent = '正解！すごい！';
   feedback.className = 'correct';
   score += 100;
   correctCount++;
@@ -2563,8 +2705,34 @@ function handleCorrect(q) {
     }
   });
 
-  showExplanation(q);
-  showNextButton();
+  // ボス戦中の処理
+  if (isBossBattle) {
+    bossComboCount++;
+    updateBossCombo();
+
+    if (bossComboCount >= BOSS_COMBO_REQUIRED) {
+      // ボス撃破！
+      feedback.textContent = 'ボス撃破！称号解放！';
+      endBossBattle(true);
+      dropMoney();
+      dropMoney(); // ボーナスでもう一回
+      showExplanation(q);
+      showNextButton();
+    } else {
+      // まだ続く - ダメージエフェクトだけ見せて次の問題へ
+      feedback.textContent = `正解！ あと${BOSS_COMBO_REQUIRED - bossComboCount}問！`;
+      showDamageEffect();
+      showExplanation(q);
+      showNextButton();
+    }
+  } else {
+    // 通常戦闘
+    feedback.textContent = '正解！すごい！';
+    defeatMonster();
+    dropMoney();
+    showExplanation(q);
+    showNextButton();
+  }
 }
 
 function handleWrong(q, wrongAnswer) {
@@ -2574,9 +2742,16 @@ function handleWrong(q, wrongAnswer) {
   showPlayerDamage();
   typingInput.disabled = true;
   typingInput.classList.add('wrong');
-  feedback.textContent = `残念！正解は「${q.answer}」でした`;
-  feedback.className = 'wrong';
   wrongCount++;
+
+  // ボス戦中ならコンボリセット
+  if (isBossBattle) {
+    resetBossCombo();
+    feedback.textContent = `残念！コンボが途切れた！正解は「${q.answer}」`;
+  } else {
+    feedback.textContent = `残念！正解は「${q.answer}」でした`;
+  }
+  feedback.className = 'wrong';
 
   const blank = document.getElementById('blank-display');
   if (blank) {
