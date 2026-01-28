@@ -423,6 +423,104 @@
       75% { transform: translateX(6px); }
     }
 
+    /* ===== モンスター表示エリア（ドラクエ風） ===== */
+    #monster-area {
+      text-align: center;
+      margin: 20px 0 12px;
+      min-height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #monster-container {
+      position: relative;
+      display: inline-block;
+    }
+    #monster-img {
+      width: 160px;
+      height: auto;
+      image-rendering: pixelated;
+      filter: drop-shadow(0 4px 16px rgba(0,0,0,0.5));
+      transition: filter 0.1s;
+    }
+    #monster-img.appear {
+      animation: monsterAppear 0.6s ease-out;
+    }
+    #monster-img.hit {
+      animation: monsterShake 0.15s ease-in-out;
+      filter: drop-shadow(0 4px 16px rgba(0,0,0,0.5)) brightness(2);
+    }
+    #monster-img.defeat {
+      animation: monsterDefeat 0.8s ease-in forwards;
+    }
+    #monster-img.fade-out {
+      animation: monsterFadeOut 0.5s ease-out forwards;
+    }
+    #damage-effect {
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 10;
+    }
+    #damage-effect.show {
+      animation: damageFlash 0.35s ease-out forwards;
+    }
+    #damage-number {
+      position: absolute;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #ff4444;
+      text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 11;
+      font-family: 'Arial Black', sans-serif;
+    }
+    #damage-number.show {
+      animation: damageNumberFloat 0.7s ease-out forwards;
+    }
+
+    @keyframes monsterAppear {
+      0% { transform: translateY(40px) scale(0.3); opacity: 0; }
+      60% { transform: translateY(-8px) scale(1.05); opacity: 1; }
+      100% { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @keyframes monsterShake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      50% { transform: translateX(8px); }
+      75% { transform: translateX(-4px); }
+      100% { transform: translateX(0); }
+    }
+    @keyframes monsterDefeat {
+      0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; }
+      30% { transform: translate(30px, -40px) scale(0.8) rotate(15deg); opacity: 1; }
+      60% { transform: translate(80px, -100px) scale(0.5) rotate(30deg); opacity: 0.7; }
+      100% { transform: translate(200px, -200px) scale(0.1) rotate(60deg); opacity: 0; }
+    }
+    @keyframes monsterFadeOut {
+      0% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    @keyframes damageFlash {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+      30% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
+    }
+    @keyframes damageNumberFloat {
+      0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+      50% { opacity: 1; }
+      100% { opacity: 0; transform: translateX(-50%) translateY(-50px); }
+    }
+
     /* ===== フィードバック・解説 ===== */
     #feedback {
       text-align: center;
@@ -1047,6 +1145,15 @@
         <input type="text" id="typing-input" autocomplete="off" spellcheck="false" placeholder="ここにタイピング...">
       </div>
 
+      <!-- モンスター表示エリア（ドラクエ風） -->
+      <div id="monster-area">
+        <div id="monster-container">
+          <img id="monster-img" src="character_monster_slime_green.png" alt="モンスター">
+          <img id="damage-effect" src="bakuhatsu_01.png" alt="ダメージ">
+          <div id="damage-number"></div>
+        </div>
+      </div>
+
       <div id="feedback"></div>
 
       <div id="explanation-box">
@@ -1200,6 +1307,11 @@ const searchLoading    = document.getElementById('search-loading');
 const searchPlaceholder = document.getElementById('search-placeholder');
 const googleOpenLink   = document.getElementById('google-open-link');
 
+// モンスター表示
+const monsterImg       = document.getElementById('monster-img');
+const damageEffect     = document.getElementById('damage-effect');
+const damageNumber     = document.getElementById('damage-number');
+
 // ---------- ユーティリティ ----------
 function shuffle(arr) {
   const a = [...arr];
@@ -1255,10 +1367,86 @@ function stopTimerSound() {
   timerSound.currentTime = 0;
 }
 
-// タイピング入力欄でキーが押されたら音を鳴らす
+// ---------- 打撃音（ダメージエフェクト用） ----------
+const punchSoundPool = [];
+const PUNCH_SOUND_POOL_SIZE = 6;
+for (let i = 0; i < PUNCH_SOUND_POOL_SIZE; i++) {
+  const a = new Audio('小パンチ.mp3');
+  a.volume = 0.5;
+  punchSoundPool.push(a);
+}
+let punchSoundIndex = 0;
+
+function playPunchSound() {
+  const sound = punchSoundPool[punchSoundIndex];
+  sound.currentTime = 0;
+  sound.play().catch(() => {});
+  punchSoundIndex = (punchSoundIndex + 1) % PUNCH_SOUND_POOL_SIZE;
+}
+
+// ---------- モンスター演出（ドラクエ風） ----------
+let monsterDefeated = false;
+
+function showMonster() {
+  monsterDefeated = false;
+  monsterImg.style.display = '';
+  monsterImg.style.opacity = '1';
+  monsterImg.style.transform = '';
+  monsterImg.className = 'appear';
+  damageEffect.className = '';
+  damageNumber.className = '';
+  damageNumber.textContent = '';
+}
+
+function showDamageEffect() {
+  if (monsterDefeated) return;
+
+  playPunchSound();
+
+  // ダメージ数値をランダムで表示（ドラクエ風）
+  const dmg = Math.floor(Math.random() * 30) + 5;
+  damageNumber.textContent = dmg;
+
+  // エフェクトのランダム位置（少しずらす）
+  const offsetX = Math.floor(Math.random() * 40) - 20;
+  const offsetY = Math.floor(Math.random() * 40) - 20;
+  damageEffect.style.left = `calc(50% + ${offsetX}px)`;
+  damageEffect.style.top = `calc(50% + ${offsetY}px)`;
+
+  // アニメーションをリセットして再発動
+  damageEffect.className = '';
+  damageNumber.className = '';
+  monsterImg.classList.remove('hit');
+  void damageEffect.offsetWidth; // reflow
+  damageEffect.className = 'show';
+  damageNumber.className = 'show';
+  monsterImg.classList.add('hit');
+
+  // hitクラスを短時間後に除去（次のキーで再発動できるように）
+  setTimeout(() => {
+    monsterImg.classList.remove('hit');
+  }, 150);
+}
+
+function defeatMonster() {
+  monsterDefeated = true;
+  monsterImg.className = 'defeat';
+  damageEffect.className = '';
+  damageNumber.className = '';
+}
+
+function fadeOutMonster() {
+  monsterDefeated = true;
+  monsterImg.className = 'fade-out';
+  damageEffect.className = '';
+  damageNumber.className = '';
+}
+
+// タイピング入力欄でキーが押されたら音とダメージエフェクトを出す
 document.getElementById('typing-input').addEventListener('keydown', (e) => {
   if (!e.ctrlKey && !e.metaKey && !e.altKey && e.key.length === 1) {
     playKeySound();
+    showDamageEffect();
   }
 });
 
@@ -1400,6 +1588,7 @@ function updateTimerDisplay() {
 
 function handleTimeout() {
   stopTimerSound();
+  fadeOutMonster();
   const q = questions[currentIndex];
   typingInput.disabled = true;
   typingInput.classList.add('wrong');
@@ -1512,6 +1701,9 @@ function showQuestion() {
   // タイマーBGM開始
   startTimerSound();
 
+  // モンスター登場
+  showMonster();
+
   typingInput.focus();
 }
 
@@ -1570,6 +1762,7 @@ function handleCorrect(q) {
   stopTimer();
   stopTimerSound();
   playCorrectSound();
+  defeatMonster();
   typingInput.disabled = true;
   typingInput.classList.add('correct');
   feedback.textContent = '正解！すごい！';
@@ -1595,6 +1788,7 @@ function handleCorrect(q) {
 function handleWrong(q, wrongAnswer) {
   stopTimer();
   stopTimerSound();
+  fadeOutMonster();
   typingInput.disabled = true;
   typingInput.classList.add('wrong');
   feedback.textContent = `残念！正解は「${q.answer}」でした`;
