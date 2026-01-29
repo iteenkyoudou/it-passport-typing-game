@@ -3092,6 +3092,7 @@ let isBossBattle = false;
 let bossComboCount = 0;
 let currentBossIndex = -1;
 let bossBattleStartQuestion = 0;
+let defeatedBosses = []; // ゲーム中に倒したボスのインデックスを記録
 
 function isBossQuestion(questionNumber) {
   return BOSS_THRESHOLDS.includes(questionNumber);
@@ -3154,6 +3155,8 @@ function endBossBattle(victory) {
   hideBossUI();
   if (victory) {
     defeatMonster();
+    // 倒したボスを記録
+    defeatedBosses.push(defeatedBossIndex);
     // 称号獲得演出を表示
     showTitleUnlockEffect(defeatedBossIndex);
   }
@@ -3548,6 +3551,7 @@ function startGame() {
   totalGold = 0;
   correctCount = 0;
   wrongCount = 0;
+  defeatedBosses = []; // 倒したボスをリセット
   resetBgm();
   resetHp();
 
@@ -3718,8 +3722,7 @@ function handleCorrect(q) {
       endBossBattle(true);
       dropMoney();
       dropMoney(); // ボーナスでもう一回
-      // 本気モードならポーションドロップ判定
-      if (gameMode === 'mission') tryDropItem();
+      // ボスはアイテムをドロップしない
       showExplanation(q);
       showNextButton();
     } else {
@@ -3744,16 +3747,21 @@ function handleCorrect(q) {
 function handleWrong(q, wrongAnswer) {
   stopTimer();
   stopTimerSound();
-  fadeOutMonster();
+
+  // ボス戦中はモンスターを消さない（戦闘継続）
+  if (!isBossBattle) {
+    fadeOutMonster();
+  }
+
   showPlayerDamage();
   typingInput.disabled = true;
   typingInput.classList.add('wrong');
   wrongCount++;
 
-  // ボス戦中ならコンボリセット
+  // ボス戦中ならコンボリセット（戦闘は継続）
   if (isBossBattle) {
     resetBossCombo();
-    feedback.textContent = `残念！コンボが途切れた！正解は「${q.answer}」`;
+    feedback.textContent = `${BOSS_NAMES[currentBossIndex]}の攻撃！正解は「${q.answer}」`;
   } else {
     feedback.textContent = `残念！正解は「${q.answer}」でした`;
   }
@@ -4194,19 +4202,26 @@ function saveUnlockedTitles(titles) {
   localStorage.setItem(TITLE_STORAGE_KEY, JSON.stringify(titles));
 }
 
-function unlockTitle(streak, playerName) {
+function unlockTitle(playerName) {
   const unlocked = getUnlockedTitles();
   let changed = false;
-  TITLE_THRESHOLDS.forEach(t => {
-    const key = String(t.min);
-    if (streak >= t.min && !unlocked[key]) {
-      unlocked[key] = {
-        name: t.name,
-        unlockedBy: playerName || ''
-      };
-      changed = true;
+
+  // 倒したボスに対応する称号を解放
+  defeatedBosses.forEach(bossIndex => {
+    const threshold = BOSS_THRESHOLDS[bossIndex]; // 10, 20, 30...
+    const key = String(threshold);
+    if (!unlocked[key]) {
+      const titleInfo = TITLE_THRESHOLDS.find(t => t.min === threshold);
+      if (titleInfo) {
+        unlocked[key] = {
+          name: titleInfo.name,
+          unlockedBy: playerName || ''
+        };
+        changed = true;
+      }
     }
   });
+
   if (changed) {
     saveUnlockedTitles(unlocked);
   }
@@ -4277,7 +4292,7 @@ function finishNameInput(name) {
     pendingRecord.name = getSavedPlayerName() || '';
   }
   saveMissionRecord(pendingRecord);
-  unlockTitle(pendingRecord.streak, pendingRecord.name);
+  unlockTitle(pendingRecord.name);
   showMissionResultScreen(pendingRecord);
   pendingRecord = null;
 }
