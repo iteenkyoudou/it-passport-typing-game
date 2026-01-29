@@ -3420,8 +3420,8 @@ function showQuestion() {
   // タイマーBGM開始
   startTimerSound();
 
-  // ボス戦判定（本気モードで、正解数が称号しきい値に達した場合）
-  const questionNumber = correctCount + 1;
+  // ボス戦判定（本気モードで、問題番号が節目に達した場合）
+  const questionNumber = currentIndex + 1; // 現在の問題番号（1始まり）
   if (gameMode === 'mission' && isBossQuestion(questionNumber) && !isBossBattle) {
     const bossIndex = getBossIndex(questionNumber);
     startBossBattle(bossIndex);
