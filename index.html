@@ -3374,9 +3374,14 @@ function showQuestion() {
   const htmlQ = q.question.replace('＿＿＿', '<span class="blank" id="blank-display">？？？</span>');
   questionText.innerHTML = htmlQ;
 
+  // 選択肢を3つに絞る（正解を含む）
+  const correctAnswer = q.answer;
+  const wrongChoices = q.choices.filter(c => c !== correctAnswer);
+  const selectedWrong = shuffle(wrongChoices).slice(0, 2); // 不正解から2つ選ぶ
+  const threeChoices = shuffle([correctAnswer, ...selectedWrong]); // 正解+不正解2つをシャッフル
+
   choicesList.innerHTML = '';
-  const shuffledChoices = shuffle(q.choices);
-  shuffledChoices.forEach(c => {
+  threeChoices.forEach(c => {
     const chip = document.createElement('div');
     chip.className = 'choice-chip';
     chip.textContent = c;
@@ -3385,8 +3390,7 @@ function showQuestion() {
   });
 
   searchChips.innerHTML = '';
-  const shuffledSearchChoices = shuffle(q.choices);
-  shuffledSearchChoices.forEach(c => {
+  threeChoices.forEach(c => {
     const chip = document.createElement('span');
     chip.className = 'search-chip';
     chip.dataset.term = c;
