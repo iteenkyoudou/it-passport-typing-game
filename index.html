@@ -4224,7 +4224,7 @@ function updateTitleList() {
 
   let html = `<table>
     <thead><tr>
-      <th>正解数</th><th>称号</th><th>解放者</th>
+      <th>討伐数</th><th>称号</th><th>解放者</th>
     </tr></thead><tbody>`;
 
   TITLE_THRESHOLDS.forEach(t => {
@@ -4234,13 +4234,13 @@ function updateTitleList() {
       const color = getColorForCss(t.css);
       const byName = info.unlockedBy ? escapeHtml(info.unlockedBy) : '';
       html += `<tr>
-        <td>${t.min}問</td>
+        <td>${t.min}体</td>
         <td><span class="title-name" style="color:${color};">${t.name}</span></td>
         <td class="unlocked-by">${byName}</td>
       </tr>`;
     } else {
       html += `<tr class="secret">
-        <td>${t.min}問</td>
+        <td>${t.min}体</td>
         <td>??? シークレット ???</td>
         <td>---</td>
       </tr>`;
