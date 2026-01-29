@@ -595,11 +595,36 @@
       0% { text-shadow: 0 0 10px #ff4444, 2px 2px 0 #000; }
       100% { text-shadow: 0 0 20px #ff8800, 0 0 40px #ff4444, 2px 2px 0 #000; }
     }
-    #boss-combo-display {
-      font-size: 1.2rem;
-      font-weight: bold;
+    #boss-status-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 8px;
+    }
+    #boss-name {
+      font-size: 1.3rem;
+      font-weight: 900;
       color: #ffd700;
-      text-shadow: 1px 1px 0 #000;
+      text-shadow: 2px 2px 0 #000, 0 0 10px rgba(255,215,0,0.5);
+      white-space: nowrap;
+    }
+    #boss-hp-container {
+      width: 180px;
+      height: 20px;
+      background: #333;
+      border: 2px solid #ff4444;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+    }
+    #boss-hp-bar {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg, #ff6666, #cc0000);
+      border-radius: 8px;
+      transition: width 0.3s ease-out;
+      box-shadow: 0 0 10px rgba(255,0,0,0.5);
     }
 
     /* ===== モンスター表示エリア（ドラクエ風） ===== */
@@ -2074,7 +2099,12 @@
       <!-- ボスバトルUI -->
       <div id="boss-battle-ui" style="display:none;">
         <div id="boss-battle-title">⚔️ BOSS BATTLE ⚔️</div>
-        <div id="boss-combo-display">連続正解: 0 / 3</div>
+        <div id="boss-status-row">
+          <div id="boss-name">ボス名</div>
+          <div id="boss-hp-container">
+            <div id="boss-hp-bar"></div>
+          </div>
+        </div>
       </div>
 
       <!-- モンスター表示エリア（ドラクエ風） -->
@@ -2938,6 +2968,18 @@ const BOSS_IMAGES = [
   'ボス/character_megami_01_pink.png',            // 90問: ITゴッド
   'ボス/character_daiakuma_01_02_black.png'       // 100問: IT伝説王
 ];
+const BOSS_NAMES = [
+  'フレイムドラゴン',      // 10問
+  'フロストドラゴン',      // 20問
+  'サンダードラゴン',      // 30問
+  'ダークナイト',          // 40問
+  '堕天使ベリアル',        // 50問
+  '妖精王オベロン',        // 60問
+  '勇者キリト',            // 70問
+  '大天使ミカエル',        // 80問
+  '女神アテナ',            // 90問
+  '魔王サタン'             // 100問
+];
 const BOSS_THRESHOLDS = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 const BOSS_COMBO_REQUIRED = 3; // 連続正解数
 let isBossBattle = false;
@@ -2976,17 +3018,22 @@ function showBoss(bossIndex) {
 
 function showBossUI() {
   const bossUI = document.getElementById('boss-battle-ui');
-  const bossComboDisplay = document.getElementById('boss-combo-display');
+  const bossName = document.getElementById('boss-name');
+  const bossHpBar = document.getElementById('boss-hp-bar');
+
   bossUI.style.display = 'block';
-  bossComboDisplay.textContent = `連続正解: ${bossComboCount} / ${BOSS_COMBO_REQUIRED}`;
+  bossName.textContent = BOSS_NAMES[currentBossIndex];
+  bossHpBar.style.width = '100%';
+
   bossUI.className = '';
   void bossUI.offsetWidth;
   bossUI.className = 'show';
 }
 
-function updateBossCombo() {
-  const bossComboDisplay = document.getElementById('boss-combo-display');
-  bossComboDisplay.textContent = `連続正解: ${bossComboCount} / ${BOSS_COMBO_REQUIRED}`;
+function updateBossHpBar() {
+  const bossHpBar = document.getElementById('boss-hp-bar');
+  const hpPercent = ((BOSS_COMBO_REQUIRED - bossComboCount) / BOSS_COMBO_REQUIRED) * 100;
+  bossHpBar.style.width = hpPercent + '%';
 }
 
 function hideBossUI() {
@@ -3005,7 +3052,7 @@ function endBossBattle(victory) {
 
 function resetBossCombo() {
   bossComboCount = 0;
-  updateBossCombo();
+  updateBossHpBar();
 }
 
 // ---------- お金ドロップ演出 ----------
@@ -3509,11 +3556,11 @@ function handleCorrect(q) {
   // ボス戦中の処理
   if (isBossBattle) {
     bossComboCount++;
-    updateBossCombo();
+    updateBossHpBar();
 
     if (bossComboCount >= BOSS_COMBO_REQUIRED) {
       // ボス撃破！
-      feedback.textContent = 'ボス撃破！称号解放！';
+      feedback.textContent = `${BOSS_NAMES[currentBossIndex]}を撃破！称号解放！`;
       endBossBattle(true);
       dropMoney();
       dropMoney(); // ボーナスでもう一回
