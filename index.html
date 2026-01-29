@@ -627,6 +627,91 @@
       box-shadow: 0 0 10px rgba(255,0,0,0.5);
     }
 
+    /* ===== 称号獲得演出 ===== */
+    #title-unlock-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      opacity: 0;
+      animation: titleOverlayFadeIn 0.5s ease-out forwards;
+    }
+    @keyframes titleOverlayFadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    #title-unlock-content {
+      text-align: center;
+      position: relative;
+    }
+    #title-unlock-label {
+      font-size: 1.5rem;
+      color: #ffd700;
+      text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+      margin-bottom: 16px;
+      animation: titleLabelPulse 1s ease-in-out infinite;
+    }
+    @keyframes titleLabelPulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
+    #title-unlock-name {
+      font-size: 3.5rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #ffd700, #ff8c00, #ffd700);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: none;
+      filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.8)) drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+      animation: titleNameAppear 0.8s ease-out, titleNameShine 2s ease-in-out infinite;
+      letter-spacing: 8px;
+    }
+    @keyframes titleNameAppear {
+      0% { transform: scale(0.3) rotateY(90deg); opacity: 0; }
+      50% { transform: scale(1.2) rotateY(-10deg); }
+      100% { transform: scale(1) rotateY(0deg); opacity: 1; }
+    }
+    @keyframes titleNameShine {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    #title-unlock-particles {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .title-particle {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      animation: particleExplode 1.5s ease-out forwards;
+    }
+    @keyframes particleExplode {
+      0% { transform: translate(0, 0) scale(1); opacity: 1; }
+      100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+    }
+    .title-sparkle {
+      position: absolute;
+      font-size: 2rem;
+      animation: sparkleFloat 2s ease-out forwards;
+    }
+    @keyframes sparkleFloat {
+      0% { transform: translate(0, 0) scale(0) rotate(0deg); opacity: 0; }
+      20% { transform: translate(var(--tx), calc(var(--ty) * 0.3)) scale(1.2) rotate(180deg); opacity: 1; }
+      100% { transform: translate(var(--tx), var(--ty)) scale(0.5) rotate(360deg); opacity: 0; }
+    }
+
     /* ===== モンスター表示エリア（ドラクエ風） ===== */
     #monster-area {
       background: rgba(255,255,255,0.03);
@@ -2107,6 +2192,15 @@
         </div>
       </div>
 
+      <!-- 称号獲得演出 -->
+      <div id="title-unlock-overlay" style="display:none;">
+        <div id="title-unlock-content">
+          <div id="title-unlock-label">称号獲得！</div>
+          <div id="title-unlock-name"></div>
+          <div id="title-unlock-particles"></div>
+        </div>
+      </div>
+
       <!-- モンスター表示エリア（ドラクエ風） -->
       <div id="monster-area">
         <div id="monster-container">
@@ -2980,6 +3074,18 @@ const BOSS_NAMES = [
   '女神アテナ',            // 90問
   '魔王サタン'             // 100問
 ];
+const TITLE_NAMES = [
+  'IT見習い',       // 10問
+  'IT冒険者',       // 20問
+  'IT騎士',         // 30問
+  'IT勇者',         // 40問
+  'IT魔法使い',     // 50問
+  'IT賢者',         // 60問
+  'ITマスター',     // 70問
+  'IT博士',         // 80問
+  'ITゴッド',       // 90問
+  'IT伝説王'        // 100問
+];
 const BOSS_THRESHOLDS = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 const BOSS_COMBO_REQUIRED = 3; // 連続正解数
 let isBossBattle = false;
@@ -3042,12 +3148,60 @@ function hideBossUI() {
 }
 
 function endBossBattle(victory) {
+  const defeatedBossIndex = currentBossIndex;
   isBossBattle = false;
   currentBossIndex = -1;
   hideBossUI();
   if (victory) {
     defeatMonster();
+    // 称号獲得演出を表示
+    showTitleUnlockEffect(defeatedBossIndex);
   }
+}
+
+// ---------- 称号獲得演出 ----------
+function showTitleUnlockEffect(bossIndex) {
+  const overlay = document.getElementById('title-unlock-overlay');
+  const titleName = document.getElementById('title-unlock-name');
+  const particles = document.getElementById('title-unlock-particles');
+
+  // 称号名を設定
+  titleName.textContent = TITLE_NAMES[bossIndex];
+
+  // パーティクルをリセット
+  particles.innerHTML = '';
+
+  // パーティクル（色付き丸）を生成
+  const colors = ['#ffd700', '#ff8c00', '#ffeb3b', '#fff176', '#ffe082', '#ff6f00'];
+  for (let i = 0; i < 30; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'title-particle';
+    particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+    particle.style.setProperty('--tx', (Math.random() - 0.5) * 400 + 'px');
+    particle.style.setProperty('--ty', (Math.random() - 0.5) * 400 + 'px');
+    particle.style.animationDelay = Math.random() * 0.3 + 's';
+    particles.appendChild(particle);
+  }
+
+  // キラキラエフェクト（絵文字）
+  const sparkles = ['✨', '⭐', '🌟', '💫', '🎉', '🏆'];
+  for (let i = 0; i < 12; i++) {
+    const sparkle = document.createElement('div');
+    sparkle.className = 'title-sparkle';
+    sparkle.textContent = sparkles[Math.floor(Math.random() * sparkles.length)];
+    sparkle.style.setProperty('--tx', (Math.random() - 0.5) * 300 + 'px');
+    sparkle.style.setProperty('--ty', (Math.random() - 0.5) * 300 - 50 + 'px');
+    sparkle.style.animationDelay = Math.random() * 0.5 + 's';
+    particles.appendChild(sparkle);
+  }
+
+  // 表示
+  overlay.style.display = 'flex';
+
+  // 3秒後に自動で閉じる
+  setTimeout(() => {
+    overlay.style.display = 'none';
+  }, 3000);
 }
 
 function resetBossCombo() {
