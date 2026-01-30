@@ -2121,7 +2121,7 @@
   <div id="intro-text-container">
     <div id="intro-text"></div>
   </div>
-  <div id="intro-skip-hint">SPACE でスキップ</div>
+  <div id="intro-skip-hint">クリック または SPACE でスキップ</div>
 </div>
 
 <div id="player-damage-overlay"></div>
@@ -4490,17 +4490,41 @@ introBgm.loop = true;
 let introIndex = 0;
 let introTimeout = null;
 let introSkipped = false;
+let introStarted = false;
+let introBgmStarted = false;
+
+// BGMを確実に再生する関数
+function ensureIntroBgm() {
+  if (introBgmStarted || introSkipped) return;
+  introBgm.play().then(() => {
+    introBgmStarted = true;
+  }).catch(() => {
+    // 再生失敗時は次の操作で再試行
+  });
+}
 
 function startIntro() {
   const introScreen = document.getElementById('intro-screen');
   const introText = document.getElementById('intro-text');
 
-  // イントロBGM開始
-  introBgm.play().catch(() => {});
-
   introIndex = 0;
   introSkipped = false;
   introText.innerHTML = '';
+
+  // 「クリックまたはキーを押してスタート」を表示
+  introText.innerHTML = '<div class="intro-line" style="color:#888;">画面をクリック または キーを押してスタート</div>';
+}
+
+function beginIntroSequence() {
+  if (introStarted || introSkipped) return;
+  introStarted = true;
+
+  // BGM再生を試みる
+  ensureIntroBgm();
+
+  const introText = document.getElementById('intro-text');
+  introText.innerHTML = '';
+  introIndex = 0;
 
   showNextIntroLine();
 }
@@ -4557,16 +4581,32 @@ function skipIntro() {
   endIntro();
 }
 
-// スペースキーでスキップ
+// イントロ画面でのキー操作
 document.addEventListener('keydown', (e) => {
   const introScreen = document.getElementById('intro-screen');
-  if (!introScreen.classList.contains('hidden') && e.code === 'Space') {
+  if (introScreen.classList.contains('hidden')) return;
+
+  if (!introStarted) {
+    // まだ開始していなければイントロ開始
+    e.preventDefault();
+    beginIntroSequence();
+  } else if (e.code === 'Space') {
+    // 開始済みならスペースでスキップ
     e.preventDefault();
     skipIntro();
   }
 });
 
-// ページ読み込み時にイントロ開始
+// イントロ画面クリックで開始/スキップ
+document.getElementById('intro-screen').addEventListener('click', () => {
+  if (!introStarted) {
+    beginIntroSequence();
+  } else {
+    skipIntro();
+  }
+});
+
+// ページ読み込み時にイントロ待機画面を表示
 startIntro();
 </script>
 
