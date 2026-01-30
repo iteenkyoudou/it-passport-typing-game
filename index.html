@@ -3252,8 +3252,30 @@ function endBossBattle(victory) {
     defeatMonster();
     // 倒したボスを記録
     defeatedBosses.push(defeatedBossIndex);
+    // 称号を即座に仮保存（解放者名は後で更新）
+    unlockTitleImmediately(defeatedBossIndex);
     // 称号獲得演出を表示
     showTitleUnlockEffect(defeatedBossIndex);
+  }
+}
+
+// ボス撃破時に即座に称号を保存（解放者名は仮）
+function unlockTitleImmediately(bossIndex) {
+  const unlocked = getUnlockedTitles();
+  const threshold = BOSS_THRESHOLDS[bossIndex];
+  const key = String(threshold);
+
+  // まだ解放されていない場合のみ保存
+  if (!unlocked[key]) {
+    const titleInfo = TITLE_THRESHOLDS.find(t => t.min === threshold);
+    if (titleInfo) {
+      // 解放者名は仮で空文字、後でゲーム終了時に更新
+      unlocked[key] = {
+        name: titleInfo.name,
+        unlockedBy: getSavedPlayerName() || '???'
+      };
+      saveUnlockedTitles(unlocked);
+    }
   }
 }
 
@@ -4305,17 +4327,14 @@ function unlockTitle(playerName) {
   const unlocked = getUnlockedTitles();
   let changed = false;
 
-  // 倒したボスに対応する称号を解放
+  // 倒したボスに対応する称号の解放者名を更新
   defeatedBosses.forEach(bossIndex => {
     const threshold = BOSS_THRESHOLDS[bossIndex]; // 10, 20, 30...
     const key = String(threshold);
-    if (!unlocked[key]) {
-      const titleInfo = TITLE_THRESHOLDS.find(t => t.min === threshold);
-      if (titleInfo) {
-        unlocked[key] = {
-          name: titleInfo.name,
-          unlockedBy: playerName || ''
-        };
+    if (unlocked[key]) {
+      // 解放者名が仮（???）または空の場合、正しい名前で更新
+      if (!unlocked[key].unlockedBy || unlocked[key].unlockedBy === '???') {
+        unlocked[key].unlockedBy = playerName || '';
         changed = true;
       }
     }
