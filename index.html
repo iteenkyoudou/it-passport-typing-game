@@ -621,11 +621,11 @@
     /* ===== ボスバトルUI ===== */
     #boss-battle-ui {
       text-align: center;
-      margin-bottom: 16px;
-      padding: 16px;
+      margin-bottom: 6px;
+      padding: 6px 12px;
       background: linear-gradient(135deg, rgba(139,0,0,0.3), rgba(75,0,130,0.3));
-      border: 3px solid #ff4444;
-      border-radius: 12px;
+      border: 2px solid #ff4444;
+      border-radius: 8px;
       animation: bossPulse 1.5s ease-in-out infinite;
       opacity: 0;
       transform: scale(0.8);
@@ -636,44 +636,43 @@
       transform: scale(1);
     }
     @keyframes bossPulse {
-      0%, 100% { border-color: #ff4444; box-shadow: 0 0 20px rgba(255,68,68,0.5); }
-      50% { border-color: #ff8800; box-shadow: 0 0 30px rgba(255,136,0,0.7); }
+      0%, 100% { border-color: #ff4444; box-shadow: 0 0 10px rgba(255,68,68,0.4); }
+      50% { border-color: #ff8800; box-shadow: 0 0 15px rgba(255,136,0,0.5); }
     }
     #boss-battle-title {
-      font-size: 1.8rem;
+      font-size: 1.1rem;
       font-weight: 900;
       color: #ff4444;
-      text-shadow: 0 0 10px #ff4444, 2px 2px 0 #000;
-      letter-spacing: 4px;
-      margin-bottom: 8px;
+      text-shadow: 0 0 8px #ff4444, 1px 1px 0 #000;
+      letter-spacing: 2px;
+      margin-bottom: 4px;
       animation: bossTextGlow 1s ease-in-out infinite alternate;
     }
     @keyframes bossTextGlow {
-      0% { text-shadow: 0 0 10px #ff4444, 2px 2px 0 #000; }
-      100% { text-shadow: 0 0 20px #ff8800, 0 0 40px #ff4444, 2px 2px 0 #000; }
+      0% { text-shadow: 0 0 8px #ff4444, 1px 1px 0 #000; }
+      100% { text-shadow: 0 0 12px #ff8800, 0 0 20px #ff4444, 1px 1px 0 #000; }
     }
     #boss-status-row {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 16px;
-      margin-top: 8px;
+      gap: 12px;
     }
     #boss-name {
-      font-size: 1.3rem;
+      font-size: 1rem;
       font-weight: 900;
       color: #ffd700;
-      text-shadow: 2px 2px 0 #000, 0 0 10px rgba(255,215,0,0.5);
+      text-shadow: 1px 1px 0 #000, 0 0 8px rgba(255,215,0,0.5);
       white-space: nowrap;
     }
     #boss-hp-container {
-      width: 180px;
-      height: 20px;
+      width: 140px;
+      height: 14px;
       background: #333;
       border: 2px solid #ff4444;
-      border-radius: 10px;
+      border-radius: 7px;
       overflow: hidden;
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
     }
     #boss-hp-bar {
       width: 100%;
@@ -2313,9 +2312,9 @@
 
         <!-- 右側：ナビゲーションボックス -->
         <div id="nav-guide-box">
-          <p>⚔️ <strong>敵が現れた！</strong> 正しい答えをタイピングして撃退しろ！</p>
-          <p>🔍 分からなかったら右の <strong>検索ボタン</strong> をクリックして調べろ！</p>
-          <p>💊 アイテムは <strong>クリック</strong> で使用！💊=HP回復 ⏰=時間リセット</p>
+          <p><strong>敵が現れた！</strong> 正しい答えをタイピングして撃退しろ！</p>
+          <p>分からなかったら右の <strong>検索ボタン</strong> をクリックして調べろ！</p>
+          <p>アイテムは <strong>クリック</strong> で使用！</p>
         </div>
       </div>
 
@@ -3620,9 +3619,9 @@ function handleTimeout() {
   // ボス戦中でも体力は回復しない
   if (isBossBattle) {
     onBossMiss();
-    feedback.textContent = `タイムアウト！${BOSS_NAMES[currentBossIndex]}の攻撃！正解は「${q.answer}」`;
+    feedback.textContent = `正解は「${q.answer}」`;
   } else {
-    feedback.textContent = `タイムアウト！正解は「${q.answer}」でした`;
+    feedback.textContent = `正解は「${q.answer}」`;
   }
   feedback.className = 'wrong';
   wrongCount++;
@@ -3855,7 +3854,7 @@ function handleCorrect(q) {
     }
   } else {
     // 通常戦闘
-    feedback.textContent = '正解！すごい！';
+    feedback.textContent = '';
     defeatMonster();
     dropMoney();
     // 本気モードならポーションドロップ判定
@@ -3882,9 +3881,9 @@ function handleWrong(q, wrongAnswer) {
   // ボス戦中でも体力は回復しない（戦闘は継続）
   if (isBossBattle) {
     onBossMiss();
-    feedback.textContent = `${BOSS_NAMES[currentBossIndex]}の攻撃！正解は「${q.answer}」 あと${BOSS_HP_REQUIRED - bossDamageCount}問！`;
+    feedback.textContent = `正解は「${q.answer}」 あと${BOSS_HP_REQUIRED - bossDamageCount}問！`;
   } else {
-    feedback.textContent = `残念！正解は「${q.answer}」でした`;
+    feedback.textContent = `正解は「${q.answer}」`;
   }
   feedback.className = 'wrong';
 
