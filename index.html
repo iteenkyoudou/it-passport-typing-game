@@ -19,6 +19,63 @@
       flex-direction: column;
     }
 
+    /* ===== イントロ画面 ===== */
+    #intro-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #000;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #intro-screen.hidden {
+      display: none;
+    }
+    #intro-text-container {
+      max-width: 700px;
+      padding: 0 32px;
+      text-align: center;
+    }
+    #intro-text {
+      font-size: 1.6rem;
+      line-height: 2;
+      color: #fff;
+      min-height: 100px;
+    }
+    #intro-text .intro-line {
+      opacity: 0;
+      animation: introFadeIn 0.8s ease-out forwards;
+    }
+    @keyframes introFadeIn {
+      0% { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    #intro-text .intro-highlight {
+      color: #ffd700;
+      font-weight: bold;
+    }
+    #intro-text .intro-question {
+      color: #4fc3f7;
+      font-size: 1.8rem;
+      font-weight: bold;
+    }
+    #intro-skip-hint {
+      position: fixed;
+      bottom: 40px;
+      color: #666;
+      font-size: 0.9rem;
+      animation: introHintBlink 2s ease-in-out infinite;
+    }
+    @keyframes introHintBlink {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+
     /* ===== ヘッダー ===== */
     header {
       text-align: center;
@@ -2058,6 +2115,14 @@
   </style>
 </head>
 <body>
+
+<!-- イントロ画面 -->
+<div id="intro-screen">
+  <div id="intro-text-container">
+    <div id="intro-text"></div>
+  </div>
+  <div id="intro-skip-hint">SPACE でスキップ</div>
+</div>
 
 <div id="player-damage-overlay"></div>
 <div id="player-damage-number"></div>
@@ -4363,6 +4428,110 @@ function toggleNavGuide() {
 
 // 初期ダッシュボード表示
 updateDashboard();
+
+// ---------- イントロ画面 ----------
+const INTRO_LINES = [
+  { text: 'うっすら気づいているだろう。', delay: 1500 },
+  { text: '今、世界は大きく変わろうとしている。', delay: 1500 },
+  { text: 'AIという新しい力が、社会を変えていく。', delay: 1500 },
+  { text: 'でも、その力を使いこなせる者は、まだ少ない。', delay: 2000 },
+  { text: '子どもの頃からITを学び、<br>資格を取ろうとする者は、もっと少ない。', delay: 2500 },
+  { text: 'キミはどうする？', delay: 2000, class: 'intro-question' },
+  { text: 'ITパスポート──', delay: 1500, class: 'intro-highlight' },
+  { text: 'それは、デジタル世界を生き抜くための「知識の証」。', delay: 2000 },
+  { text: 'プログラム、ネットワーク、セキュリティ、AI...', delay: 2000 },
+  { text: 'これらを理解する者だけが、<br>未来を自分の手で切り開ける。', delay: 2500 },
+  { text: 'キミがこの資格を手にしたとき、', delay: 1500 },
+  { text: 'ITは、一生使えるキミの武器になる。', delay: 2000, class: 'intro-highlight' },
+  { text: 'IT技術に使われる側ではなく、理解し使う側へ。', delay: 2500 },
+  { text: 'さあ、冒険をはじめよう。', delay: 2000, class: 'intro-highlight' }
+];
+
+const introBgm = new Audio('iwashiro_mikaduki_jelly.mp3');
+introBgm.volume = 0.5;
+introBgm.loop = true;
+
+let introIndex = 0;
+let introTimeout = null;
+let introSkipped = false;
+
+function startIntro() {
+  const introScreen = document.getElementById('intro-screen');
+  const introText = document.getElementById('intro-text');
+
+  // イントロBGM開始
+  introBgm.play().catch(() => {});
+
+  introIndex = 0;
+  introSkipped = false;
+  introText.innerHTML = '';
+
+  showNextIntroLine();
+}
+
+function showNextIntroLine() {
+  if (introSkipped) return;
+
+  const introText = document.getElementById('intro-text');
+
+  if (introIndex >= INTRO_LINES.length) {
+    // イントロ終了
+    setTimeout(() => {
+      if (!introSkipped) endIntro();
+    }, 1500);
+    return;
+  }
+
+  const line = INTRO_LINES[introIndex];
+  const lineClass = line.class || '';
+
+  // 新しい行を表示
+  introText.innerHTML = `<div class="intro-line ${lineClass}">${line.text}</div>`;
+
+  introIndex++;
+  introTimeout = setTimeout(showNextIntroLine, line.delay);
+}
+
+function endIntro() {
+  const introScreen = document.getElementById('intro-screen');
+  introScreen.classList.add('hidden');
+
+  // BGMをフェードアウト
+  let vol = introBgm.volume;
+  const fadeOut = setInterval(() => {
+    vol -= 0.05;
+    if (vol <= 0) {
+      clearInterval(fadeOut);
+      introBgm.pause();
+      introBgm.currentTime = 0;
+    } else {
+      introBgm.volume = vol;
+    }
+  }, 50);
+}
+
+function skipIntro() {
+  if (introSkipped) return;
+  introSkipped = true;
+
+  if (introTimeout) {
+    clearTimeout(introTimeout);
+  }
+
+  endIntro();
+}
+
+// スペースキーでスキップ
+document.addEventListener('keydown', (e) => {
+  const introScreen = document.getElementById('intro-screen');
+  if (!introScreen.classList.contains('hidden') && e.code === 'Space') {
+    e.preventDefault();
+    skipIntro();
+  }
+});
+
+// ページ読み込み時にイントロ開始
+startIntro();
 </script>
 
 </body>
