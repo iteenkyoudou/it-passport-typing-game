@@ -3179,15 +3179,18 @@ const TITLE_NAMES = [
   'IT伝説王'        // 100問
 ];
 const BOSS_THRESHOLDS = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-const BOSS_COMBO_REQUIRED = 3; // 連続正解数
+const BOSS_HP_REQUIRED = 3; // ボスを倒すのに必要な正解数
 let isBossBattle = false;
-let bossComboCount = 0;
+let bossDamageCount = 0; // ボスに与えた累計ダメージ（正解数）
 let currentBossIndex = -1;
 let bossBattleStartQuestion = 0;
 let defeatedBosses = []; // ゲーム中に倒したボスのインデックスを記録
 
 function isBossQuestion(questionNumber) {
-  return BOSS_THRESHOLDS.includes(questionNumber);
+  if (!BOSS_THRESHOLDS.includes(questionNumber)) return false;
+  // 既に倒したボスは出現しない
+  const bossIndex = BOSS_THRESHOLDS.indexOf(questionNumber);
+  return !defeatedBosses.includes(bossIndex);
 }
 
 function getBossIndex(questionNumber) {
@@ -3196,7 +3199,7 @@ function getBossIndex(questionNumber) {
 
 function startBossBattle(bossIndex) {
   isBossBattle = true;
-  bossComboCount = 0;
+  bossDamageCount = 0; // 累計ダメージをリセット
   currentBossIndex = bossIndex;
   bossBattleStartQuestion = currentIndex;
   showBossUI();
@@ -3231,8 +3234,8 @@ function showBossUI() {
 
 function updateBossHpBar() {
   const bossHpBar = document.getElementById('boss-hp-bar');
-  const hpPercent = ((BOSS_COMBO_REQUIRED - bossComboCount) / BOSS_COMBO_REQUIRED) * 100;
-  bossHpBar.style.width = hpPercent + '%';
+  const hpPercent = ((BOSS_HP_REQUIRED - bossDamageCount) / BOSS_HP_REQUIRED) * 100;
+  bossHpBar.style.width = Math.max(0, hpPercent) + '%';
 }
 
 function hideBossUI() {
@@ -3299,9 +3302,9 @@ function showTitleUnlockEffect(bossIndex) {
   }, 3000);
 }
 
-function resetBossCombo() {
-  bossComboCount = 0;
-  updateBossHpBar();
+function onBossMiss() {
+  // 間違えてもボスの体力は回復しない
+  // （累計ダメージはそのまま維持）
 }
 
 // ---------- お金ドロップ演出 ----------
@@ -3592,10 +3595,10 @@ function handleTimeout() {
   typingInput.disabled = true;
   typingInput.classList.add('wrong');
 
-  // ボス戦中ならコンボリセット
+  // ボス戦中でも体力は回復しない
   if (isBossBattle) {
-    resetBossCombo();
-    feedback.textContent = `タイムアウト！コンボが途切れた！正解は「${q.answer}」`;
+    onBossMiss();
+    feedback.textContent = `タイムアウト！${BOSS_NAMES[currentBossIndex]}の攻撃！正解は「${q.answer}」`;
   } else {
     feedback.textContent = `タイムアウト！正解は「${q.answer}」でした`;
   }
@@ -3809,10 +3812,10 @@ function handleCorrect(q) {
 
   // ボス戦中の処理
   if (isBossBattle) {
-    bossComboCount++;
+    bossDamageCount++;
     updateBossHpBar();
 
-    if (bossComboCount >= BOSS_COMBO_REQUIRED) {
+    if (bossDamageCount >= BOSS_HP_REQUIRED) {
       // ボス撃破！
       feedback.textContent = `${BOSS_NAMES[currentBossIndex]}を撃破！称号解放！`;
       endBossBattle(true);
@@ -3823,7 +3826,7 @@ function handleCorrect(q) {
       showNextButton();
     } else {
       // まだ続く - ダメージエフェクトだけ見せて次の問題へ
-      feedback.textContent = `正解！ あと${BOSS_COMBO_REQUIRED - bossComboCount}問！`;
+      feedback.textContent = `正解！ あと${BOSS_HP_REQUIRED - bossDamageCount}問！`;
       showDamageEffect();
       showExplanation(q);
       showNextButton();
@@ -3854,10 +3857,10 @@ function handleWrong(q, wrongAnswer) {
   typingInput.classList.add('wrong');
   wrongCount++;
 
-  // ボス戦中ならコンボリセット（戦闘は継続）
+  // ボス戦中でも体力は回復しない（戦闘は継続）
   if (isBossBattle) {
-    resetBossCombo();
-    feedback.textContent = `${BOSS_NAMES[currentBossIndex]}の攻撃！正解は「${q.answer}」`;
+    onBossMiss();
+    feedback.textContent = `${BOSS_NAMES[currentBossIndex]}の攻撃！正解は「${q.answer}」 あと${BOSS_HP_REQUIRED - bossDamageCount}問！`;
   } else {
     feedback.textContent = `残念！正解は「${q.answer}」でした`;
   }
