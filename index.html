@@ -2513,6 +2513,26 @@ healSound.volume = 0.5;
 const watchSound = new Audio('重力魔法1.mp3');
 watchSound.volume = 0.5;
 
+// UI切り替え音（モード選択、カテゴリ選択、サウンド設定）
+const uiClickSound = new Audio('決定ボタンを押す3.mp3');
+uiClickSound.volume = 0.5;
+
+// スタートボタン音
+const startSound = new Audio('決定ボタンを押す18.mp3');
+startSound.volume = 0.5;
+
+function playUiClickSound() {
+  if (isMutedAll) return;
+  uiClickSound.currentTime = 0;
+  uiClickSound.play().catch(() => {});
+}
+
+function playStartSound() {
+  if (isMutedAll) return;
+  startSound.currentTime = 0;
+  startSound.play().catch(() => {});
+}
+
 // ---------- ユーティリティ ----------
 function shuffle(arr) {
   const a = [...arr];
@@ -2557,10 +2577,16 @@ function isGamePlaying() {
 }
 
 function toggleMuteAll() {
+  // 音をミュートにする前に効果音を鳴らす
+  if (!isMutedAll) {
+    uiClickSound.currentTime = 0;
+    uiClickSound.play().catch(() => {});
+  }
   isMutedAll = !isMutedAll;
   if (isMutedAll) {
     stopBgm();
   } else {
+    playUiClickSound();
     // ゲーム中のみBGMを再生
     if (!isMutedBgm && isGamePlaying()) startBgm();
   }
@@ -2568,6 +2594,7 @@ function toggleMuteAll() {
 }
 
 function toggleMuteBgm() {
+  playUiClickSound();
   isMutedBgm = !isMutedBgm;
   if (isMutedBgm) {
     stopBgm();
@@ -3358,6 +3385,7 @@ document.getElementById('typing-input').addEventListener('keydown', (e) => {
 
 // ---------- モード選択 ----------
 function selectMode(mode) {
+  playUiClickSound();
   gameMode = mode;
   document.querySelectorAll('.mode-card').forEach(card => {
     card.classList.toggle('selected', card.dataset.mode === mode);
@@ -3496,7 +3524,10 @@ function updateQCountInfo() {
 }
 
 document.querySelectorAll('input[name="cat"]').forEach(radio => {
-  radio.addEventListener('change', updateQCountInfo);
+  radio.addEventListener('change', () => {
+    playUiClickSound();
+    updateQCountInfo();
+  });
 });
 
 updateQCountInfo();
@@ -4384,8 +4415,12 @@ playerNameInput.addEventListener('keydown', (e) => {
 });
 
 // ---------- イベント ----------
-startBtn.addEventListener('click', startGame);
+startBtn.addEventListener('click', () => {
+  playStartSound();
+  startGame();
+});
 retryBtn.addEventListener('click', () => {
+  playStartSound();
   resultScreen.style.display = 'none';
   startScreen.classList.remove('hidden');
   updateDashboard();
