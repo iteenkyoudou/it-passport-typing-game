@@ -4428,21 +4428,22 @@ updateDashboard();
 
 // ---------- イントロ画面 ----------
 const INTRO_LINES = [
-  { text: 'うっすら気づいているだろう。', delay: 1500 },
-  { text: '今、世界は大きく変わろうとしている。', delay: 1500 },
-  { text: 'AIという新しい力が、社会を変えていく。', delay: 1500 },
-  { text: 'でも、その力を使いこなせる者は、まだ少ない。', delay: 2000 },
-  { text: '子どもの頃からITを学び、<br>資格を取ろうとする者は、もっと少ない。', delay: 2500 },
-  { text: 'キミはどうする？', delay: 2000, class: 'intro-question' },
-  { text: 'ITパスポート──', delay: 1500, class: 'intro-highlight' },
-  { text: 'それは、デジタル世界を生き抜くための「知識の証」。', delay: 2000 },
-  { text: 'プログラム、ネットワーク、セキュリティ、AI...', delay: 2000 },
-  { text: 'これらを理解する者だけが、<br>未来を自分の手で切り開ける。', delay: 2500 },
-  { text: 'キミがこの資格を手にしたとき、', delay: 1500 },
-  { text: 'ITは、一生使えるキミの武器になる。', delay: 2000, class: 'intro-highlight' },
-  { text: 'IT技術に使われる側ではなく、理解し使う側へ。', delay: 2500 },
-  { text: 'さあ、冒険をはじめよう。', delay: 2000, class: 'intro-highlight' }
+  { text: 'うっすら気づいているだろう。' },
+  { text: '今、世界は大きく変わろうとしている。' },
+  { text: 'AIという新しい力が、社会を変えていく。' },
+  { text: 'でも、その力を使いこなせる者は、まだ少ない。' },
+  { text: '子どもの頃からITを学び、<br>資格を取ろうとする者は、もっと少ない。' },
+  { text: 'キミはどうする？', class: 'intro-question' },
+  { text: 'ITパスポート──', class: 'intro-highlight' },
+  { text: 'それは、デジタル世界を生き抜くための「知識の証」。' },
+  { text: 'プログラム、ネットワーク、セキュリティ、AI...' },
+  { text: 'これらを理解する者だけが、<br>未来を自分の手で切り開ける。' },
+  { text: 'キミがこの資格を手にしたとき、' },
+  { text: 'ITは、一生使えるキミの武器になる。', class: 'intro-highlight' },
+  { text: 'IT技術に使われる側ではなく、理解し使う側へ。' },
+  { text: 'さあ、冒険をはじめよう。', class: 'intro-highlight' }
 ];
+const INTRO_DELAY = 2500; // 一律2.5秒
 
 const introBgm = new Audio('iwashiro_mikaduki_jelly.mp3');
 introBgm.volume = 0.5;
@@ -4486,7 +4487,7 @@ function showNextIntroLine() {
   introText.innerHTML = `<div class="intro-line ${lineClass}">${line.text}</div>`;
 
   introIndex++;
-  introTimeout = setTimeout(showNextIntroLine, line.delay);
+  introTimeout = setTimeout(showNextIntroLine, INTRO_DELAY);
 }
 
 function endIntro() {
