@@ -11,31 +11,33 @@ ITパスポート試験の学習を楽しくゲーム感覚で進められるタ
 
 ## 🚀 起動方法
 
-### 方法1: コマンドラインから起動
+### 推奨: Python3で起動（Node.js不要）
 ```bash
 # プロジェクトディレクトリに移動
 cd 37_ITパスポートタイピングゲーム
 
-# HTTPサーバーを起動（Python3が必要）
+# HTTPサーバーを起動（Python3のみ必要）
 python3 -m http.server 8000
 
 # ブラウザで以下のURLにアクセス
-# http://localhost:8000/course.html
+http://localhost:8000/course.html
 ```
 
-### 方法2: npmスクリプトで起動
+**💡 ポート8000が使用中の場合:**
 ```bash
-# プロジェクトディレクトリに移動
-cd 37_ITパスポートタイピングゲーム
+# 使用中のプロセスを確認
+lsof -i :8000
 
-# サーバーを起動
-npm start
-# または
-npm run dev
-
-# ブラウザで以下のURLにアクセス
-# http://localhost:8000/course.html
+# プロセスを終了（PIDは上記コマンドで確認）
+kill <PID>
 ```
+
+### 別の方法: npmスクリプトで起動（Node.js/npmが必要）
+```bash
+# Node.js/npmがインストールされている場合のみ
+npm start
+```
+※ `npm start` は内部で `python3 -m http.server 8000` を実行しています
 
 ## ⚠️ 注意事項
 

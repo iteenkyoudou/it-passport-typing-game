@@ -26,12 +26,13 @@ button{cursor:pointer;font-family:inherit}
   padding:20px 16px;overflow-y:auto;
   display:flex;flex-direction:column;gap:16px;
 }
-.sp-brand{font-size:.95rem;font-weight:bold;color:#ffd700;text-align:center;line-height:1.5;padding-bottom:12px;border-bottom:1px solid #555}
-.sp-avatar{
-  width:64px;height:64px;margin:0 auto;border-radius:50%;
-  background:#111;border:2px solid #888;
-  display:flex;align-items:center;justify-content:center;
-  font-size:.7rem;color:#aaa;
+.sp-account-name{
+  font-size:1rem;font-weight:bold;color:#fff;text-align:center;
+  padding:8px 0 4px;
+}
+.sp-account-title{
+  font-size:.75rem;color:#ffd700;text-align:center;
+  padding-bottom:12px;border-bottom:1px solid #555;
 }
 .sp-section{text-align:center}
 .sp-level-label{font-size:.65rem;color:#aaa;letter-spacing:2px;text-transform:uppercase}
@@ -430,8 +431,7 @@ button{cursor:pointer;font-family:inherit}
     gap:3px 10px;align-items:center;
     overflow:hidden;
   }
-  .sp-brand{display:none}
-  #sp-avatar-area{display:none}
+  #sp-account-area{display:none}
   .sp-divider{display:none}
   .sp-title-next{display:none}
   .app-header{display:none}
@@ -537,10 +537,9 @@ button{cursor:pointer;font-family:inherit}
 <body>
 
 <aside class="side-panel" id="side-panel">
-  <div class="sp-brand">ITパスポート<br>対策講座</div>
-
-  <div class="sp-section" id="sp-avatar-area">
-    <div class="sp-avatar" id="sp-avatar"></div>
+  <div class="sp-section" id="sp-account-area">
+    <div class="sp-account-name" id="sp-account-name">ゲストユーザー（仮）</div>
+    <div class="sp-account-title" id="sp-account-title">駆け出しの学び手（仮）</div>
   </div>
 
   <div class="sp-section" id="sp-level-area">
