@@ -2112,6 +2112,9 @@
       #search-side-panel { height: 350px; }
     }
   </style>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
@@ -2428,6 +2431,19 @@
 
 <script src="questions.js"></script>
 <script>
+// ---------- Firebase初期化 ----------
+const firebaseConfig = {
+  apiKey: "AIzaSyB50ZX_dGaQoau4XUdopaFm2hy4hMRiqpA",
+  authDomain: "it-passport-typing-game.firebaseapp.com",
+  projectId: "it-passport-typing-game",
+  storageBucket: "it-passport-typing-game.firebasestorage.app",
+  messagingSenderId: "854167549178",
+  appId: "1:854167549178:web:ddd8f78da8025a7454c543",
+  measurementId: "G-V4020ES7EZ"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
 // ---------- ゲーム状態 ----------
 let questions = [];
@@ -3729,7 +3745,7 @@ function showQuestion() {
   typingInput.value = '';
   typingInput.className = '';
   typingInput.disabled = false;
-  typingInput.placeholder = `「${q.choices.join('」「')}」のどれかをタイピング`;
+  typingInput.placeholder = `「${threeChoices.join('」「')}」のどれかをタイピング`;
   feedback.textContent = '';
   feedback.className = '';
   explanationBox.style.display = 'none';
@@ -4188,7 +4204,15 @@ function restoreResultScreen() {
 const STORAGE_KEY = 'itpassport_mission_records';
 const PLAYER_NAME_KEY = 'itpassport_player_name';
 
+// クラウドから取得したランキングデータをキャッシュ
+let cachedCloudRankings = null;
+
 function getMissionRecords() {
+  // キャッシュがあればそれを返す（クラウドからロード済み）
+  if (cachedCloudRankings !== null) {
+    return cachedCloudRankings;
+  }
+  // ローカルのデータをフォールバックとして使用
   try {
     const data = localStorage.getItem(STORAGE_KEY);
     if (!data) return [];
@@ -4204,7 +4228,55 @@ function saveMissionRecord(record) {
   // 稼いだゴールドでソート（多い順）
   records.sort((a, b) => (b.gold || 0) - (a.gold || 0));
   const top10 = records.slice(0, 10);
+  // ローカルにも保存（オフライン時のフォールバック）
   localStorage.setItem(STORAGE_KEY, JSON.stringify(top10));
+  // キャッシュを更新
+  cachedCloudRankings = top10;
+  // クラウドに保存
+  saveRankingsToCloud(top10);
+}
+
+// クラウドからランキングデータをロード
+async function loadRankingsFromCloud() {
+  try {
+    const doc = await db.collection('game_data').doc('rankings').get();
+    if (doc.exists) {
+      cachedCloudRankings = doc.data().records || [];
+      // ローカルにも保存
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(cachedCloudRankings));
+    } else {
+      // クラウドにデータがない場合、ローカルのデータを使用
+      try {
+        const localData = localStorage.getItem(STORAGE_KEY);
+        cachedCloudRankings = localData ? JSON.parse(localData) : [];
+      } catch {
+        cachedCloudRankings = [];
+      }
+    }
+    return cachedCloudRankings;
+  } catch (error) {
+    console.error('ランキングデータのクラウド読み込みエラー:', error);
+    // オフライン時はローカルから読み込み
+    try {
+      const localData = localStorage.getItem(STORAGE_KEY);
+      cachedCloudRankings = localData ? JSON.parse(localData) : [];
+    } catch {
+      cachedCloudRankings = [];
+    }
+    return cachedCloudRankings;
+  }
+}
+
+// クラウドにランキングデータを保存
+async function saveRankingsToCloud(records) {
+  try {
+    await db.collection('game_data').doc('rankings').set({
+      records: records,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+  } catch (error) {
+    console.error('ランキングデータのクラウド保存エラー:', error);
+  }
 }
 
 function getSavedPlayerName() {
@@ -4308,7 +4380,15 @@ const TITLE_THRESHOLDS = [
   { min: 100, name: 'IT伝説王',       css: 'rank-legend' }
 ];
 
+// クラウドから取得した称号データをキャッシュ
+let cachedCloudTitles = null;
+
 function getUnlockedTitles() {
+  // キャッシュがあればそれを返す（クラウドからロード済み）
+  if (cachedCloudTitles !== null) {
+    return cachedCloudTitles;
+  }
+  // ローカルのデータをフォールバックとして使用
   try {
     const data = localStorage.getItem(TITLE_STORAGE_KEY);
     if (!data) return {};
@@ -4319,7 +4399,55 @@ function getUnlockedTitles() {
 }
 
 function saveUnlockedTitles(titles) {
+  // ローカルにも保存（オフライン時のフォールバック）
   localStorage.setItem(TITLE_STORAGE_KEY, JSON.stringify(titles));
+  // キャッシュを更新
+  cachedCloudTitles = titles;
+  // クラウドに保存
+  saveUnlockedTitlesToCloud(titles);
+}
+
+// クラウドから称号データをロード
+async function loadUnlockedTitlesFromCloud() {
+  try {
+    const doc = await db.collection('game_data').doc('unlocked_titles').get();
+    if (doc.exists) {
+      cachedCloudTitles = doc.data().titles || {};
+      // ローカルにも保存
+      localStorage.setItem(TITLE_STORAGE_KEY, JSON.stringify(cachedCloudTitles));
+    } else {
+      // クラウドにデータがない場合、ローカルのデータを使用
+      try {
+        const localData = localStorage.getItem(TITLE_STORAGE_KEY);
+        cachedCloudTitles = localData ? JSON.parse(localData) : {};
+      } catch {
+        cachedCloudTitles = {};
+      }
+    }
+    return cachedCloudTitles;
+  } catch (error) {
+    console.error('称号データのクラウド読み込みエラー:', error);
+    // オフライン時はローカルから読み込み
+    try {
+      const localData = localStorage.getItem(TITLE_STORAGE_KEY);
+      cachedCloudTitles = localData ? JSON.parse(localData) : {};
+    } catch {
+      cachedCloudTitles = {};
+    }
+    return cachedCloudTitles;
+  }
+}
+
+// クラウドに称号データを保存
+async function saveUnlockedTitlesToCloud(titles) {
+  try {
+    await db.collection('game_data').doc('unlocked_titles').set({
+      titles: titles,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+  } catch (error) {
+    console.error('称号データのクラウド保存エラー:', error);
+  }
 }
 
 function unlockTitle(playerName) {
@@ -4627,8 +4755,28 @@ document.getElementById('intro-screen').addEventListener('click', () => {
   }
 });
 
+// ページ読み込み時にクラウドからデータを取得してダッシュボードを更新
+async function initializeFromCloud() {
+  try {
+    // 称号とランキングデータを並行して取得
+    await Promise.all([
+      loadUnlockedTitlesFromCloud(),
+      loadRankingsFromCloud()
+    ]);
+    // ダッシュボードを更新
+    updateDashboard();
+  } catch (error) {
+    console.error('クラウドデータ初期化エラー:', error);
+    // エラー時もローカルデータでダッシュボードを更新
+    updateDashboard();
+  }
+}
+
 // ページ読み込み時にイントロ待機画面を表示
 startIntro();
+
+// クラウドからデータを取得
+initializeFromCloud();
 </script>
 
 </body>

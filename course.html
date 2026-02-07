@@ -1,0 +1,1946 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ITパスポート対策講座</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Segoe UI','Hiragino Sans','Meiryo',sans-serif;
+  background:#000;color:#fff;min-height:100vh;line-height:1.7;
+  padding-left:220px;
+}
+button{cursor:pointer;font-family:inherit}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#111}
+::-webkit-scrollbar-thumb{background:#555;border-radius:3px}
+
+/* ===== DQ風枠 ===== */
+.dq-box{background:#000;border:2px solid #fff;border-radius:8px;padding:16px}
+
+/* ===== サイドパネル ===== */
+.side-panel{
+  position:fixed;left:0;top:0;width:220px;height:100vh;
+  background:#000;border-right:2px solid #888;z-index:101;
+  padding:20px 16px;overflow-y:auto;
+  display:flex;flex-direction:column;gap:16px;
+}
+.sp-brand{font-size:.95rem;font-weight:bold;color:#ffd700;text-align:center;line-height:1.5;padding-bottom:12px;border-bottom:1px solid #555}
+.sp-avatar{
+  width:64px;height:64px;margin:0 auto;border-radius:50%;
+  background:#111;border:2px solid #888;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.7rem;color:#aaa;
+}
+.sp-section{text-align:center}
+.sp-level-label{font-size:.65rem;color:#aaa;letter-spacing:2px;text-transform:uppercase}
+.sp-level-num{font-size:2.8rem;font-weight:bold;color:#fff;line-height:1.1}
+.sp-bar{width:100%;height:8px;background:#222;border-radius:4px;overflow:hidden;margin:6px 0 4px}
+.sp-bar-fill{height:100%;border-radius:4px;transition:width .6s ease}
+.sp-bar-fill.exp-fill{background:linear-gradient(90deg,#7ecfff,#4fc3f7)}
+.sp-bar-fill.cur-fill{background:linear-gradient(90deg,#4caf50,#66bb6a)}
+.sp-bar-text{font-size:.65rem;color:#777}
+.sp-row{display:flex;justify-content:space-between;align-items:center;padding:2px 0}
+.sp-label{font-size:.7rem;color:#aaa}.sp-val{font-weight:bold}
+.sp-val.exp-color{color:#7ecfff}.sp-val.gold-color{color:#ffd700}
+.sp-title-label{font-size:.8rem;color:#ffd700;font-weight:bold;letter-spacing:1px}
+.sp-title-next{font-size:.6rem;color:#888;margin-top:2px}
+.sp-divider{height:1px;background:#555}
+.sp-cur-label{font-size:.75rem;color:#ccc;margin-bottom:6px;font-weight:bold}
+.sp-flash .sp-bar-fill.exp-fill{filter:brightness(2);transition:filter .15s}
+
+/* ===== ヘッダー ===== */
+.app-header{
+  background:#000;padding:10px 16px;display:flex;align-items:center;
+  border-bottom:2px solid #888;position:sticky;top:0;z-index:100;
+}
+.app-title{font-size:1rem;font-weight:bold;color:#ffd700}
+
+.main-container{max-width:800px;margin:0 auto;padding:16px}
+.screen{display:none}.screen.active{display:block}
+
+/* ===== ステージ選択 ===== */
+.chapter-title{text-align:center;margin:16px 0 8px;font-size:1.4rem;color:#ffd700}
+.chapter-desc{text-align:center;color:#ccc;margin-bottom:24px;font-size:0.9rem}
+.stage-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.stage-card{
+  background:#000;border:2px solid #888;border-radius:8px;padding:14px;
+  transition:all .2s;position:relative;overflow:hidden;
+}
+.stage-card:hover:not(.locked){border-color:#fff;transform:translateY(-2px)}
+.stage-card.locked{opacity:.4;cursor:not-allowed}
+.stage-card.locked::after{content:'🔒';position:absolute;top:8px;right:8px;font-size:1.2rem}
+.stage-card.cleared{border-color:#ffd700}
+.stage-card.cleared::after{content:'✓';position:absolute;top:6px;right:10px;font-size:1.3rem;color:#ffd700;font-weight:bold}
+.stage-card.boss{border-color:#ff5252}
+.stage-card.boss.locked{border-color:#553333}
+.stage-num{font-size:.75rem;color:#aaa}
+.stage-name{font-size:1rem;font-weight:bold;margin:4px 0;color:#fff}
+.stage-sub{font-size:.75rem;color:#ccc}
+.stage-category{display:inline-block;font-size:.65rem;padding:2px 8px;border-radius:10px;margin-top:6px;background:#222;color:#ccc}
+
+/* ===== 学習画面 ===== */
+.learn-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.back-btn{background:none;border:1px solid #888;color:#ccc;padding:6px 12px;border-radius:6px;font-size:.85rem}
+.back-btn:hover{border-color:#fff;color:#fff}
+.learn-stage-title{font-size:1.2rem;font-weight:bold;color:#fff}
+.learn-stage-sub{font-size:.8rem;color:#ccc}
+.progress-bar-container{display:flex;align-items:center;gap:8px;margin-bottom:20px}
+.progress-bar{flex:1;height:6px;background:#333;border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:#ffd700;border-radius:3px;transition:width .5s ease}
+.progress-label{font-size:.75rem;color:#aaa;white-space:nowrap}
+
+/* ===== セクションカード ===== */
+.section-card{background:#000;border:2px solid #888;border-radius:8px;padding:20px;margin-bottom:16px}
+.section-title{font-size:1rem;font-weight:bold;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #555}
+.section-title.question-title{color:#ffb74d}
+.section-title.knowledge-title{color:#ffd700}
+.section-title.practice-title{color:#ffd700}
+.section-title.reward-title{color:#ffd700}
+
+/* ===== 問題表示 ===== */
+.q-source{font-size:.75rem;color:#aaa;margin-bottom:8px}
+.q-text{font-size:1.4rem;line-height:1.9;background:#111;padding:16px 18px;border-radius:8px;border-left:4px solid #ffb74d;margin-bottom:12px}
+
+/* ===== 開閉パネル ===== */
+.accordion{margin:8px 0;border:1px solid #666;border-radius:8px;overflow:hidden}
+.accordion-header{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 14px;background:#111;cursor:pointer;
+  font-size:.9rem;font-weight:bold;transition:background .2s;
+  user-select:none;
+}
+.accordion-header:hover{background:#1a1a1a}
+.accordion-header .acc-icon{
+  transition:transform .3s;font-size:.7rem;color:#aaa;
+}
+.accordion.open .accordion-header .acc-icon{transform:rotate(90deg)}
+.accordion-header .acc-label{flex:1}
+.acc-tag{font-size:.65rem;padding:2px 8px;border-radius:10px;font-weight:normal}
+.acc-tag.hint{background:#222;color:#ffb74d}
+.acc-tag.guide{background:#222;color:#ffd700}
+.acc-tag.words{background:#222;color:#ccc}
+.accordion-body{
+  max-height:0;overflow:hidden;transition:max-height .4s ease,padding .3s ease;
+  padding:0 14px;background:#0a0a0a;
+}
+.accordion.open .accordion-body{max-height:2000px;padding:12px 14px}
+
+/* ===== 選択肢 ===== */
+.q-choices{list-style:none}
+.choice-item{
+  margin:8px 0;border:2px solid #666;border-radius:8px;
+  overflow:hidden;transition:all .3s ease;
+}
+.choice-item:hover:not(.answered):not(.selected){border-color:#fff}
+.choice-main{
+  display:flex;align-items:center;gap:8px;
+  padding:12px 14px;cursor:pointer;font-size:.95rem;transition:background .2s;
+}
+.choice-main:hover{background:#111}
+.choice-label{font-weight:bold;color:#ffd700;flex-shrink:0}
+.choice-text{flex:1}
+.choice-hint-btn{
+  flex-shrink:0;background:#111;border:1px solid #666;color:#ffb74d;
+  padding:5px 12px;border-radius:8px;font-size:.75rem;font-weight:bold;cursor:pointer;
+  transition:all .2s;animation:btnPulse 2.5s ease-in-out infinite;
+}
+.choice-hint-btn:hover{background:#222;border-color:#ffb74d;animation:none;transform:scale(1.05)}
+@keyframes btnPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,183,77,0)}50%{box-shadow:0 0 8px 2px rgba(255,183,77,.25)}}
+.choice-hint{
+  max-height:0;overflow:hidden;transition:max-height .4s ease,padding .3s ease,opacity .3s ease;
+  padding:0 14px;background:#111;font-size:.85rem;color:#ffb74d;
+  border-top:1px solid transparent;opacity:0;
+}
+.choice-hint.open{max-height:300px;padding:10px 14px;border-top-color:#444;opacity:1}
+.choice-item.selected{border-color:#ffd700;background:#111}
+.choice-item.selected .choice-main{color:#ffd700}
+.choice-item.correct{border-color:#4caf50;background:#0a1a0a}
+.choice-item.correct .choice-main{color:#81c784}
+.choice-item.wrong{border-color:#f44336;background:#1a0a0a}
+.choice-item.wrong .choice-main{color:#ef9a9a}
+.answer-confirm{
+  display:none;margin-top:12px;padding:16px;text-align:center;
+  background:#111;border:2px solid #ffd700;
+  border-radius:8px;animation:fadeIn .3s ease;
+}
+.answer-confirm .confirm-text{color:#ffd700}
+.answer-confirm .confirm-yes{background:#ffd700;color:#000}
+
+/* ===== 回答後の解説 ===== */
+.post-answer{display:none;margin-top:16px;animation:fadeIn .4s ease}
+.post-answer.visible{display:block}
+.result-banner{
+  padding:14px 18px;border-radius:8px;margin-bottom:12px;
+  font-weight:bold;font-size:1.1rem;text-align:center;
+  animation:fadeIn .3s ease;
+}
+.result-banner.correct{background:#0a2a0a;border:2px solid #4caf50;color:#81c784;box-shadow:0 0 16px rgba(76,175,80,.4)}
+.result-banner.wrong{background:#2a0a0a;border:2px solid #f44336;color:#ef9a9a;box-shadow:0 0 16px rgba(244,67,54,.4)}
+.analysis-item{padding:10px 14px;margin:6px 0;background:#111;border-radius:8px}
+.analysis-item.is-correct{border-left:3px solid #4caf50}
+.analysis-item.is-wrong{border-left:3px solid #555}
+.analysis-verdict{font-weight:bold;margin-right:6px}
+.analysis-verdict.correct{color:#4caf50}.analysis-verdict.wrong{color:#888}
+.strategy-steps{list-style:none;counter-reset:step}
+.strategy-steps li{
+  counter-increment:step;padding:8px 14px 8px 48px;margin:6px 0;
+  background:#111;border-radius:8px;position:relative;font-size:.9rem;
+}
+.strategy-steps li::before{content:'Step ' counter(step);position:absolute;left:8px;top:9px;font-size:.7rem;color:#ffb74d;font-weight:bold}
+.trap-box{background:#1a0a0a;border:1px solid #553333;border-radius:8px;padding:12px 14px;margin-top:10px;font-size:.85rem}
+.trap-label{color:#ff5252;font-weight:bold;margin-bottom:4px}
+
+/* ===== 単語解説（パネル内） ===== */
+.word-item{padding:8px 0;border-bottom:1px solid #333}
+.word-item:last-child{border-bottom:none}
+.word-term{font-weight:bold;color:#ffd700;margin-bottom:2px;font-size:.9rem}
+.word-reading{font-size:.7rem;color:#aaa}
+.word-desc{font-size:.82rem;color:#ccc;margin-top:2px}
+
+/* ===== 関連知識 ===== */
+.knowledge-item{padding:10px 14px;margin:6px 0;background:#111;border-radius:8px;border-left:3px solid #ffd700}
+.knowledge-term{font-weight:bold;color:#ffd700;margin-bottom:4px}
+.knowledge-desc{font-size:.85rem;color:#ccc;white-space:pre-line}
+
+/* ===== 練習問題 ===== */
+.practice-q{background:#111;border-radius:8px;padding:16px;margin:10px 0;border:1px solid #555}
+.practice-q .q-text{margin-bottom:8px;border-left-color:#ffb74d}
+.practice-explanation{display:none;margin-top:10px;padding:10px;background:#0a1a0a;border-radius:8px;font-size:.85rem;color:#a5d6a7}
+.practice-explanation.visible{display:block}
+
+/* ===== カード獲得 ===== */
+.reward-card{
+  text-align:center;padding:24px;
+  background:#000;border:2px solid #ffd700;
+  border-radius:8px;animation:cardAppear .6s ease;
+}
+@keyframes cardAppear{0%{transform:scale(.8) rotateY(90deg);opacity:0}100%{transform:scale(1) rotateY(0deg);opacity:1}}
+.reward-card-name{font-size:1.3rem;font-weight:bold;color:#ffd700;margin-bottom:4px}
+.reward-rarity{color:#ffb74d;margin-bottom:10px}
+.reward-summary{font-size:.85rem;color:#ccc;margin-bottom:16px;line-height:1.6}
+.reward-stats{display:flex;justify-content:center;gap:24px;margin-bottom:16px}
+.reward-stat{text-align:center}
+.reward-stat-value{font-size:1.3rem;font-weight:bold}
+.reward-stat-value.exp{color:#7ecfff}
+.reward-stat-value.gold{color:#ffd700}
+.reward-stat-label{font-size:.7rem;color:#aaa}
+
+/* ===== ボタン ===== */
+.next-btn{
+  display:block;width:100%;padding:14px;margin:16px 0;
+  background:#ffd700;color:#000;
+  font-size:1rem;font-weight:bold;border:none;border-radius:8px;transition:all .2s;
+}
+.next-btn:hover{transform:translateY(-1px);box-shadow:0 4px 15px rgba(255,215,0,.3)}
+.next-btn.secondary{background:#333;color:#fff;border:1px solid #666}
+.next-btn.secondary:hover{border-color:#fff}
+
+/* ===== ボスバトル ===== */
+.boss-header{text-align:center;padding:20px;background:#000;border:2px solid #ff5252;border-radius:8px;margin-bottom:16px}
+.boss-name{font-size:1.5rem;font-weight:bold;color:#ff5252;margin-bottom:4px}
+.boss-desc{font-size:.85rem;color:#ff8a80}
+.boss-hp-container{margin-top:4px;display:flex;align-items:center;justify-content:center;gap:8px}
+.boss-hp-bar{flex:1;max-width:200px;height:10px;background:#333;border-radius:5px;overflow:hidden}
+.boss-hp-fill{height:100%;background:linear-gradient(90deg,#f44336,#ff5252);transition:width .5s ease;border-radius:5px}
+.boss-hp-text{font-size:.8rem;color:#ff8a80}
+.boss-q-counter{text-align:center;color:#aaa;font-size:.85rem;margin:12px 0}
+.boss-result{text-align:center;padding:30px}
+.boss-result h2{font-size:1.5rem;margin-bottom:8px}
+.boss-result.win h2{color:#ffd700}
+.boss-result.lose h2{color:#ff5252}
+.boss-result p{color:#ccc;margin-bottom:16px}
+.boss-score{font-size:1.2rem;color:#fff;margin-bottom:16px}
+
+/* ===== カード図鑑 ===== */
+.collection-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.coll-card{background:#000;border:1px solid #666;border-radius:8px;padding:12px;text-align:center;font-size:.8rem}
+.coll-card.owned{border-color:#ffd700}.coll-card.not-owned{opacity:.35}
+.coll-card-name{font-weight:bold;color:#ffd700;margin-bottom:4px}
+.coll-card-rarity{color:#ffb74d;font-size:.7rem}
+
+/* ===== ことばステップ ===== */
+.vocab-intro{font-size:.9rem;color:#ccc;margin-bottom:16px;line-height:1.8;background:#111;padding:14px;border-radius:8px;border-left:3px solid #ffd700}
+.vocab-grid{display:grid;gap:12px}
+.vocab-card{background:#111;border:1px solid #555;border-radius:8px;padding:14px 16px;transition:border-color .2s}
+.vocab-card:hover{border-color:#ffd700}
+.vocab-word{font-size:1rem;font-weight:bold;color:#ffd700}
+.vocab-reading{font-size:.75rem;color:#aaa;margin-left:6px}
+.vocab-meaning{font-size:.88rem;color:#ddd;margin-top:6px;line-height:1.7}
+.step-badge{display:inline-block;font-size:.7rem;padding:3px 10px;border-radius:12px;margin-bottom:10px;font-weight:bold}
+.step-badge.step-vocab{background:#111;color:#ffd700;border:1px solid #555}
+.step-badge.step-question{background:#111;color:#ffb74d;border:1px solid #555}
+.step-badge.step-knowledge{background:#111;color:#ffd700;border:1px solid #555}
+.step-badge.step-practice{background:#111;color:#ffb74d;border:1px solid #555}
+.step-badge.step-reward{background:#111;color:#ff5252;border:1px solid #ff5252}
+.question-guide{background:#111;border:1px solid #555;border-radius:8px;padding:14px;margin-bottom:14px}
+.question-guide-title{font-size:.85rem;font-weight:bold;color:#ffb74d;margin-bottom:8px}
+.question-guide-text{font-size:.88rem;color:#ddd;line-height:1.8;white-space:pre-line}
+
+/* ===== 考え方のヒント アコーディオン ===== */
+.strategy-hint-wrap{margin-bottom:12px}
+.strategy-hint-btn{
+  display:flex;align-items:center;gap:8px;width:100%;
+  padding:10px 14px;background:#111;border:1px solid #666;border-radius:8px;
+  color:#ffb74d;font-size:.85rem;font-weight:bold;cursor:pointer;
+  transition:all .3s;user-select:none;
+  animation:hintPulse 2.5s ease-in-out infinite;
+}
+.strategy-hint-btn:hover{background:#1a1a1a;border-color:#ffb74d;animation:none;transform:scale(1.02)}
+.strategy-hint-btn.open{animation:none}
+@keyframes hintPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,183,77,0)}50%{box-shadow:0 0 10px 2px rgba(255,183,77,.25)}}
+.strategy-hint-icon{font-size:.7rem;transition:transform .3s}
+.strategy-hint-btn.open .strategy-hint-icon{transform:rotate(90deg)}
+.strategy-hint-body{
+  max-height:0;overflow:hidden;transition:max-height .5s ease,padding .3s ease,opacity .3s ease;
+  padding:0 14px;background:#111;border-radius:0 0 8px 8px;opacity:0;
+}
+.strategy-hint-body.open{max-height:600px;padding:12px 14px;opacity:1}
+
+/* ===== 順次表示システム ===== */
+.reveal-block{opacity:0;max-height:0;overflow:hidden;transition:opacity .5s ease,max-height .5s ease,margin .3s ease;margin:0;pointer-events:none}
+.reveal-block.revealed{opacity:1;max-height:2000px;overflow:visible;margin:12px 0;pointer-events:auto}
+.tap-indicator{
+  text-align:center;padding:14px;margin:8px 16px;cursor:pointer;
+  background:#111;border:1px dashed #666;border-radius:8px;
+  color:#ffd700;font-size:.85rem;font-weight:bold;
+  transition:all .2s;user-select:none;display:none;
+}
+.tap-indicator:hover{background:#1a1a1a;border-color:#ffd700}
+.tap-indicator.active{display:block;animation:tapPulse 2s infinite}
+@keyframes tapPulse{0%,100%{opacity:.7;transform:scale(1)}50%{opacity:1;transform:scale(1.02)}}
+.confirm-box{
+  background:#000;border:2px solid #4caf50;
+  border-radius:8px;padding:20px;text-align:center;
+}
+.confirm-text{font-size:1rem;font-weight:bold;color:#fff;margin-bottom:14px}
+.confirm-subtext{font-size:.8rem;color:#ccc;margin-bottom:14px}
+.confirm-btn{padding:12px 24px;border:none;border-radius:8px;font-size:.9rem;font-weight:bold;margin:4px;cursor:pointer;transition:all .2s}
+.confirm-yes{background:#4caf50;color:#fff;animation:btnGlow 2s ease-in-out infinite}
+.confirm-yes:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(76,175,80,.4);animation:none}
+@keyframes btnGlow{0%,100%{box-shadow:0 0 0 0 rgba(76,175,80,0)}50%{box-shadow:0 0 10px 2px rgba(76,175,80,.2)}}
+.confirm-retry{background:#333;color:#ccc;border:1px solid #666}
+.confirm-retry:hover{border-color:#fff;color:#fff}
+
+/* ===== アニメ ===== */
+@keyframes fadeIn{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .4s ease}
+.content-spacer{height:70px}
+
+/* ===== タップ経験値パーティクル ===== */
+.xp-particle{
+  position:fixed;pointer-events:none;z-index:9999;
+  width:8px;height:8px;border-radius:50%;
+  background:radial-gradient(circle,#fff 0%,#7ecfff 60%,#4fc3f7 100%);
+  box-shadow:0 0 6px 1px rgba(79,195,247,.4);
+}
+.tap-ripple{
+  position:fixed;pointer-events:none;z-index:9998;
+  width:24px;height:24px;border-radius:50%;border:1.5px solid rgba(126,207,255,.4);
+  animation:rippleOut .5s ease-out forwards;
+}
+@keyframes rippleOut{0%{transform:scale(0);opacity:.5}100%{transform:scale(2);opacity:0}}
+.gold-particle{
+  position:fixed;pointer-events:none;z-index:9999;
+  width:10px;height:10px;border-radius:50%;
+  background:radial-gradient(circle,#fff176 0%,#ffd700 50%,#f9a825 100%);
+  box-shadow:0 0 6px 1px rgba(255,215,0,.4);
+  border:1px solid #ffb300;
+}
+.sidebar-gain{
+  position:fixed;pointer-events:none;z-index:9999;
+  font-weight:bold;font-size:.7rem;white-space:nowrap;
+}
+.sp-buff{font-size:.6rem;color:#ce93d8;margin-top:4px;font-weight:bold;min-height:14px}
+
+/* ===== バフ獲得演出 ===== */
+.buff-overlay{
+  position:fixed;top:0;left:0;width:100%;height:100%;z-index:9997;
+  pointer-events:none;display:flex;align-items:center;justify-content:center;
+  animation:buffFlash .8s ease forwards;
+}
+@keyframes buffFlash{0%{background:rgba(206,147,216,0)}12%{background:rgba(206,147,216,.2)}100%{background:rgba(206,147,216,0)}}
+.buff-banner{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9998;
+  pointer-events:none;text-align:center;
+}
+.buff-banner-text{
+  font-size:1.6rem;font-weight:bold;color:#ce93d8;letter-spacing:2px;
+  text-shadow:0 0 20px rgba(206,147,216,.6),0 0 40px rgba(206,147,216,.2);
+}
+.buff-banner-sub{font-size:.8rem;color:#e1bee7;margin-top:6px}
+
+/* ===== レベルアップ演出 ===== */
+.levelup-overlay{
+  position:fixed;top:0;left:0;width:100%;height:100%;z-index:9998;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  background:rgba(0,0,0,.85);opacity:0;pointer-events:none;
+  transition:opacity .3s;
+}
+.levelup-overlay.active{opacity:1;pointer-events:auto}
+.levelup-box{text-align:center}
+.levelup-label{font-size:1.1rem;color:#ffd700;margin-bottom:8px;letter-spacing:3px;animation:lvLabelIn .5s ease .2s both}
+.levelup-number{font-size:3rem;font-weight:bold;color:#fff;text-shadow:0 0 30px #ffd700,0 0 60px rgba(255,215,0,.3);animation:lvNumIn .6s ease .4s both}
+.levelup-sub{font-size:.85rem;color:#aaa;margin-top:14px;animation:lvSubIn .4s ease .8s both}
+@keyframes lvLabelIn{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes lvNumIn{0%{transform:scale(0) rotate(-5deg);opacity:0}60%{transform:scale(1.15) rotate(2deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+@keyframes lvSubIn{0%{opacity:0}100%{opacity:1}}
+.levelup-flash{
+  position:fixed;top:0;left:0;width:100%;height:100%;z-index:9997;
+  pointer-events:none;animation:lvFlash .6s ease forwards;
+}
+@keyframes lvFlash{0%{background:rgba(255,215,0,0)}15%{background:rgba(255,215,0,.35)}100%{background:rgba(255,215,0,0)}}
+
+/* ===== 称号獲得演出 ===== */
+.title-overlay{
+  position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  background:rgba(0,0,0,.9);opacity:0;pointer-events:none;
+  transition:opacity .4s;
+}
+.title-overlay.active{opacity:1;pointer-events:auto}
+.title-got-label{font-size:.9rem;color:#fff;letter-spacing:4px;margin-bottom:12px;animation:titleLabelIn .5s ease .2s both}
+.title-got-name{
+  font-size:2rem;font-weight:bold;color:#ffd700;
+  text-shadow:0 0 20px #ffd700,0 0 40px rgba(255,215,0,.4),0 0 80px rgba(255,215,0,.2);
+  animation:titleNameIn .7s ease .5s both;
+}
+.title-got-sub{font-size:.8rem;color:#aaa;margin-top:16px;animation:titleSubIn .4s ease 1s both}
+.title-flash{
+  position:fixed;top:0;left:0;width:100%;height:100%;z-index:9997;
+  pointer-events:none;animation:titleFlashAnim .8s ease forwards;
+}
+@keyframes titleLabelIn{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes titleNameIn{0%{transform:scale(0);opacity:0}50%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
+@keyframes titleSubIn{0%{opacity:0}100%{opacity:1}}
+@keyframes titleFlashAnim{0%{background:rgba(255,215,0,0)}10%{background:rgba(255,215,0,.5)}100%{background:rgba(255,215,0,0)}}
+
+/* ===== レスポンシブ ===== */
+@media(max-width:768px){
+  body{padding-left:0;padding-top:0;padding-bottom:88px}
+  .side-panel{
+    top:auto;bottom:0;
+    width:100%;height:auto;
+    display:grid;
+    grid-template-columns:auto 1fr auto;
+    grid-template-rows:auto auto;
+    padding:6px 10px;
+    border-right:none;border-top:2px solid #555;border-bottom:none;
+    gap:3px 10px;align-items:center;
+    overflow:hidden;
+  }
+  .sp-brand{display:none}
+  #sp-avatar-area{display:none}
+  .sp-divider{display:none}
+  .sp-title-next{display:none}
+  .app-header{display:none}
+  /* Row 1: Level | Title | Gold */
+  #sp-level-area{grid-row:1;grid-column:1;text-align:left}
+  #sp-title-area{grid-row:1;grid-column:2;text-align:center;overflow:hidden}
+  #sp-gold-area{grid-row:1;grid-column:3;text-align:right}
+  /* Row 2: EXP | Items | Progress */
+  #sp-exp-area{grid-row:2;grid-column:1;text-align:left}
+  #sp-items-area{grid-row:2;grid-column:2;text-align:center}
+  #sp-progress-area{grid-row:2;grid-column:3;text-align:right}
+  .sp-level-num{font-size:1.2rem;line-height:1}
+  .sp-level-label{font-size:.5rem}
+  .sp-section{white-space:nowrap;min-width:0}
+  .sp-bar{width:60px;margin:2px 0 1px}.sp-bar-text{font-size:.5rem}
+  .sp-cur-label{font-size:.55rem;margin-bottom:1px}
+  .sp-title-label{font-size:.65rem;text-overflow:ellipsis;overflow:hidden}
+  .sp-row{gap:3px}
+  .mc-item-bar{gap:1px}
+  .mc-slot{width:28px;height:28px}
+  .mc-slot img{width:22px;height:22px}
+}
+/* スマホ: 問題文スティッキー */
+@media(max-width:768px){
+  .sticky-q.revealed{
+    position:sticky;top:0;z-index:50;
+    background:#000;
+    padding:8px 12px 6px;margin:0;
+    border-bottom:2px solid #ffb74d;
+    box-shadow:0 4px 12px rgba(0,0,0,.8);
+  }
+  .sticky-q.revealed .q-text{
+    max-height:30vh;overflow-y:auto;
+    font-size:1.1rem;line-height:1.7;
+    margin-bottom:4px;padding:10px 12px;
+  }
+  .sticky-q.revealed .q-source{
+    font-size:.65rem;margin-bottom:4px;
+  }
+}
+
+@media(max-width:600px){
+  .stage-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+  .main-container{padding:10px}
+  .section-card{padding:14px}
+  .choice-main{padding:10px 10px}
+  .choice-hint-btn{padding:3px 6px;font-size:.65rem}
+}
+/* ===== ショップ ===== */
+.shop-warning{background:rgba(255,82,82,.15);border:1px solid #ff5252;border-radius:8px;padding:12px;margin-bottom:16px;color:#ff8a80;font-size:.85rem;line-height:1.5;text-align:center}
+.shop-gold{text-align:center;font-size:1.1rem;color:#ffd700;font-weight:bold;margin-bottom:12px}
+.shop-item{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.05);border:1px solid #555;border-radius:8px;padding:12px;margin-bottom:10px}
+.shop-item-icon{flex-shrink:0;width:40px;height:40px;overflow:hidden}
+.shop-item-icon img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
+.boss-bag-item-icon{width:24px;height:24px;max-width:24px;max-height:24px;object-fit:contain;image-rendering:pixelated;vertical-align:middle;margin-right:4px}
+.boss-bag-item{display:flex;align-items:center;gap:4px;margin:4px 0}
+.shop-item-info{flex:1}
+.shop-item-name{font-weight:bold;color:#fff;font-size:.9rem}
+.shop-item-desc{font-size:.75rem;color:#aaa;margin-top:2px}
+.shop-item-price{color:#ffd700;font-size:.8rem;margin-top:4px}
+.shop-buy-btn{background:#ffd700;color:#1a1a2e;border:none;border-radius:6px;padding:6px 14px;font-weight:bold;cursor:pointer;font-size:.8rem;flex-shrink:0}
+.shop-buy-btn:disabled{background:#555;color:#888;cursor:not-allowed}
+.boss-bag{background:rgba(255,215,0,.1);border:1px solid #5a4a00;border-radius:8px;padding:12px;margin:16px 0}
+.boss-bag-title{font-size:.85rem;color:#ffd700;font-weight:bold;margin-bottom:8px}
+.boss-bag-item{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:.85rem;color:#fff}
+.boss-bag-empty{font-size:.8rem;color:#888}
+.boss-use-glasses{background:#4fc3f7;color:#1a1a2e;border:none;border-radius:6px;padding:6px 14px;font-weight:bold;cursor:pointer;font-size:.8rem;margin-top:8px;display:none}
+.boss-use-glasses.visible{display:inline-block}
+.choice-hidden{opacity:.3;pointer-events:none;text-decoration:line-through}
+/* ===== モーダル ===== */
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:1000;animation:fadeIn .2s}
+.modal-box{background:#1a1a2e;border:2px solid #ff5252;border-radius:12px;padding:24px;max-width:340px;width:90%;text-align:center}
+.modal-box h3{color:#ff5252;margin:0 0 12px;font-size:1.1rem}
+.modal-bag{background:rgba(255,215,0,.1);border:1px solid #5a4a00;border-radius:8px;padding:8px 12px;margin:12px 0;font-size:.85rem;color:#ffd700}
+.modal-bag-item-icon{width:20px;height:20px;vertical-align:middle;image-rendering:pixelated;margin-right:4px}
+.modal-note{color:#aaa;font-size:.8rem;margin:12px 0 16px}
+.modal-btns{display:flex;gap:10px;justify-content:center}
+.modal-btns button{flex:1;padding:10px;border:none;border-radius:8px;font-size:.9rem;font-weight:bold;cursor:pointer}
+.modal-btn-go{background:#ff5252;color:#fff}
+.modal-btn-back{background:#333;color:#aaa}
+/* ===== ボススプライト ===== */
+.boss-sprite{display:block;margin:0 auto 8px;image-rendering:pixelated;width:120px;height:auto}
+.boss-sprite-sm{image-rendering:pixelated;width:120px;height:auto}
+@keyframes bossIdle{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.boss-sprite-anim{animation:bossIdle 1.2s ease-in-out infinite}
+@keyframes bossHit{0%{filter:brightness(3) drop-shadow(0 0 12px #ff0);transform:translateX(-6px)}25%{transform:translateX(6px)}50%{filter:brightness(2);transform:translateX(-4px)}75%{transform:translateX(4px)}100%{filter:brightness(1);transform:translateX(0)}}
+.boss-sprite-hit{animation:bossHit .5s ease}
+/* ===== ボス2カラムヘッダー ===== */
+.boss-header-row{display:flex;align-items:center;justify-content:center;gap:24px;padding:12px 20px;background:#111;border:2px solid #ff5252;border-radius:12px;margin-bottom:12px}
+.boss-info-col{text-align:center;min-width:0}
+.boss-sprite-col{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px}
+/* ===== 画面揺れ ===== */
+@keyframes screenShake{0%{transform:translate(0,0)}10%{transform:translate(-8px,4px)}20%{transform:translate(6px,-6px)}30%{transform:translate(-4px,6px)}40%{transform:translate(4px,-2px)}50%{transform:translate(-2px,4px)}60%{transform:translate(6px,-4px)}70%{transform:translate(-4px,2px)}80%{transform:translate(2px,-6px)}90%{transform:translate(-2px,2px)}100%{transform:translate(0,0)}}
+.screen-shake{animation:screenShake .4s ease}
+/* ===== マイクラ風アイテムボックス ===== */
+.mc-item-bar{display:flex;gap:2px;justify-content:center}
+.mc-slot{width:36px;height:36px;background:#555;border:2px solid #222;border-top-color:#373737;border-left-color:#373737;border-right-color:#8b8b8b;border-bottom-color:#8b8b8b;display:flex;align-items:center;justify-content:center;position:relative}
+.mc-slot.empty{background:#555}
+.mc-slot img{width:28px;height:28px;object-fit:contain;image-rendering:pixelated}
+.mc-slot-label{position:absolute;bottom:-1px;right:1px;font-size:8px;color:#fff;text-shadow:1px 1px 0 #000;font-weight:bold}
+</style>
+</head>
+<body>
+
+<aside class="side-panel" id="side-panel">
+  <div class="sp-brand">ITパスポート<br>対策講座</div>
+
+  <div class="sp-section" id="sp-avatar-area">
+    <div class="sp-avatar" id="sp-avatar"></div>
+  </div>
+
+  <div class="sp-section" id="sp-level-area">
+    <div class="sp-level-label">LEVEL</div>
+    <div class="sp-level-num" id="sp-level">1</div>
+  </div>
+
+  <div class="sp-section" id="sp-title-area">
+    <div class="sp-title-label" id="sp-title">駆け出しの学び手</div>
+    <div class="sp-title-next" id="sp-title-next"></div>
+  </div>
+
+  <div class="sp-section" id="sp-items-area">
+    <div style="font-size:.65rem;color:#aaa;margin-bottom:4px;letter-spacing:1px">ITEMS</div>
+    <div id="sp-item-bar" class="mc-item-bar"></div>
+  </div>
+
+  <div class="sp-section" id="sp-exp-area">
+    <div class="sp-row"><span class="sp-label">EXP</span><span class="sp-val exp-color" id="sp-exp">0</span></div>
+    <div class="sp-bar"><div class="sp-bar-fill exp-fill" id="sp-exp-bar" style="width:0%"></div></div>
+    <div class="sp-bar-text" id="sp-exp-next">次のLvまで 5</div>
+    <div class="sp-buff" id="sp-buff"></div>
+  </div>
+
+  <div class="sp-section" id="sp-gold-area">
+    <div class="sp-row"><span class="sp-label">GOLD</span><span class="sp-val gold-color" id="sp-gold">0</span></div>
+  </div>
+
+  <div class="sp-divider"></div>
+
+  <div class="sp-section" id="sp-progress-area">
+    <div class="sp-cur-label">カリキュラム進捗</div>
+    <div class="sp-bar"><div class="sp-bar-fill cur-fill" id="sp-cur-fill" style="width:0%"></div></div>
+    <div class="sp-bar-text" id="sp-cur-text">0 / 12 クリア</div>
+  </div>
+</aside>
+
+<div class="app-header">
+  <div class="app-title">ITパスポート対策講座</div>
+</div>
+
+<div id="screen-map" class="screen active">
+  <div class="main-container">
+    <div class="chapter-title">第1章 コンピュータの世界</div>
+    <div class="chapter-desc">毎日使ってるスマホやパソコン、中身を知ろう</div>
+    <div class="stage-grid" id="stage-grid"></div>
+    <div style="margin-top:20px">
+      <button class="next-btn secondary" onclick="showScreen('screen-collection')">カード図鑑</button>
+    </div>
+    <div class="content-spacer"></div>
+  </div>
+</div>
+
+<div id="screen-learn" class="screen">
+  <div class="main-container">
+    <div class="learn-header">
+      <button class="back-btn" onclick="showScreen('screen-map')">← 戻る</button>
+      <div>
+        <div class="learn-stage-title" id="learn-title"></div>
+        <div class="learn-stage-sub" id="learn-sub"></div>
+      </div>
+    </div>
+    <div class="progress-bar-container">
+      <div class="progress-bar"><div class="progress-fill" id="learn-progress"></div></div>
+      <div class="progress-label" id="learn-progress-label"></div>
+    </div>
+    <div id="learn-content"></div>
+    <div id="tap-indicator" class="tap-indicator" onclick="revealNext(event)">タップ or スペースキーで続きを読む ▼</div>
+    <div class="content-spacer"></div>
+  </div>
+</div>
+
+<div id="screen-boss-prep" class="screen">
+  <div class="main-container">
+    <div class="learn-header">
+      <button class="back-btn" onclick="showScreen('screen-map')">← 戻る</button>
+      <div><div class="learn-stage-title" style="color:#ff5252" id="boss-prep-title">ボス戦準備</div></div>
+    </div>
+    <div id="boss-prep-content"></div>
+    <div class="content-spacer"></div>
+  </div>
+</div>
+
+<div id="screen-boss" class="screen">
+  <div class="main-container">
+    <div class="learn-header">
+      <button class="back-btn" onclick="showScreen('screen-map')">← 戻る</button>
+      <div><div class="learn-stage-title" style="color:#ff5252" id="boss-title">章ボス</div></div>
+    </div>
+    <div id="boss-content"></div>
+    <div class="content-spacer"></div>
+  </div>
+</div>
+
+<div id="screen-collection" class="screen">
+  <div class="main-container">
+    <div class="learn-header">
+      <button class="back-btn" onclick="showScreen('screen-map')">← 戻る</button>
+      <div><div class="learn-stage-title">カード図鑑</div></div>
+    </div>
+    <div class="collection-grid" id="collection-grid"></div>
+    <div class="content-spacer"></div>
+  </div>
+</div>
+
+<div class="levelup-overlay" id="levelup-overlay" onclick="closeLevelUp()">
+  <div class="levelup-box">
+    <div class="levelup-label">LEVEL UP!</div>
+    <div class="levelup-number" id="levelup-number">Lv.2</div>
+    <div class="levelup-sub">タップして閉じる</div>
+  </div>
+</div>
+
+<div class="title-overlay" id="title-overlay" onclick="closeTitleOverlay()">
+  <div class="title-got-label">新しい称号を手に入れた！</div>
+  <div class="title-got-name" id="title-got-name"></div>
+  <div class="title-got-sub">タップして閉じる</div>
+</div>
+
+<script>
+/* ===== コースデータ ===== */
+let COURSE_DATA =
+[{"stageId":1,"title":"コンピュータの種類","subtitle":"スマホもPCもゲーム機も全部コンピュータ","category":"テクノロジ系","subcategory":"ハードウェア","estimatedMinutes":15,"mainQuestion":{"source":"令和4年 問74","originalText":"PCやスマートフォンのOSに関する記述のうち，適切なものはどれか。","choices":{"ア":"OSが異なるPCやスマートフォン同士では，同じファイル形式のドキュメントであっても，互いに読むことはできない。","イ":"OSの機能の一つとして，アプリケーションがメモリやハードディスクなどのハードウェアを利用する際に，その利用方法を調整し管理する機能がある。","ウ":"PCのOSを入れ替えた場合，そのPC上のアプリケーションは入替え前のOSのときと同様に動作する。","エ":"スマートフォンのOSは，PCのOSとは異なり，ファイル管理の機能をもたない。"},"answer":"イ","wordExplanations":[{"word":"OS","reading":"オペレーティングシステム","explanation":"コンピュータ全体を動かす「司令塔」のようなソフトウェア。Windows、macOS、iOS、Androidなどがあるよ。"},{"word":"ハードウェア","reading":"ハードウェア","explanation":"実際に手で触れる部品のこと。キーボード、画面、メモリなど。"},{"word":"アプリケーション","reading":"アプリケーション","explanation":"「アプリ」のこと。ゲームや計算ソフトなど、特定の目的のために使うソフトウェアだよ。"}],"questionExplained":"この問題は「OSって何ができるの？」を聞いているよ。\n\nOSは、きみのスマホやパソコンの中で「全体のまとめ役」をしているソフトウェアなんだ。アプリが動くのも、画面に文字が出るのも、ぜんぶOSのおかげ。","choiceAnalysis":[{"choice":"ア","verdict":"✗","explanation":"OSが違っても、同じファイル形式（たとえばPDFや写真のJPEG）なら読めるよ。WindowsでもMacでも同じ写真は開ける。"},{"choice":"イ","verdict":"◎ 正解","explanation":"これがOSの大事な仕事！アプリが「メモリを使いたい」「画面に絵を出したい」と言ったとき、OSが「はい、この部分を使っていいよ」と調整してくれる。"},{"choice":"ウ","verdict":"✗","explanation":"OSを入れ替えると、前のOSで動いていたアプリは動かなくなることがあるよ。WindowsのゲームがそのままMacで動くわけではないよね。"},{"choice":"エ","verdict":"✗","explanation":"スマホにもファイル管理の機能はあるよ。写真フォルダやダウンロードフォルダがあるのがその証拠だね。"}],"solvingStrategy":{"steps":["「OSの役割」を思い出そう → ハードウェアとアプリの間に立つ「まとめ役」","選択肢の中で「OSの基本的な仕事」を正しく書いているのはどれか探す","イの「ハードウェアの利用を調整し管理する」がまさにOSの仕事！"],"trap":"アは「OSが違うとファイルも読めない」と言ってるけど、ファイル形式が同じなら読める。OS ≠ ファイル形式 を混同させるひっかけだよ。"}},"relatedKnowledge":{"title":"コンピュータの5つの種類を覚えよう","content":[{"term":"スーパーコンピュータ","description":"天気予報や宇宙の研究に使う超高速コンピュータ。日本の「富岳」が有名。"},{"term":"サーバ","description":"みんなにサービスを提供するコンピュータ。YouTubeの動画もサーバに入っているよ。"},{"term":"PC","description":"個人で使うコンピュータ。デスクトップ型とノート型がある。"},{"term":"タブレット・スマートフォン","description":"持ち運べる小さなコンピュータ。中身はPCとほぼ同じしくみ。"},{"term":"組込みシステム","description":"家電や自動車の中に入っている小さなコンピュータ。エアコンや炊飯器にも入ってるよ。"}]},"practiceQuestions":[{"source":"令和3年 問72","questionText":"家庭内の家電をインターネットに接続する際に利用する組込みシステムの特徴として，最も適切なものはどれか。","choices":{"ア":"一般的なPCと同じOSで動作する。","イ":"特定の機能を実現するために専用化されている。","ウ":"利用者がOSを入れ替えることができる。","エ":"利用者が自由にアプリを追加できる。"},"answer":"イ","shortExplanation":"組込みシステムは「その家電だけの仕事」をするために専用に作られているんだ。"},{"source":"令和5年 問63","questionText":"IoTデバイスで収集した情報をサーバに送信するとき，途中でデータが改ざんされていないことを検証する仕組みはどれか。","choices":{"ア":"アクセスポイント","イ":"ディジタル署名","ウ":"ファイアウォール","エ":"ブルートフォース攻撃"},"answer":"イ","shortExplanation":"ディジタル署名＝「このデータは本物で途中で変えられていないよ」を証明する仕組み。"}],"cardReward":{"cardName":"コンピュータの種類","rarity":1,"summary":"コンピュータにはスーパーコンピュータ・サーバ・PC・スマホ・組込みシステムなどの種類がある。OSがハードウェアとアプリの間に立って管理している！","exp":100,"gold":200}},{"stageId":2,"title":"入力と出力","subtitle":"キーボードで打つ＝入力、画面に映る＝出力","category":"テクノロジ系","subcategory":"入出力デバイス","estimatedMinutes":15,"mainQuestion":{"source":"令和5年 問98","originalText":"IoT機器であるスマートメーターに関する記述として，適切なものはどれか。","choices":{"ア":"カーナビやゲームコントローラーに内蔵され，速度の変化を計測する。","イ":"住宅に設置され，電気やガスの使用量を自動計測し，供給事業者にデータを送信する。","ウ":"モバイル端末のデータを，ネットワークを介して遠隔地から消去する。","エ":"歩数を数え，GPS機能で歩行経路の把握や消費エネルギーを計算する。"},"answer":"イ","wordExplanations":[{"word":"スマートメーター","reading":"スマートメーター","explanation":"電気やガスの使用量を自動で測って会社に送る「かしこいメーター」。"},{"word":"IoT機器","reading":"アイオーティーきき","explanation":"Internet of Things。ネットにつながる家電や機械のこと。"},{"word":"GPS","reading":"ジーピーエス","explanation":"人工衛星で今いる場所を正確に知る仕組み。地図アプリで使われている。"}],"questionExplained":"「スマートメーターって何？」を聞いているよ。\n\n「スマート」＋「メーター（計測器）」＝電気やガスを自動で測って送信できるもの。","choiceAnalysis":[{"choice":"ア","verdict":"✗","explanation":"これは「加速度センサー」の説明。"},{"choice":"イ","verdict":"◎ 正解","explanation":"スマートメーター＝使用量を自動で測って送信。"},{"choice":"ウ","verdict":"✗","explanation":"これは「リモートワイプ」の説明。"},{"choice":"エ","verdict":"✗","explanation":"これは「スマートウォッチ」の説明。"}],"solvingStrategy":{"steps":["名前を分解 →「スマート」＋「メーター」","メーター＝電気やガスを測るもの","スマート＝自動で測って送信 → イ"],"trap":"エの「歩数を数える」は「スマート○○」つながりで選びたくなるけど、メーターではなくウォッチの話。"}},"relatedKnowledge":{"title":"入力装置と出力装置を整理しよう","content":[{"term":"入力装置","description":"人間→コンピュータ。キーボード、マウス、マイク、カメラ、スキャナ、バーコードリーダー"},{"term":"出力装置","description":"コンピュータ→人間。ディスプレイ、プリンタ、スピーカー、プロジェクタ"},{"term":"入出力両方","description":"タッチパネル、ヘッドセット"}]},"practiceQuestions":[{"source":"令和4年 問85","questionText":"タッチパネルに関する記述として，適切なものはどれか。","choices":{"ア":"入力装置であり出力機能は持たない。","イ":"画面に表示されたキーボード画像に触れて文字入力ができる。","ウ":"キーボードの代わりで画面表示機能は持たない。","エ":"外付け専用でスマートフォンには搭載されていない。"},"answer":"イ","shortExplanation":"タッチパネルは入力＋出力の両方。ソフトウェアキーボードで文字も打てる。"},{"source":"令和3年 問87","questionText":"バーコードリーダは入力装置か出力装置か。","choices":{"ア":"入力装置","イ":"出力装置","ウ":"両方","エ":"どちらでもない"},"answer":"ア","shortExplanation":"バーコードを「読み取って」コンピュータに「入れる」→入力装置。"}],"cardReward":{"cardName":"入力と出力","rarity":1,"summary":"入力＝人間→PC、出力＝PC→人間。タッチパネルは両方！","exp":100,"gold":200}},{"stageId":3,"title":"CPUってなに？","subtitle":"コンピュータの脳みそ","category":"テクノロジ系","subcategory":"プロセッサ","estimatedMinutes":15,"mainQuestion":{"source":"令和6年 問60","originalText":"CPUに関する記述のうち，適切なものはどれか。","choices":{"ア":"1秒間に実行できる命令の数はクロック周波数によらず一定。","イ":"処理の高速化技法の一つとしてパイプラインがある。","ウ":"処理の高速化のために主記憶の容量は関係しない。","エ":"高速化にはCPUやコアの数を減らした方がよい。"},"answer":"イ","wordExplanations":[{"word":"CPU","reading":"セントラル プロセッシング ユニット","explanation":"コンピュータの「脳みそ」。計算や命令の実行を行う。"},{"word":"クロック周波数","reading":"クロックしゅうはすう","explanation":"CPUの速さ。GHzで表す。数字が大きいほど速い。"},{"word":"パイプライン","reading":"パイプライン","explanation":"CPUの仕事を「流れ作業」にする方法。"},{"word":"コア","reading":"コア","explanation":"CPUの中の「脳みその数」。デュアルコア＝2つ。"}],"questionExplained":"「CPUを速くする方法」を聞いているよ。\n\nお弁当工場で「ごはんを入れる→おかずを入れる→ふたを閉める」を3人で分担＝パイプライン！","choiceAnalysis":[{"choice":"ア","verdict":"✗","explanation":"クロック周波数が高いほど命令数は多くなる。「一定」はウソ。"},{"choice":"イ","verdict":"◎ 正解","explanation":"パイプライン＝流れ作業で速くする代表的な技！"},{"choice":"ウ","verdict":"✗","explanation":"メモリが少ないとCPUが待たされる。関係ある。"},{"choice":"エ","verdict":"✗","explanation":"コアは多い方が速い。減らしたら遅くなる。"}],"solvingStrategy":{"steps":["CPUの速さ → クロック周波数、コア数、パイプライン、キャッシュ","「高速化の技法」→パイプライン","「一定」「関係ない」「減らす」は怪しい"],"trap":"「一定」「関係ない」「減らした方がよい」は逆のことを言っている。"}},"relatedKnowledge":{"title":"CPUの速さを決める3つの要素","content":[{"term":"クロック周波数","description":"CPUの動く速さ。3.5GHz＝1秒に35億回。高いほど速い。"},{"term":"コア数","description":"脳みその数。2コア＝2つの仕事を同時に。"},{"term":"キャッシュメモリ","description":"CPUそばの超高速メモリ。よく使うデータを置く。"}]},"practiceQuestions":[{"source":"令和4年 問71","questionText":"クロック周波数の説明として適切なものは？","choices":{"ア":"値が大きいほど処理速度が速い。","イ":"電源投入後は一定で変化しない。","ウ":"単位はバイトである。","エ":"デュアルコアはシングルの2倍。"},"answer":"ア","shortExplanation":"クロック周波数が大きい＝速い。単位はHz。"},{"source":"令和2年秋 問74","questionText":"マルチコアプロセッサの説明として適切なものは？","choices":{"ア":"1つのCPUに複数コアで複数処理を並行実行できる。","イ":"1コアの同時スレッド数が増える。","ウ":"1コアの性能が高くなる。","エ":"クロック周波数が高くなる。"},"answer":"ア","shortExplanation":"マルチコア＝脳みそが複数。同時にたくさんの仕事ができる。"}],"cardReward":{"cardName":"CPU","rarity":2,"summary":"CPU＝脳みそ。速さはクロック周波数・コア数・キャッシュで決まる。パイプライン＝流れ作業！","exp":120,"gold":250}},{"stageId":4,"title":"メモリとストレージ","subtitle":"机の広さ＝メモリ、引き出し＝ストレージ","category":"テクノロジ系","subcategory":"メモリ","estimatedMinutes":15,"mainQuestion":{"source":"令和5年 問96","originalText":"SI接頭語に関する記述のうち，適切なものはどれか。","choices":{"ア":"Gの10の6乗倍はTである。","イ":"Mの10の3乗倍はGである。","ウ":"Mの10の6乗倍はGである。","エ":"Tの10の3乗倍はGである。"},"answer":"イ","wordExplanations":[{"word":"SI接頭語","reading":"エスアイせっとうご","explanation":"大きな数を短く表す記号。k、M、G、Tなど。"},{"word":"10の3乗","reading":"じゅうのさんじょう","explanation":"10×10×10＝1000。「千倍」。"}],"questionExplained":"「キロ、メガ、ギガ、テラの関係」を聞いているよ。\n\nk → M → G → T の順。となりどうしは1000倍（10の3乗）！","choiceAnalysis":[{"choice":"ア","verdict":"✗","explanation":"Gの百万倍はP。"},{"choice":"イ","verdict":"◎ 正解","explanation":"M×1000＝G。となりだから1000倍。"},{"choice":"ウ","verdict":"✗","explanation":"Mの百万倍はT。"},{"choice":"エ","verdict":"✗","explanation":"Tの1000倍はP。逆。"}],"solvingStrategy":{"steps":["順番: k→M→G→T→P","となり＝1000倍（10の3乗）","2つ飛ばし＝百万倍（10の6乗）"],"trap":"10の3乗と10の6乗を混同しないように。"}},"relatedKnowledge":{"title":"メモリとストレージの違い","content":[{"term":"メモリ（RAM）","description":"「作業机」。電源OFFで消える。速い。4〜32GB。"},{"term":"ストレージ（HDD/SSD）","description":"「引き出し」。電源OFFでも残る。遅い。128GB〜数TB。"},{"term":"キャッシュメモリ","description":"CPUそばの「メモ用紙」。超速いが量は少ない。"},{"term":"速さの順番","description":"キャッシュ > メモリ > SSD > HDD（容量は逆）"}]},"practiceQuestions":[{"source":"令和4年 問63","questionText":"主記憶とキャッシュメモリの関係として適切なものは？","choices":{"ア":"キャッシュの容量は主記憶と同じかそれ以上。","イ":"キャッシュはCPUと主記憶の速度差を埋めるために使う。","ウ":"キャッシュは主記憶より遅い。","エ":"主記憶がニーズを超えているときキャッシュが使われる。"},"answer":"イ","shortExplanation":"キャッシュはCPUとメモリの速さの差を埋める。"},{"source":"令和3年 問78","questionText":"SSDの説明として適切なものは？","choices":{"ア":"HDDより振動に弱い。","イ":"HDDより読み書きが遅い。","ウ":"半導体メモリを使用している。","エ":"磁気ディスクを使用している。"},"answer":"ウ","shortExplanation":"SSD＝半導体メモリ。回る部品なし→振動に強くて速い。"}],"cardReward":{"cardName":"メモリとストレージ","rarity":2,"summary":"メモリ＝机（速い・消える）、ストレージ＝引き出し（遅い・残る）。k→M→G→T＝1000倍ずつ！","exp":120,"gold":250}},{"stageId":5,"title":"OSってなに？","subtitle":"コンピュータの司令塔","category":"テクノロジ系","subcategory":"OS","estimatedMinutes":15,"mainQuestion":{"source":"令和6年 問64","originalText":"OSの仮想記憶の説明として適切なものはどれか。","choices":{"ア":"CPUと主記憶の速度差を埋める記憶階層。","イ":"主記憶不足時に補助記憶の一部を使い、主記憶より大きな領域を使用可能にする機能。","ウ":"必要時に補助記憶からモジュールをロードする方式。","エ":"利用者ごとの主記憶領域を管理し、他者のアクセスを防ぐ機能。"},"answer":"イ","wordExplanations":[{"word":"仮想記憶","reading":"かそうきおく","explanation":"メモリ不足時にストレージを「にせものの机」として使う仕組み。"},{"word":"主記憶","reading":"しゅきおく","explanation":"RAM（作業机）のこと。"},{"word":"補助記憶","reading":"ほじょきおく","explanation":"HDD/SSD（引き出し）のこと。"}],"questionExplained":"「仮想記憶ってなに？」を聞いているよ。\n\n机がいっぱい→床を一時的な机代わりに使う。OSが自動でやりくり。","choiceAnalysis":[{"choice":"ア","verdict":"✗","explanation":"これは「キャッシュメモリ」の説明。"},{"choice":"イ","verdict":"◎ 正解","explanation":"主記憶不足→補助記憶を借りる＝仮想記憶！"},{"choice":"ウ","verdict":"✗","explanation":"これは「動的ローディング」の説明。"},{"choice":"エ","verdict":"✗","explanation":"これは「メモリ保護」の説明。"}],"solvingStrategy":{"steps":["「仮想」＝あるように見せかける","実際より多くのメモリがあるように見せる","補助記憶を借りて使う→イ"],"trap":"キャッシュは「速さ」の問題、仮想記憶は「容量」の問題。混同注意。"}},"relatedKnowledge":{"title":"OSの4つの仕事","content":[{"term":"メモリ管理","description":"メモリの使い方を管理。仮想記憶でやりくり。"},{"term":"タスク管理","description":"複数アプリを同時に動かす。音楽聴きながらブラウザOK。"},{"term":"ファイル管理","description":"ファイルやフォルダの保存・削除・整理。"},{"term":"入出力管理","description":"キーボードやプリンタなどの機器をコントロール。"}]},"practiceQuestions":[{"source":"令和3年 問69","questionText":"OSの機能として適切なものは？","choices":{"ア":"アプリ追加にはOS入替えが必要。","イ":"複数アプリにCPU時間を配分して管理。","ウ":"複数アプリを同時実行できない。","エ":"利用者が直接ハードウェアを操作できる。"},"answer":"イ","shortExplanation":"OSは複数アプリにCPU時間を配分する「タスク管理」をしている。"},{"source":"令和4年 問69","questionText":"PC起動時に最初に実行されるプログラムは？","choices":{"ア":"BIOS","イ":"OS","ウ":"Webブラウザ","エ":"ワープロソフト"},"answer":"ア","shortExplanation":"電源ON→BIOS→OS→アプリの順番。"}],"cardReward":{"cardName":"OS","rarity":2,"summary":"OS＝司令塔。メモリ管理・タスク管理・ファイル管理・入出力管理。仮想記憶で容量不足解決！","exp":120,"gold":250}},{"stageId":6,"title":"ファイルとフォルダ","subtitle":"プリントを整理する棚と同じ","category":"テクノロジ系","subcategory":"ファイルシステム","estimatedMinutes":15,"mainQuestion":{"source":"令和4年 問72","originalText":"ディレクトリに関する記述のうち，適切なものはどれか。","choices":{"ア":"最上位のディレクトリをカレントディレクトリという。","イ":"最上位のディレクトリをルートディレクトリという。","ウ":"カレントディレクトリからのパスを絶対パスという。","エ":"ルートディレクトリからのパスを相対パスという。"},"answer":"イ","wordExplanations":[{"word":"ディレクトリ","reading":"ディレクトリ","explanation":"フォルダと同じ意味。"},{"word":"ルートディレクトリ","reading":"ルートディレクトリ","explanation":"root＝根っこ。一番上のフォルダ。"},{"word":"カレントディレクトリ","reading":"カレントディレクトリ","explanation":"current＝現在の。今いるフォルダ。"},{"word":"絶対パス","reading":"ぜったいパス","explanation":"ルートから書く完全な住所。"},{"word":"相対パス","reading":"そうたいパス","explanation":"今いる場所からの住所。"}],"questionExplained":"「フォルダの用語」を聞いているよ。\n\nルート＝一番上、カレント＝今いる場所。絶対パス＝ルートから、相対パス＝カレントから。","choiceAnalysis":[{"choice":"ア","verdict":"✗","explanation":"最上位は「ルート」。"},{"choice":"イ","verdict":"◎ 正解","explanation":"ルート＝根っこ＝一番上。"},{"choice":"ウ","verdict":"✗","explanation":"逆！カレントからは「相対パス」。"},{"choice":"エ","verdict":"✗","explanation":"逆！ルートからは「絶対パス」。"}],"solvingStrategy":{"steps":["ルート＝一番上、カレント＝今の場所","絶対＝ルートから、相対＝カレントから","ウとエは入れ替えのひっかけ"],"trap":"「絶対」と「相対」が逆の選択肢に注意！"}},"relatedKnowledge":{"title":"ファイルの重要用語","content":[{"term":"拡張子","description":".txt .jpg .pdf .mp3 など。ファイルの種類がわかる。"},{"term":"圧縮と解凍","description":"圧縮＝小さくまとめる（.zip）。解凍＝元に戻す。"},{"term":"バックアップ","description":"大事なファイルのコピーを別の場所に保存。"}]},"practiceQuestions":[{"source":"令和3年 問85","questionText":"拡張子に関する記述のうち適切なものは？","choices":{"ア":"拡張子が異なっても対応アプリは同じ。","イ":"拡張子はファイルの種類を識別するために利用される。","ウ":"拡張子はファイルの暗号化のために付けられる。","エ":"拡張子を変更するとファイル内容が変換される。"},"answer":"イ","shortExplanation":"拡張子＝ファイルの「名札」。種類を教えてくれる。"},{"source":"令和5年 問64","questionText":"ルート直下のディレクトリAの中のファイルBの絶対パスは？","choices":{"ア":"/A/B","イ":"/B/A","ウ":"A/B","エ":"B/A"},"answer":"ア","shortExplanation":"絶対パスはルート（/）から。/A/Bが正解。"}],"cardReward":{"cardName":"ファイルシステム","rarity":2,"summary":"ルート＝一番上、カレント＝今の場所。絶対パス＝ルートから、相対パス＝カレントから。","exp":120,"gold":250}},{"stageId":7,"title":"ソフトウェアの種類","subtitle":"アプリってソフトウェアのこと","category":"テクノロジ系","subcategory":"オフィスツール","estimatedMinutes":15,"mainQuestion":{"source":"令和5年 問75","originalText":"表計算ソフトで合否判定。条件(1)合計120点以上 または (2)少なくとも一つが100点で合格。セルC2に入れる式は？","choices":{"ア":"IF(論理積(...)，'合格'，'不合格')","イ":"IF(論理積(...)，'不合格'，'合格')","ウ":"IF(論理和(...)，'合格'，'不合格')","エ":"IF(論理和(...)，'不合格'，'合格')"},"answer":"ウ","wordExplanations":[{"word":"表計算ソフト","reading":"ひょうけいさんソフト","explanation":"エクセルのようなソフト。"},{"word":"IF関数","reading":"イフかんすう","explanation":"「もし○○なら△△、そうでなければ□□」。"},{"word":"論理積","reading":"ろんりせき","explanation":"AND。「両方正しいとき」だけ正しい。"},{"word":"論理和","reading":"ろんりわ","explanation":"OR。「どちらか一つでも」正しい。"}],"questionExplained":"条件(1)「または」条件(2)で合格 → 「または」＝論理和（OR）！","choiceAnalysis":[{"choice":"ア","verdict":"✗","explanation":"論理積（AND）は「全部同時に」。「または」ではない。"},{"choice":"イ","verdict":"✗","explanation":"論理積で合格不合格も逆。"},{"choice":"ウ","verdict":"◎ 正解","explanation":"論理和で当てはまったら合格。ぴったり！"},{"choice":"エ","verdict":"✗","explanation":"論理和は正しいが合格と不合格が逆。"}],"solvingStrategy":{"steps":["「または」＝論理和（OR）","論理和はウとエ → ア・イは消える","当てはまったら「合格」→ ウ"],"trap":"「または」なのに「論理積」を選ぶミスが多い。"}},"relatedKnowledge":{"title":"ソフトウェアの種類","content":[{"term":"OS（基本ソフト）","description":"Windows, macOS, iOS, Android。土台。"},{"term":"アプリケーション","description":"ワープロ、表計算、ブラウザ、ゲームなど。"},{"term":"ミドルウェア","description":"OSとアプリの間に入るソフト。"},{"term":"ファームウェア","description":"機械の中のソフト。ルーターや炊飯器に入っている。"}]},"practiceQuestions":[{"source":"令和4年 問76","questionText":"IF(B1>=80,'合格','不合格')でB1=75のとき表示は？","choices":{"ア":"75","イ":"80","ウ":"合格","エ":"不合格"},"answer":"エ","shortExplanation":"75は80未満なので「不合格」。"},{"source":"令和3年 問80","questionText":"アプリ・OS・ハードウェアの関係は？","choices":{"ア":"HW→アプリ→OS","イ":"HW→OS→アプリ","ウ":"OS・HW並列→アプリ","エ":"OS→HW→アプリ"},"answer":"イ","shortExplanation":"下からハードウェア→OS→アプリ。"}],"cardReward":{"cardName":"ソフトウェアの種類","rarity":2,"summary":"HW→OS→ミドルウェア→アプリ。IF関数と論理和・論理積が超重要！","exp":120,"gold":250}},{"stageId":8,"title":"オープンソースってなに？","subtitle":"みんなで作る無料のソフト","category":"テクノロジ系","subcategory":"OSS","estimatedMinutes":15,"mainQuestion":{"source":"令和6年 問70","originalText":"OSSに関する記述のうち適切なものはどれか。","choices":{"ア":"変更後ソースコードの再配布は禁止。","イ":"商用目的で利用できない。","ウ":"無償だがソースコードは非公開。","エ":"ソースコードを入手して改良し再配布できる。"},"answer":"エ","wordExplanations":[{"word":"OSS","reading":"オープンソースソフトウェア","explanation":"ソースコードが公開されていて自由に使えるソフト。"},{"word":"ソースコード","reading":"ソースコード","explanation":"プログラムの「レシピ」。"},{"word":"再配布","reading":"さいはいふ","explanation":"もらったソフトを他の人に配ること。"}],"questionExplained":"「OSSのルール」を聞いているよ。見る・直す・配るが全部OK！","choiceAnalysis":[{"choice":"ア","verdict":"✗","explanation":"再配布はOK！"},{"choice":"イ","verdict":"✗","explanation":"商用利用もOK。"},{"choice":"ウ","verdict":"✗","explanation":"ソースコードは公開されている。"},{"choice":"エ","verdict":"◎ 正解","explanation":"見る・直す・配る、すべてOK。"}],"solvingStrategy":{"steps":["OSS＝Open Source → ソースコード公開","自由：見る・改良・再配布OK","「禁止」「できない」「非公開」は全部ウソ"],"trap":"無料＝OSSではない。ソースコード公開がポイント。"}},"relatedKnowledge":{"title":"有名なOSS","content":[{"term":"Linux","description":"OS。サーバで活躍。Androidの土台。"},{"term":"Firefox","description":"Webブラウザ。"},{"term":"LibreOffice","description":"無料のワープロ・表計算ソフト。"},{"term":"Apache","description":"Webサーバのソフト。"},{"term":"MySQL","description":"データベースソフト。"}]},"practiceQuestions":[{"source":"令和5年 問66","questionText":"OSSの特徴として最も適切なものは？","choices":{"ア":"個人は開発に参加できない。","イ":"ソースコード公開でバグを修正して利用できる。","ウ":"特定OSでしか利用できない。","エ":"ライセンス費用が発生する。"},"answer":"イ","shortExplanation":"ソースコード公開だからバグも自分で直せる。"},{"source":"令和4年 問79","questionText":"フリーウェアとOSSの違いは？","choices":{"ア":"フリーウェアは無料だがソース公開とは限らない。OSSはソース公開。","イ":"両方ソース公開。","ウ":"両方ソース非公開。","エ":"フリーウェアがソース公開、OSSが非公開。"},"answer":"ア","shortExplanation":"フリーウェア＝無料（ソース非公開かも）。OSS＝ソース公開。"}],"cardReward":{"cardName":"OSS","rarity":2,"summary":"OSS＝ソースコード公開。見る・直す・配る自由。無料≠OSS！","exp":120,"gold":250}},{"stageId":9,"title":"2進数の世界","subtitle":"コンピュータは0と1しか分からない","category":"テクノロジ系","subcategory":"離散数学","estimatedMinutes":15,"mainQuestion":{"source":"令和6年 問56","originalText":"10進数の「30」を2進数で表したものはどれか。","choices":{"ア":"10011","イ":"11110","ウ":"11111","エ":"100000"},"answer":"イ","wordExplanations":[{"word":"10進数","reading":"じっしんすう","explanation":"ふだん使う0〜9の数え方。"},{"word":"2進数","reading":"にしんすう","explanation":"0と1だけで数を表す。コンピュータの基本。"}],"questionExplained":"30を2で割り続ける：30→15余0、15→7余1、7→3余1、3→1余1、1→0余1。あまりを下から → 11110","choiceAnalysis":[{"choice":"ア","verdict":"✗","explanation":"10011=19"},{"choice":"イ","verdict":"◎ 正解","explanation":"11110=16+8+4+2=30"},{"choice":"ウ","verdict":"✗","explanation":"11111=31"},{"choice":"エ","verdict":"✗","explanation":"100000=32"}],"solvingStrategy":{"steps":["2で割り続けてあまりを下から読む","または2の累乗の組み合わせ: 16+8+4+2=30","検算で確認"],"trap":"11111=31は30と1違いのひっかけ。"}},"relatedKnowledge":{"title":"2進数と10進数の変換","content":[{"term":"2の累乗","description":"1,2,4,8,16,32,64,128"},{"term":"2進→10進","description":"各桁に2の累乗を掛けて足す。1101→8+4+0+1=13"},{"term":"16進数","description":"0〜9,A〜F。A=10,B=11...F=15。2進数4桁=16進数1桁。"}]},"practiceQuestions":[{"source":"令和5年 問57","questionText":"2進数「1011」を10進数で表すと？","choices":{"ア":"9","イ":"10","ウ":"11","エ":"13"},"answer":"ウ","shortExplanation":"1011→8+0+2+1=11"},{"source":"令和4年 問58","questionText":"16進数「2A」を10進数で表すと？","choices":{"ア":"22","イ":"28","ウ":"42","エ":"52"},"answer":"ウ","shortExplanation":"A=10。2×16+10=42"}],"cardReward":{"cardName":"2進数","rarity":3,"summary":"0と1だけ！「2で割ってあまり」で変換。16進数のA=10〜F=15も。","exp":150,"gold":300}},{"stageId":10,"title":"データの単位","subtitle":"ギガって何の数字？","category":"テクノロジ系","subcategory":"情報の理論","estimatedMinutes":15,"mainQuestion":{"source":"令和4年 問62","originalText":"情報量の単位に関する記述のうち適切なものはどれか。","choices":{"ア":"1バイトは8ビットである。","イ":"1バイトは16ビットである。","ウ":"1ビットは8バイトである。","エ":"1ビットは16バイトである。"},"answer":"ア","wordExplanations":[{"word":"ビット","reading":"ビット","explanation":"情報の最小単位。0か1の1つ。"},{"word":"バイト","reading":"バイト","explanation":"8ビットをまとめた単位。半角英数字1文字分。"}],"questionExplained":"1バイト＝8ビット。ITの超基本！ビット＜バイト。","choiceAnalysis":[{"choice":"ア","verdict":"◎ 正解","explanation":"1バイト＝8ビット。正しい！"},{"choice":"イ","verdict":"✗","explanation":"16ビット＝2バイト。"},{"choice":"ウ","verdict":"✗","explanation":"大小関係が逆！"},{"choice":"エ","verdict":"✗","explanation":"同じく逆。"}],"solvingStrategy":{"steps":["ビット＜バイト","1バイト＝8ビット","ウ・エは大小が逆→即アウト"],"trap":"ビットとバイトが逆の選択肢に注意。"}},"relatedKnowledge":{"title":"データの大きさ","content":[{"term":"1KB","description":"約1000バイト。短いメール。"},{"term":"1MB","description":"約100万バイト。写真1枚。"},{"term":"1GB","description":"約10億バイト。映画1本。"},{"term":"1TB","description":"約1兆バイト。映画1000本。"},{"term":"bps","description":"通信速度。1秒に何ビット送れるか。ストレージはバイトなので8倍の差！"}]},"practiceQuestions":[{"source":"令和3年 問76","questionText":"日本語1文字2バイトで800文字のデータサイズは？","choices":{"ア":"0.8KB","イ":"1.6KB","ウ":"8KB","エ":"16KB"},"answer":"イ","shortExplanation":"800×2=1600バイト=1.6KB"},{"source":"令和5年 問96","questionText":"Mの10の3乗倍は？","choices":{"ア":"Gの10の6乗倍はT","イ":"Mの10の3乗倍はG","ウ":"Mの10の6乗倍はG","エ":"Tの10の3乗倍はG"},"answer":"イ","shortExplanation":"k→M→G→T、となり同士1000倍。M×1000=G。"}],"cardReward":{"cardName":"データの単位","rarity":2,"summary":"1バイト＝8ビット！KB→MB→GB→TBは1000倍ずつ。","exp":120,"gold":250}},{"stageId":11,"title":"画像・音・動画のデータ","subtitle":"写真のサイズが大きい理由","category":"テクノロジ系","subcategory":"マルチメディア","estimatedMinutes":15,"mainQuestion":{"source":"令和6年 問78","originalText":"画像のデータ量に関する記述のうち適切なものはどれか。","choices":{"ア":"色ビット数が多いほどデータ量は小さい。","イ":"色ビット数が多いほどデータ量は大きい。","ウ":"解像度が高いほどデータ量は小さい。","エ":"データ量は解像度や色ビット数と関係しない。"},"answer":"イ","wordExplanations":[{"word":"解像度","reading":"かいぞうど","explanation":"画像のきめ細かさ。ドットの数。"},{"word":"色深度","reading":"いろしんど","explanation":"1ドットに何色使えるか。24ビット＝約1677万色。"},{"word":"ドット","reading":"ドット","explanation":"画像を作る「点」の一つ。"}],"questionExplained":"画像データ量＝解像度×色ビット数。どちらが増えてもデータは大きくなる。","choiceAnalysis":[{"choice":"ア","verdict":"✗","explanation":"多いほど大きくなる。逆。"},{"choice":"イ","verdict":"◎ 正解","explanation":"色ビット数多い→情報量増→データ大きい！"},{"choice":"ウ","verdict":"✗","explanation":"高いほど大きくなる。逆。"},{"choice":"エ","verdict":"✗","explanation":"関係ある！"}],"solvingStrategy":{"steps":["データ量＝解像度×色ビット数","どちらが増えても「大きくなる」","「小さい」「関係ない」は全部×"],"trap":"「多いほど小さい」は直感に反する。"}},"relatedKnowledge":{"title":"画像・音の圧縮","content":[{"term":"可逆圧縮","description":"元に完全に戻せる。PNG、ZIP。"},{"term":"非可逆圧縮","description":"完全には戻せない。JPEG、MP3。"},{"term":"画像形式","description":"JPEG→写真、PNG→イラスト、GIF→アニメ、BMP→無圧縮"},{"term":"音と動画","description":"MP3→音楽、MP4→動画。サンプリング周波数で音質が決まる。"}]},"practiceQuestions":[{"source":"令和5年 問60","questionText":"JPEGの特徴として適切なものは？","choices":{"ア":"アニメーション表現できる。","イ":"可逆圧縮。","ウ":"フルカラーを扱える。","エ":"文字・図形の圧縮に適している。"},"answer":"ウ","shortExplanation":"JPEG＝写真向き・非可逆・フルカラー。アニメはGIF。"},{"source":"令和3年 問91","questionText":"サンプリング周波数が高いほど？","choices":{"ア":"元の波形に近い音になる。","イ":"データ量は小さくなる。","ウ":"元の波形から遠くなる。","エ":"データ量に影響しない。"},"answer":"ア","shortExplanation":"周波数高い→記録回数多い→元の音に近い（データは大きい）。"}],"cardReward":{"cardName":"マルチメディア","rarity":2,"summary":"データ量＝解像度×色ビット数。JPEG＝写真（非可逆）、PNG＝イラスト（可逆）。","exp":120,"gold":250}}];
+
+let BOSS_DATA={"stageId":12,"title":"章ボス","isBossBattle":true,"passingScore":7,"bossName":"メカドラゴン","bossSprite":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfQAAADzCAYAAABwpOSGAAAAAXNSR0IArs4c6QAACF1JREFUeJzt3T+MHGcdx+E5vKf1+SIhkCAXOa6SWLi4xg1yFROlPLmjcHpwRYvcIEWioadC9ElBd7oSCVNZNG5cWLrEle3YiiVouJxPF+to+SOQfi83777+7vPU++qd3Zmdj6aZ38YEtDibe4P33/nBRnXNl89ftuxTXvPl85ezf/9pmsrfH9bZd1Z9AADA/0/QASCAoANAAEEHgACCDgABBB0AAgg6AAQQdAAIIOgAEEDQASCAoANAAEEHgACGH0Cb0nCSX+z9pLzBbw/+VF4ztf2ny4NWOn0f9yco8IQOAAEEHQACCDoABBB0AAgg6AAQQNABIICgA0AAQQeAAIIOAAEEHQACCDoABBB0AAiwWPUBjODG8mLp8/dPXpWHWVC3u7ksD+d4eHqy7ucm6ft3+S6us3HdWF4snZv7J6/mOpQ3gid0AAgg6AAQQNABIICgA0AAQQeAAIIOAAEEHQACCDoABBB0AAgg6AAQQNABIICgA0CA8lCCVntb2+U1B8dHQw5AePbue6s+hLVw+enjLvv0OJ8t3+XFrZszHMn52Nm/V14z6u/cwj2gj17ns2pva7vczoPjozkO5V94QgeAAIIOAAEEHQACCDoABBB0AAgg6AAQQNABIICgA0AAQQeAAIIOAAEEHQACCDoABGgaztJr0MqoAxBGHRjQU/XctPxmu5vLLsODHp6ezH5tXrh+pbpFnNcPnpQ+v+7XjPtMVgN6DHTxhA4AAQQdAAIIOgAEEHQACCDoABBA0AEggKADQABBB4AAgg4AAQQdAAIIOgAEWKS9l73H+49Hfb9wq1HfGf3w9GTVh/Bf7fzx+6XPv/zlTAfyBqn+ZtOP6tflyNdMD+5NdS2/Wcuay08fl7tZff+7J3QACCDoABBA0AEggKADQABBB4AAgg4AAQQdAAIIOgAEEHQACCDoABBA0AEggKADQIBF2qCVHsf2vV/9bPY9pmma/vbr33fZZ1Q3lhfLa+6fvJrhSP7Ti4//Wvr8hev1IUhpqr9ZLyNfZ6PqdQ981uEe2KszPQa6eEIHgACCDgABBB0AAgg6AAQQdAAIIOgAEEDQASCAoANAAEEHgACCDgABBB0AAgg6AARY9Nqo1wvwew0NqGoZtNLyXUYd6NJjMME0TdPVxeZGdc3ht6fVJWWvHzwpr7lw/coMR3I+Wr5PD1cXm+U1909eDTugqode95mWfXrcz1sGwIw6OMwTOgAEEHQACCDoABBA0AEggKADQABBB4AAgg4AAQQdAAIIOgAEEHQACCDoABBA0AEgQLfhLEl6DSbopXFwyux79Bro0qLH99/Zv1de0+Nc9tyn6vDb02EHrfS4ZnoZeaDLOvOEDgABBB0AAgg6AAQQdAAIIOgAEEDQASCAoANAAEEHgACCDgABBB0AAgg6AAQQdAAIMPRwlqZhDnfunv+B/BtDE+q/QY/BHNM07qCNFr2+y6jXc9K5nKY+3ydtmMmlDvfzJJ7QASCAoANAAEEHgACCDgABBB0AAgg6AAQQdAAIIOgAEEDQASCAoANAAEEHgABDv8t9mqaNHpvsbi5Ln7/89PFZdY9vqgsGV31n9LOG98W3vGN71Pdy9zqukSX9Zi3vZa/+Z1pmLIys5Xzubi5LDXh4elLeo1G5AT14QgeAAIIOAAEEHQACCDoABBB0AAgg6AAQQNABIICgA0AAQQeAAIIOAAEEHQACCDoABFjsbW2XB6C0DCdp2efg+Ki6pEmPF/pfunN39j1atQyaqGoZzPDi1s0ZjuR87OzfK33+7POr9U0++KS+ppcvPisv2bh9WPp80vmfpj4Dmka+z7ToOGylZNRuekIHgACCDgABBB0AAgg6AAQQdAAIIOgAEEDQASCAoANAAEEHgACCDgABBB0AAgg6AARYNA5AGXbQysDKv1mL3c1leU3L0IAegybevv1VeU11AMg0NQ5O2S9+vmXQSsMAlG6aBsd8Wvp01Plv0DLQaHdzWb7PdByAUr7PjGrUbnpCB4AAgg4AAQQdAAIIOgAEEHQACCDoABBA0AEggKADQABBB4AAgg4AAQQdAAIIOgAE6DIwhOHNPjThm9/9przm0p275TUvbt0sr9nZv1deU9U0AKRpAEonDYNjWganVPU6/72u5wbu6WvMEzoABBB0AAgg6AAQQNABIICgA0AAQQeAAIIOAAEEHQACCDoABBB0AAgg6AAQQNABIIAX+TNNDcNZrr3zw9K18+j51+U9nr37XnXJdOH6lfKaFq8fPCl9/vLTx+U9mga6dNIyaKV6Pkc9l9PUdj57/Gcm9/S15gkdAAIIOgAEEHQACCDoABBA0AEggKADQABBB4AAgg4AAQQdAAIIOgAEEHQACLBY9QEwhPL7nx89/3qO4+CfffDJqo/gf/h01Qfwxmn4z3gvOyWe0AEggKADQABBB4AAgg4AAQQdAAIIOgAEEHQACCDoABBA0AEggKADQABBB4AAgg4AAQxnIcrrB09WfQjn54vPVn0EKxV1LqEDT+gAEEDQASCAoANAAEEHgACCDgABBB0AAgg6AAQQdAAIIOgAEEDQASCAoANAAEEHgAAbqz4A1sPe1nZ5zcHx0Vl1zdnnV8v7bNw+LK+p7tOyR5oev1mv87+3tV2+dx4cH5X3gQpP6AAQQNABIICgA0AAQQeAAIIOAAEEHQACCDoABBB0AAgg6AAQQNABIICgA0AAQQeAAItVHwDroWUwxU9//FZ5AMbG7cPyQJeff/Td2ff58NpWeY8/PzquLunmw2tb5TXV36zHeZmmtuvsD3/5e3UJzM4TOgAEEHQACCDoABBA0AEggKADQABBB4AAgg4AAQQdAAIIOgAEEHQACCDoABDgH5KLq0c7G9nyAAAAAElFTkSuQmCC","bossDescription":"全問正解で撃破！","questions":[{"id":"q1","questionText":"コンピュータ全体を管理する「司令塔」のソフトウェアはどれか。","choices":{"ア":"アプリケーション","イ":"ハードウェア","ウ":"OS","エ":"USB"},"answer":"ウ","shortExplanation":"OS＝司令塔。"},{"id":"q2","questionText":"入力装置だけを全て挙げたものはどれか。","choices":{"ア":"キーボード，マウス","イ":"キーボード，プリンタ","ウ":"ディスプレイ，スピーカー","エ":"プリンタ，スピーカー"},"answer":"ア","shortExplanation":"プリンタ・ディスプレイ・スピーカーは出力。"},{"id":"q3","questionText":"クロック周波数の値が大きいほどどうなるか。","choices":{"ア":"処理速度が速い","イ":"処理速度が遅い","ウ":"記憶容量が増える","エ":"変化しない"},"answer":"ア","shortExplanation":"大きい＝速い。"},{"id":"q4","questionText":"電源を切ると記憶が消える装置はどれか。","choices":{"ア":"HDD","イ":"RAM","ウ":"SSD","エ":"DVD"},"answer":"イ","shortExplanation":"RAM＝揮発性。電源OFFで消える。"},{"id":"q5","questionText":"仮想記憶の説明として適切なものはどれか。","choices":{"ア":"CPUの速度を上げる技術","イ":"補助記憶を使って主記憶を超える領域を使える機能","ウ":"ファイルを暗号化する機能","エ":"CPU時間を配分する機能"},"answer":"イ","shortExplanation":"メモリ不足→ストレージを借りる。"},{"id":"q6","questionText":"ルートディレクトリからファイル位置を指定する方法は？","choices":{"ア":"絶対パス","イ":"相対パス","ウ":"カレントパス","エ":"拡張子"},"answer":"ア","shortExplanation":"ルートから＝絶対パス。"},{"id":"q7","questionText":"論理和（OR）の説明として適切なものは？","choices":{"ア":"全条件が正しいとき正しい","イ":"どれか一つでも正しければ正しい","ウ":"条件を反転させる","エ":"正しくないとき正しい"},"answer":"イ","shortExplanation":"OR＝どれか一つでもOK。"},{"id":"q8","questionText":"OSSの説明として適切なものは？","choices":{"ア":"利用料が必要","イ":"ソースコード公開で改良・再配布OK","ウ":"ソース非公開で無料","エ":"商用利用禁止"},"answer":"イ","shortExplanation":"OSS＝ソース公開。自由。"},{"id":"q9","questionText":"10進数「13」を2進数で表すと？","choices":{"ア":"1011","イ":"1100","ウ":"1101","エ":"1110"},"answer":"ウ","shortExplanation":"13=8+4+1=1101"},{"id":"q10","questionText":"JPEGの特徴はどれか。","choices":{"ア":"可逆圧縮で完全復元","イ":"非可逆圧縮で写真に適している","ウ":"アニメーション表現できる","エ":"最大256色まで"},"answer":"イ","shortExplanation":"JPEG＝写真・非可逆・フルカラー。"}],"rewards":{"clearTitle":"コンピュータの冒険者","exp":500,"gold":1000,"bonusCard":{"cardName":"メカドラゴン撃破の証","rarity":4,"summary":"第1章制覇の証。"}}};
+
+/* ===== アイテム定義 ===== */
+const ITEM_ICONS={
+  life_stone:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfQAAAKpCAYAAABKLt4+AAAAAXNSR0IArs4c6QAADMxJREFUeJzt1yFuZfcZh+F7LG+h8DKrgQYDCwIsVfIKwsIGdAUer8D1CgaElc0KLI1kKQGFAwwTmUQXdg++hWWtzsl0Pvu9z7OCn46O/q++ZQf/y/5yesF6h6fj9AReuf3lMj1htcPT9AJesbPpAQDAHyfoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQsEwP2Oy776cXrPfrL8fpCafi7OZxegKv3Mv91fSE0/Hd92+vNb/+Mr1gNRc6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAELNMD/oDj9IC1zm4epycAfHMv91fTE7Z4c310oQNAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0DA+W5/Ob1hm8PT9IKTcXd9MT1htduH5+kJm7zcX01PWO3s5nF6wib+a/6rN9hGFzoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQsu93uOD1ii7Obx+kJq91dX0xP2OT24Xl6wmov91fTEzZZ/vLjMr1hreM///Em35D7n3+fnnAyvCHfhgsdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACzqcHwP/D2c3j9IRNXu6vjtMb1nqr3xpqXOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQcD49APiPs5vH6QnAG+VCB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAgPPd/nKZHrHFy/3VcXrDWre7x+kJm9xdX0xPWO324Xl6AsA35UIHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAgPPd4Wl6A/CG3V1fTE84GbcPz9MTNnm5v5qesN7+cpmesJYLHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAs6nB2y2v1ymJ6z1cn91nN6wyfXv0wsAvq3D0/SC1VzoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQcD49gNfv9uF5egJ8dR8+fp6esNrx0/vpCdvsL5fpCasdnqYXrOZCB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgIDz3f7d9IZtDl+O0xPWOrt5nJ7AK3d3fTE9YbUPHz9PT+C1OzxNLzgJLnQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAhYdrvdcXrEFssPP01POBl//9tfpyecjA8fP09POBnHT++nJ6y3f7dMT9jk8GV6wUlwoQNAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0DAstvtjtMjtlh++Gl6Anx1x0/vpyecjv27ZXrCaocv0wt4xVzoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQsOz276Y3bHP4cpyeAF/dn/68TE9Y7V+/TS8Adi50AEgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAI+Dewi3GmZnUriQAAAABJRU5ErkJggg==',
+  sage_glasses:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfQAAAEdCAYAAAD6nZXAAAAAAXNSR0IArs4c6QAABT1JREFUeJzt17ttG1EURdEZg2pAlagJxQ5cpwPHroKVqAEC41QgTAey4ftma60KDvi5G2/fOJtjesDC9ukBnJb/1WP+VyfxZXoAAPD3BB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAvbpASdwTA+44zsD/ic38CS80AEgQNABIEDQASBA0AEgQNABIEDQASBA0AEgQNABIEDQASBA0AEgQNABIEDQASBA0AEgQNABIEDQASBA0AEgQNABIEDQASBA0AEgQNABIEDQASBA0AEgQNABIEDQASBA0AEgQNABIEDQASBA0AEgQNABIEDQASBA0AEgQNABIEDQASBA0AEgQNABIGCfHvAbx/SAOyt+RgCflUY84IUOAAGCDgABgg4AAYIOAAGCDgABgg4AAYIOAAGCDgABgg4AAYIOAAGCDgABgg4AAYIOAAGCDgABgg4AAYIOAAGCDgABgg4AAYIOAAGCDgABgg4AAYIOAAGCDgABgg4AAYIOAAGCDgABgg4AAYIOAAGCDgABgg4AAYIOAAGCDgABgg4AAYIOAAH7tm3H9AiI2qcHLMzdgX/MCx0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAL2bduO6RHvHcdSc5ZzfbtNT1jWy/PT9AROyt15zM35s5Xujhc6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAEXKYHrO76dpuewHnt0wMWdkwPWJm7w0d4oQNAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAwGV6wL3r2216AvDJuDsUeKEDQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0DA5fXrt316xHsvz0/H9AbOabXf8s8f36cnLGu178rd4aNW+i17oQNAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAwC9uWitvipNWkAAAAABJRU5ErkJggg=='
+};
+const SHOP_ITEMS=[
+  {id:'life_stone',name:'命のたま',price:500,desc:'不正解でもリセットされない（自動使用）',icon:ITEM_ICONS.life_stone},
+  {id:'sage_glasses',name:'賢者のメガネ',price:300,desc:'選択肢を2つに絞るヒントが使える',icon:ITEM_ICONS.sage_glasses}
+];
+
+/* ===== 状態管理 ===== */
+let state=loadState();
+function defaultState(){return{exp:0,gold:5000,level:1,clearedStages:[1,2,3,4,5,6,7,8,9,10,11],ownedCards:[],bossCleared:false,titles:['駆け出しの学び手'],currentTitle:'駆け出しの学び手',inventory:[]}}
+/* ↑ テスト用: gold:5000, clearedStages全開放。本番では gold:0, clearedStages:[] に戻す */
+function loadState(){
+  /* テスト用: 強制リセット。本番では下の1行を削除 */
+  localStorage.removeItem('it-course-state');return defaultState();
+  try{
+    const s=localStorage.getItem('it-course-state');
+    if(!s)return defaultState();
+    const d=JSON.parse(s);
+    if(!d.titles){d.titles=['駆け出しの学び手'];d.currentTitle='駆け出しの学び手';}
+    if(!d.inventory)d.inventory=[];
+    return d;
+  }catch(e){return defaultState();}
+}
+function saveState(){localStorage.setItem('it-course-state',JSON.stringify(state));updateHeader()}
+
+/* ===== 効果音 ===== */
+const SFX={
+  exp:new Audio('決定ボタンを押す22.mp3'),
+  gold:new Audio('お金がジャラジャラ.mp3'),
+  select:new Audio('決定ボタンを押す3.mp3'),
+  confirm:new Audio('決定ボタンを押す18.mp3'),
+  buff:new Audio('ゲージ回復1.mp3'),
+  correct:new Audio('クイズ正解1.mp3'),
+  wrong:new Audio('小パンチ.mp3'),
+  typing:new Audio('キーボード1.mp3'),
+  hit:new Audio('大キック.mp3'),
+  magic:new Audio('重力魔法1.mp3'),
+  victory:new Audio('決定ボタンを押す41.mp3'),
+  buy:new Audio('お金がジャラジャラ.mp3')
+};
+Object.values(SFX).forEach(a=>{a.volume=0.4;a.preload='auto';});
+SFX.typing.volume=0.15;
+SFX.hit.volume=0.5;
+function playSfx(key){const a=SFX[key];if(!a)return;a.currentTime=0;a.play().catch(()=>{});}
+
+/* ===== タイプライター演出 ===== */
+let twTimer=null,twSkipFn=null;
+function typewriter(el,text,speed,onDone){
+  let i=0;el.textContent='';
+  clearInterval(twTimer);
+  twTimer=setInterval(()=>{
+    if(i<text.length){
+      el.textContent+=text[i];
+      if(i%2===0)playSfx('typing');
+      i++;
+      if(i%20===0)el.scrollIntoView({behavior:'smooth',block:'nearest'});
+    }else{
+      clearInterval(twTimer);twTimer=null;twSkipFn=null;
+      if(onDone)onDone();
+    }
+  },speed);
+  twSkipFn=()=>{clearInterval(twTimer);twTimer=null;el.textContent=text;twSkipFn=null;if(onDone)onDone();};
+}
+function skipTypewriter(){if(twSkipFn){twSkipFn();return true;}return false;}
+
+/* ===== DQ風レベル計算 ===== */
+const MAX_LEVEL=999;
+function expForLevel(lv){return Math.floor(5+lv*0.35+Math.pow(lv/60,2)*3);}
+function calcLevel(totalExp){
+  let lv=1,used=0;
+  while(lv<MAX_LEVEL){
+    const need=expForLevel(lv);
+    if(totalExp<used+need)return{level:lv,cur:totalExp-used,next:need};
+    used+=need;lv++;
+  }
+  return{level:MAX_LEVEL,cur:0,next:0};
+}
+
+/* ===== 称号システム ===== */
+const TITLE_TABLE=[
+  {lv:1,name:'駆け出しの学び手'},
+  {lv:5,name:'見習い冒険者'},
+  {lv:10,name:'冒険者'},
+  {lv:20,name:'旅の剣士'},
+  {lv:30,name:'知識の探求者'},
+  {lv:50,name:'熟練の戦士'},
+  {lv:75,name:'白銀の騎士'},
+  {lv:100,name:'知識の騎士'},
+  {lv:150,name:'魔法使い'},
+  {lv:200,name:'大魔法使い'},
+  {lv:250,name:'賢者'},
+  {lv:300,name:'大賢者'},
+  {lv:400,name:'勇者'},
+  {lv:500,name:'伝説の勇者'},
+  {lv:600,name:'英雄'},
+  {lv:700,name:'大英雄'},
+  {lv:800,name:'覇王'},
+  {lv:900,name:'神の領域'},
+  {lv:950,name:'ITの守護者'},
+  {lv:999,name:'ITの神'}
+];
+function getTitleForLevel(lv){
+  let t=TITLE_TABLE[0];
+  for(const e of TITLE_TABLE){if(lv>=e.lv)t=e;else break;}
+  return t.name;
+}
+function getNextTitle(lv){
+  for(const e of TITLE_TABLE){if(e.lv>lv)return e;}
+  return null;
+}
+// 既存セーブの称号を現在レベルに合わせて補正
+(function(){
+  const lv=calcLevel(state.exp).level;
+  const t=getTitleForLevel(lv);
+  if(state.currentTitle!==t){
+    state.currentTitle=t;
+    if(!state.titles)state.titles=[];
+    for(const e of TITLE_TABLE){if(e.lv<=lv&&!state.titles.includes(e.name))state.titles.push(e.name);}
+  }
+})();
+function updateHeader(){
+  const info=calcLevel(state.exp);
+  state.level=info.level;
+  // サイドパネル更新
+  const el=id=>document.getElementById(id);
+  el('sp-level').textContent=state.level;
+  el('sp-exp').textContent=state.exp;
+  el('sp-gold').textContent=state.gold;
+  const pct=info.next>0?Math.min((info.cur/info.next)*100,100):100;
+  el('sp-exp-bar').style.width=pct+'%';
+  el('sp-exp-next').textContent=info.next>0?`次のLvまで ${info.next-info.cur}`:'MAX';
+  // 称号更新
+  const title=getTitleForLevel(info.level);
+  if(!state.currentTitle)state.currentTitle=title;
+  el('sp-title').textContent=state.currentTitle;
+  const nt=getNextTitle(info.level);
+  el('sp-title-next').textContent=nt?`次の称号: ${nt.name} (Lv${nt.lv})`:'最高称号に到達！';
+  // カリキュラム進捗
+  const total=12;
+  const cleared=state.clearedStages.length+(state.bossCleared?1:0);
+  el('sp-cur-fill').style.width=((cleared/total)*100)+'%';
+  el('sp-cur-text').textContent=`${cleared} / ${total} クリア`;
+  // アイテムバー
+  renderSidebarItems();
+}
+
+/* ===== 画面切り替え ===== */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  if(id==='screen-map')renderStageGrid();
+  if(id==='screen-collection')renderCollection();
+}
+
+/* ===== ステージ選択 ===== */
+function renderStageGrid(){
+  const grid=document.getElementById('stage-grid');grid.innerHTML='';
+  COURSE_DATA.forEach((st,i)=>{
+    const unlocked=i===0||state.clearedStages.includes(COURSE_DATA[i-1].stageId);
+    const cleared=state.clearedStages.includes(st.stageId);
+    const c=document.createElement('div');
+    c.className='stage-card'+(unlocked?'':' locked')+(cleared?' cleared':'');
+    c.innerHTML=`<div class="stage-num">Stage ${st.stageId}</div><div class="stage-name">${st.title}</div><div class="stage-sub">${st.subtitle}</div><div class="stage-category">${st.subcategory}</div>`;
+    if(unlocked)c.onclick=()=>startStage(st.stageId);
+    grid.appendChild(c);
+  });
+  const bu=state.clearedStages.length>=11;
+  const bc=document.createElement('div');
+  bc.className='stage-card boss'+(bu?'':' locked')+(state.bossCleared?' cleared':'');
+  bc.innerHTML=`<div class="stage-num">Stage 12</div><div class="stage-name">${BOSS_DATA.bossName}</div><div class="stage-sub">${BOSS_DATA.bossDescription}</div><div class="stage-category" style="color:#ff5252">BOSS</div>`;
+  if(bu)bc.onclick=()=>showBossPrep();
+  grid.appendChild(bc);
+}
+
+/* ===== 学習フロー ===== */
+let currentStage=null,learnStep=0;
+const LEARN_STEPS=['vocab','question','knowledge','practice1','practice2','reward'];
+const STEP_NAMES={vocab:'ことばを知ろう',question:'問題に挑戦',knowledge:'知識を広げよう',practice1:'練習問題①',practice2:'練習問題②',reward:'カード獲得'};
+
+function startStage(id){
+  playSfx('confirm');
+  currentStage=COURSE_DATA.find(s=>s.stageId===id);
+  if(!currentStage)return;
+  learnStep=0;
+  document.getElementById('learn-title').textContent=`Stage ${id}: ${currentStage.title}`;
+  document.getElementById('learn-sub').textContent=currentStage.subtitle;
+  showScreen('screen-learn');
+  renderLearnStep();
+}
+
+function renderLearnStep(){
+  const c=document.getElementById('learn-content');
+  const pct=((learnStep+1)/LEARN_STEPS.length*100).toFixed(0);
+  document.getElementById('learn-progress').style.width=pct+'%';
+  const stepName=STEP_NAMES[LEARN_STEPS[learnStep]]||'';
+  document.getElementById('learn-progress-label').textContent=`${learnStep+1}/${LEARN_STEPS.length} ${stepName}`;
+  c.innerHTML='';
+  const step=LEARN_STEPS[learnStep];
+  const mq=currentStage.mainQuestion;
+  if(step==='vocab')renderVocab(c,currentStage);
+  else if(step==='question')renderIntegratedQuestion(c,mq);
+  else if(step==='knowledge')renderKnowledge(c,currentStage.relatedKnowledge);
+  else if(step==='practice1')renderPractice(c,currentStage.practiceQuestions[0],1);
+  else if(step==='practice2')renderPractice(c,currentStage.practiceQuestions[1],2);
+  else if(step==='reward')renderReward(c,currentStage);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function nextStep(){
+  playSfx('confirm');
+  learnStep++;
+  if(learnStep>=LEARN_STEPS.length){showScreen('screen-map');return}
+  renderLearnStep();
+}
+
+/* ===== アコーディオン開閉 ===== */
+function toggleAcc(el){
+  const acc=el.closest('.accordion');
+  const wasOpen=acc.classList.contains('open');
+  acc.classList.toggle('open');
+  if(!wasOpen&&!acc.dataset.rewarded){acc.dataset.rewarded='1';const r=acc.getBoundingClientRect();rollTapReward(r.left+r.width/2,r.top+r.height/2);}
+}
+
+/* ===== 選択肢ヒント開閉 ===== */
+function toggleHint(e,id){
+  e.stopPropagation();
+  const h=document.getElementById(id);
+  const wasOpen=h.classList.contains('open');
+  h.classList.toggle('open');
+  if(!wasOpen){
+    if(!h.dataset.rewarded){h.dataset.rewarded='1';rollTapReward(e.clientX,e.clientY);}
+    // タイプライターで表示（初回のみ）
+    if(h.dataset.hint&&!h.dataset.filled){
+      h.dataset.filled='1';
+      h.textContent='';
+      typewriter(h,h.dataset.hint,30);
+    }
+  }
+}
+
+/* ===== 順次表示システム ===== */
+let revealPaused=false;
+
+function revealNext(e){
+  if(revealPaused)return;
+  // タイプライター中ならスキップして終了
+  if(skipTypewriter())return;
+  const container=document.getElementById('learn-content');
+  if(!container)return;
+  const next=container.querySelector('.reveal-block:not(.revealed)');
+  if(!next)return;
+  next.classList.add('revealed');
+  setTimeout(()=>{next.scrollIntoView({behavior:'smooth',block:'nearest'})},150);
+  if(next.dataset.wait){revealPaused=true;}
+  updateTapIndicator();
+  // タイプライター要素があれば開始
+  const twEl=next.querySelector('[data-tw]');
+  if(twEl){typewriter(twEl,twEl.dataset.tw,35);}
+  // タップ報酬
+  let x,y;
+  if(e&&e.clientX!==undefined){x=e.clientX;y=e.clientY;}
+  else{const ind=document.getElementById('tap-indicator');if(ind){const r=ind.getBoundingClientRect();x=r.left+r.width/2;y=r.top+r.height/2;}else{x=window.innerWidth/2;y=window.innerHeight/2;}}
+  rollTapReward(x,y);
+}
+
+function resumeReveal(){revealPaused=false;updateTapIndicator();}
+
+function updateTapIndicator(){
+  const container=document.getElementById('learn-content');
+  const indicator=document.getElementById('tap-indicator');
+  if(!indicator||!container)return;
+  const hasMore=container.querySelector('.reveal-block:not(.revealed)');
+  if(hasMore&&!revealPaused){indicator.classList.add('active');}
+  else{indicator.classList.remove('active');}
+}
+
+function retryStep(){renderLearnStep();}
+
+document.addEventListener('keydown',(e)=>{
+  if(e.code==='Space'&&document.querySelector('#screen-learn.active')){
+    e.preventDefault();revealNext(null);
+  }
+});
+
+/* ===== ランダム報酬システム ===== */
+let expMultiplier=1,expBuffRemaining=0;
+
+function rollTapReward(x,y){
+  let baseExp=2;
+  if(expBuffRemaining>0){baseExp=Math.ceil(baseExp*expMultiplier);expBuffRemaining--;updateBuffDisplay();}
+  const roll=Math.random();
+  if(roll<0.08){
+    expMultiplier=1.2;expBuffRemaining=10;
+    gainTapExp(x,y,baseExp);
+    updateBuffDisplay();
+    showBuffBanner();
+  }else if(roll<0.23){
+    const gold=1+Math.floor(Math.random()*3);
+    state.gold+=gold;
+    gainTapExp(x,y,baseExp);
+    spawnGoldCoins(x,y,gold);
+  }else{
+    gainTapExp(x,y,baseExp);
+  }
+}
+
+function spawnGoldCoins(fromX,fromY,amount){
+  playSfx('gold');
+  const target=document.getElementById('sp-gold');
+  if(!target)return;
+  const tRect=target.getBoundingClientRect();
+  const tx=tRect.left+tRect.width/2,ty=tRect.top+tRect.height/2;
+  const count=3;
+  for(let i=0;i<count;i++){
+    const p=document.createElement('div');p.className='gold-particle';
+    const ox=(Math.random()-.5)*30,oy=(Math.random()-.5)*30;
+    p.style.left=(fromX+ox)+'px';p.style.top=(fromY+oy)+'px';
+    document.body.appendChild(p);
+    const dx=tx-(fromX+ox),dy=ty-(fromY+oy);
+    const delay=i*50;
+    p.animate([
+      {transform:'translate(0,0) scale(1) rotate(0deg)',opacity:.8},
+      {transform:`translate(${dx}px,${dy}px) scale(0.3) rotate(360deg)`,opacity:.3}
+    ],{duration:500,delay:delay,easing:'ease-in',fill:'forwards'});
+    setTimeout(()=>p.remove(),600+delay);
+  }
+  setTimeout(()=>showSidebarGain('sp-gold','+'+amount+' G','#ffd700'),400);
+}
+
+function updateBuffDisplay(){
+  const el=document.getElementById('sp-buff');
+  if(!el)return;
+  if(expBuffRemaining>0){el.textContent=`EXP x${expMultiplier} (残り${expBuffRemaining}回)`;}
+  else{el.textContent='';}
+}
+
+/* ===== サイドバー到着時の増加表示 ===== */
+function showSidebarGain(targetId,text,color){
+  const el=document.getElementById(targetId);
+  if(!el)return;
+  const rect=el.getBoundingClientRect();
+  const t=document.createElement('div');t.className='sidebar-gain';
+  t.textContent=text;t.style.color=color;
+  t.style.left=(rect.right+6)+'px';t.style.top=(rect.top)+'px';
+  document.body.appendChild(t);
+  t.animate([
+    {transform:'translateY(0)',opacity:1},
+    {transform:'translateY(-14px)',opacity:0}
+  ],{duration:800,fill:'forwards'});
+  setTimeout(()=>t.remove(),900);
+}
+
+/* ===== バフ獲得演出 ===== */
+function showBuffBanner(){
+  playSfx('buff');
+  // 画面フラッシュ
+  const flash=document.createElement('div');flash.className='buff-overlay';
+  document.body.appendChild(flash);setTimeout(()=>flash.remove(),900);
+  // 中央バナー
+  const b=document.createElement('div');b.className='buff-banner';
+  b.innerHTML='<div class="buff-banner-text">EXP x1.2 GET!</div><div class="buff-banner-sub">10回分のEXPがアップ！</div>';
+  document.body.appendChild(b);
+  b.animate([
+    {transform:'translate(-50%,-50%) scale(.5)',opacity:0},
+    {transform:'translate(-50%,-50%) scale(1.05)',opacity:1,offset:.2},
+    {transform:'translate(-50%,-50%) scale(1)',opacity:1,offset:.5},
+    {transform:'translate(-50%,-50%) scale(1)',opacity:0}
+  ],{duration:1800,fill:'forwards'});
+  setTimeout(()=>b.remove(),1900);
+}
+
+/* ===== タップ経験値 & パーティクル演出 ===== */
+function gainTapExp(x,y,amount){
+  const oldLv=calcLevel(state.exp).level;
+  state.exp+=amount;
+  saveState();
+  playSfx('exp');
+  spawnTapRipple(x,y);
+  spawnParticles(x,y,amount);
+  const area=document.getElementById('sp-exp-area');
+  if(area){area.classList.add('sp-flash');setTimeout(()=>area.classList.remove('sp-flash'),300);}
+  const newLv=calcLevel(state.exp).level;
+  if(newLv>oldLv)showLevelUp(newLv);
+}
+
+function spawnTapRipple(x,y){
+  const r=document.createElement('div');r.className='tap-ripple';
+  r.style.left=(x-12)+'px';r.style.top=(y-12)+'px';
+  document.body.appendChild(r);
+  setTimeout(()=>r.remove(),600);
+}
+
+function spawnParticles(fromX,fromY,amount){
+  const target=document.getElementById('sp-exp-area');
+  if(!target)return;
+  const tRect=target.getBoundingClientRect();
+  const tx=tRect.left+tRect.width/2,ty=tRect.top+tRect.height/2;
+  const count=4;
+  for(let i=0;i<count;i++){
+    const p=document.createElement('div');p.className='xp-particle';
+    const angle=(Math.PI*2/count)*i;
+    const spread=12+Math.random()*10;
+    const ox=Math.cos(angle)*spread,oy=Math.sin(angle)*spread;
+    p.style.left=(fromX+ox)+'px';p.style.top=(fromY+oy)+'px';
+    document.body.appendChild(p);
+    const dx=tx-(fromX+ox),dy=ty-(fromY+oy);
+    const delay=i*30;
+    p.animate([
+      {transform:'translate(0,0) scale(1)',opacity:.8},
+      {transform:`translate(${dx}px,${dy}px) scale(0.2)`,opacity:.2}
+    ],{duration:450,delay:delay,easing:'ease-in',fill:'forwards'});
+    setTimeout(()=>p.remove(),550+delay);
+  }
+  setTimeout(()=>showSidebarGain('sp-exp','+'+amount,'#7ecfff'),350);
+}
+
+function showLevelUp(newLv){
+  const flash=document.createElement('div');flash.className='levelup-flash';
+  document.body.appendChild(flash);setTimeout(()=>flash.remove(),700);
+  const ov=document.getElementById('levelup-overlay');
+  document.getElementById('levelup-number').textContent='Lv.'+newLv;
+  setTimeout(()=>ov.classList.add('active'),300);
+  // 称号チェック
+  const newTitle=getTitleForLevel(newLv);
+  if(newTitle!==state.currentTitle){
+    state.currentTitle=newTitle;
+    if(!state.titles)state.titles=[];
+    if(!state.titles.includes(newTitle))state.titles.push(newTitle);
+    saveState();
+    setTimeout(()=>showTitleOverlay(newTitle),1200);
+  }
+}
+function closeLevelUp(){document.getElementById('levelup-overlay').classList.remove('active');}
+
+function showTitleOverlay(titleName){
+  closeLevelUp();
+  const flash=document.createElement('div');flash.className='title-flash';
+  document.body.appendChild(flash);setTimeout(()=>flash.remove(),900);
+  document.getElementById('title-got-name').textContent=titleName;
+  setTimeout(()=>document.getElementById('title-overlay').classList.add('active'),200);
+}
+function closeTitleOverlay(){document.getElementById('title-overlay').classList.remove('active');}
+
+/* ===== ことばステップ ===== */
+function renderVocab(c,stage){
+  const mq=stage.mainQuestion;
+  const words=mq.wordExplanations||[];
+  revealPaused=false;
+  const div=document.createElement('div');
+  let html=`<div class="section-card">
+    <span class="step-badge step-vocab">Step ${learnStep+1}</span>
+    <div class="section-title" style="color:#ffd700;border-bottom-color:#5a4a00">まず、ことばを知ろう</div>
+
+    <div class="reveal-block revealed">
+      <div class="vocab-intro" data-tw="このステージのテーマは「${stage.title}」だよ。\n${stage.subtitle}。\n\n問題を解く前に、出てくる大事なことばを1つずつ覚えよう！"></div>
+    </div>
+
+    ${words.map(w=>`<div class="reveal-block">
+      <div class="vocab-card">
+        <div><span class="vocab-word">${w.word}</span>${w.reading&&w.reading!==w.word?`<span class="vocab-reading">（${w.reading}）</span>`:''}</div>
+        <div class="vocab-meaning" data-tw="${w.explanation.replace(/"/g,'&quot;')}"></div>
+      </div>
+    </div>`).join('')}
+
+    <div class="reveal-block">
+      <div class="confirm-box">
+        <div class="confirm-text">ここまでのことばは覚えた？</div>
+        <div class="confirm-subtext">${words.length}つのことばを学んだよ。問題に出てくるので覚えておこう！</div>
+        <button class="confirm-btn confirm-yes" onclick="nextStep()">覚えた！問題に進む</button>
+        <button class="confirm-btn confirm-retry" onclick="retryStep()">もう一度読む</button>
+      </div>
+    </div>
+  </div>`;
+  div.innerHTML=html;
+  c.appendChild(div);
+  updateTapIndicator();
+  const firstTw=div.querySelector('.reveal-block.revealed [data-tw]');
+  if(firstTw){typewriter(firstTw,firstTw.dataset.tw,35);}
+}
+
+/* ===== 統合問題画面 ===== */
+function renderIntegratedQuestion(c,mq){
+  revealPaused=false;
+  const div=document.createElement('div');
+
+  const keys=['ア','イ','ウ','エ'];
+  let choicesHtml='';
+  keys.forEach(k=>{
+    if(!mq.choices[k])return;
+    const hintId='hint-main-'+k;
+    const analysis=mq.choiceAnalysis.find(a=>a.choice===k);
+    const hintText=analysis?analysis.explanation:'';
+    choicesHtml+=`<div class="choice-item" id="ci-${k}">
+      <div class="choice-main" onclick="selectMain('${k}','${mq.answer}')">
+        <span class="choice-label">${k}.</span>
+        <span class="choice-text">${mq.choices[k]}</span>
+        <button class="choice-hint-btn" onclick="toggleHint(event,'${hintId}')">ヒント</button>
+      </div>
+      <div class="choice-hint" id="${hintId}" data-hint="${hintText.replace(/"/g,'&quot;')}"></div>
+    </div>`;
+  });
+
+  let html=`<div class="section-card">
+    <span class="step-badge step-question">Step ${learnStep+1}</span>
+    <div class="section-title question-title">過去問に挑戦しよう</div>
+
+    <!-- ブロック1: 問題文（自動表示・タイプライター、モバイルでスティッキー） -->
+    <div class="reveal-block revealed sticky-q">
+      <div class="q-source">${mq.source}</div>
+      <div class="q-text" data-tw="${mq.originalText.replace(/"/g,'&quot;')}"></div>
+    </div>
+
+    <!-- ブロック2: この問題は何を聞いている？ -->
+    <div class="reveal-block">
+      <div class="question-guide">
+        <div class="question-guide-title">この問題は何を聞いている？</div>
+        <div class="question-guide-text" data-tw="${mq.questionExplained.replace(/"/g,'&quot;')}"></div>
+      </div>
+    </div>
+
+    <!-- ブロック3: ことば復習 -->
+    <div class="reveal-block">
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          <span class="acc-icon">▶</span>
+          <span class="acc-label">ことばを復習する</span>
+          <span class="acc-tag words">用語</span>
+        </div>
+        <div class="accordion-body">
+          ${mq.wordExplanations.map(w=>`<div class="word-item">
+            <div class="word-term">${w.word}${w.reading&&w.reading!==w.word?` <span class="word-reading">（${w.reading}）</span>`:''}</div>
+            <div class="word-desc">${w.explanation}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- ブロック4: 選択肢（回答を待つ） -->
+    <div class="reveal-block" data-wait="answer">
+      <div style="margin-top:8px;margin-bottom:8px;font-size:.9rem;color:#ffd700;font-weight:bold">さあ、答えを選ぼう！</div>
+      <div class="strategy-hint-wrap">
+        <button class="strategy-hint-btn" onclick="toggleStrategyHint(this)">
+          <span class="strategy-hint-icon">▶</span> 考え方のヒント
+        </button>
+        <div class="strategy-hint-body" id="strategy-hint-body">
+          <ol class="strategy-steps" id="strategy-hint-steps"></ol>
+        </div>
+      </div>
+      <div id="main-choices">${choicesHtml}</div>
+      <div class="answer-confirm" id="answer-confirm">
+        <div class="confirm-text">この答えでいい？</div>
+        <div id="answer-confirm-label" style="font-size:.85rem;color:#aaa;margin:8px 0"></div>
+        <button class="confirm-btn confirm-yes" onclick="confirmAnswer()">この答えで決定！</button>
+        <button class="confirm-btn confirm-retry" onclick="cancelAnswer()">選び直す</button>
+      </div>
+    </div>
+
+    <!-- === 回答後に順次表示されるブロック === -->
+
+    <!-- ブロック5: 正解/不正解バナー + 全選択肢の解説 -->
+    <div class="reveal-block" id="rb-analysis">
+      <div id="result-banner"></div>
+      <div style="margin-top:12px;font-size:.9rem;font-weight:bold;color:#fff;margin-bottom:8px">全選択肢の解説</div>
+      <div id="choice-analysis-content">
+        ${mq.choiceAnalysis.map(a=>{
+          const isC=a.verdict.includes('正解');
+          return`<div class="analysis-item ${isC?'is-correct':'is-wrong'}">
+            <span class="analysis-verdict ${isC?'correct':'wrong'}">${a.choice}. ${a.verdict}</span>
+            <div style="font-size:.85rem;color:#ccc;margin-top:4px">${a.explanation}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+
+    <!-- ブロック7: 解き方の振り返り（全ステップ＋ひっかけ） -->
+    <div class="reveal-block" id="rb-strategy">
+      <div style="font-size:.9rem;font-weight:bold;color:#ffb74d;margin-bottom:8px">解き方の振り返り</div>
+      <div style="font-size:.82rem;color:#aaa;margin-bottom:8px">答えを含めた全ステップを確認しよう</div>
+      <ol class="strategy-steps">${mq.solvingStrategy.steps.map(s=>`<li>${s}</li>`).join('')}</ol>
+      <div class="trap-box"><div class="trap-label">ひっかけポイント</div><div>${mq.solvingStrategy.trap}</div></div>
+    </div>
+
+    <!-- ブロック7: 理解度確認 -->
+    <div class="reveal-block" id="rb-confirm">
+      <div class="confirm-box">
+        <div class="confirm-text">この問題の解き方は理解できた？</div>
+        <div class="confirm-subtext">選択肢ごとの正誤の理由と、解き方のコツを覚えよう！</div>
+        <button class="confirm-btn confirm-yes" onclick="nextStep()">理解できた！次へ進む</button>
+        <button class="confirm-btn confirm-retry" onclick="retryStep()">もう一度読む</button>
+      </div>
+    </div>
+  </div>`;
+
+  div.innerHTML=html;
+  c.appendChild(div);
+  updateTapIndicator();
+  // 保留中のストラテジーステップを保存
+  window._strategySteps=mq.solvingStrategy.steps.slice(0,-1);
+  // 最初のブロック（問題文）のタイプライターを自動開始
+  const firstTw=div.querySelector('.reveal-block.revealed [data-tw]');
+  if(firstTw){typewriter(firstTw,firstTw.dataset.tw,35);}
+}
+
+/* ===== 考え方のヒント 開閉 ===== */
+function toggleStrategyHint(btn){
+  const wasOpen=btn.classList.contains('open');
+  btn.classList.toggle('open');
+  const body=document.getElementById('strategy-hint-body');
+  if(!body)return;
+  if(!wasOpen){
+    body.classList.add('open');
+    // 初回のみ報酬＋タイプライターで順次表示
+    if(!btn.dataset.rewarded){
+      btn.dataset.rewarded='1';
+      const r=btn.getBoundingClientRect();
+      rollTapReward(r.left+r.width/2,r.top+r.height/2);
+    }
+    // ステップを1つずつタイプライターで表示
+    const ol=document.getElementById('strategy-hint-steps');
+    if(ol&&window._strategySteps&&!ol.dataset.filled){
+      ol.dataset.filled='1';
+      ol.innerHTML='';
+      let idx=0;
+      const steps=window._strategySteps;
+      function showNextStep(){
+        if(idx>=steps.length)return;
+        const li=document.createElement('li');
+        li.style.opacity='0';
+        ol.appendChild(li);
+        li.animate([{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'translateY(0)'}],{duration:300,fill:'forwards'});
+        typewriter(li,steps[idx],30,()=>{idx++;setTimeout(showNextStep,200);});
+      }
+      showNextStep();
+    }
+  }else{
+    body.classList.remove('open');
+  }
+}
+
+let pendingKey=null,pendingAnswer=null;
+
+function selectMain(key,answer){
+  if(document.querySelector('.choice-item.correct'))return;
+  playSfx('select');
+  // 既に選択中なら解除
+  document.querySelectorAll('.choice-item.selected').forEach(ci=>ci.classList.remove('selected'));
+  // 選択をハイライト
+  pendingKey=key;pendingAnswer=answer;
+  document.getElementById('ci-'+key).classList.add('selected');
+  // 確認ダイアログを表示
+  const conf=document.getElementById('answer-confirm');
+  const label=document.getElementById('answer-confirm-label');
+  label.textContent='選んだ答え: '+key;
+  conf.style.display='block';
+  setTimeout(()=>{conf.scrollIntoView({behavior:'smooth',block:'nearest'})},100);
+}
+
+function confirmAnswer(){
+  if(!pendingKey)return;
+  playSfx('confirm');
+  const key=pendingKey,answer=pendingAnswer;
+  const correct=key===answer;
+  // 確認ダイアログを非表示
+  document.getElementById('answer-confirm').style.display='none';
+  // 正解/不正解を反映
+  document.querySelectorAll('.choice-item').forEach(ci=>{
+    ci.classList.remove('selected');
+    ci.classList.add('answered');
+    if(ci.id==='ci-'+answer)ci.classList.add('correct');
+    else if(ci.id==='ci-'+key&&!correct)ci.classList.add('wrong');
+  });
+  document.querySelectorAll('.choice-hint').forEach(h=>h.classList.add('open'));
+  const banner=document.getElementById('result-banner');
+  banner.className='result-banner '+(correct?'correct':'wrong');
+  if(correct){
+    playSfx('correct');
+    banner.textContent='正解！';
+    const ci=document.getElementById('ci-'+answer);
+    const rect=ci?ci.getBoundingClientRect():{left:window.innerWidth/2,top:window.innerHeight/2,width:0,height:0};
+    const bx=rect.left+rect.width/2,by=rect.top+rect.height/2;
+    setTimeout(()=>gainTapExp(bx,by,20),200);
+  }else{
+    playSfx('wrong');
+    const lost=Math.floor(state.gold/2);
+    state.gold=state.gold-lost;
+    saveState();
+    banner.textContent='不正解… 正解は '+answer+(lost>0?' （GOLD -'+lost+'）':'');
+  }
+  pendingKey=null;pendingAnswer=null;
+  // 回答後の順次表示を再開
+  resumeReveal();
+  setTimeout(()=>{revealNext();},300);
+}
+
+function cancelAnswer(){
+  if(!pendingKey)return;
+  document.querySelectorAll('.choice-item.selected').forEach(ci=>ci.classList.remove('selected'));
+  document.getElementById('answer-confirm').style.display='none';
+  pendingKey=null;pendingAnswer=null;
+}
+
+/* ===== 関連知識 ===== */
+function renderKnowledge(c,rk){
+  revealPaused=false;
+  const div=document.createElement('div');
+  let html=`<div class="section-card">
+    <span class="step-badge step-knowledge">Step ${learnStep+1}</span>
+    <div class="section-title knowledge-title">${rk.title}</div>
+
+    <div class="reveal-block revealed">
+      <div class="vocab-intro" data-tw="問題に関連する知識をもっと学ぼう！\n1つずつ確認していこう。"></div>
+    </div>
+
+    ${rk.content.map(k=>`<div class="reveal-block">
+      <div class="knowledge-item">
+        <div class="knowledge-term">${k.term}</div>
+        <div class="knowledge-desc" data-tw="${k.description.replace(/"/g,'&quot;')}"></div>
+      </div>
+    </div>`).join('')}
+
+    <div class="reveal-block">
+      <div class="confirm-box">
+        <div class="confirm-text">関連知識を覚えた？</div>
+        <div class="confirm-subtext">${rk.content.length}つの知識を学んだよ。練習問題で確認しよう！</div>
+        <button class="confirm-btn confirm-yes" onclick="nextStep()">覚えた！練習問題へ</button>
+        <button class="confirm-btn confirm-retry" onclick="retryStep()">もう一度読む</button>
+      </div>
+    </div>
+  </div>`;
+  div.innerHTML=html;
+  c.appendChild(div);
+  updateTapIndicator();
+  const firstTw=div.querySelector('.reveal-block.revealed [data-tw]');
+  if(firstTw){typewriter(firstTw,firstTw.dataset.tw,35);}
+}
+
+/* ===== 練習問題 ===== */
+const _pqState={};
+function renderPractice(c,pq,num){
+  revealPaused=false;
+  const uid='pq-'+num;
+  const div=document.createElement('div');
+
+  /* === 選択肢シャッフル（ラベルはア〜エ固定、中身を入れ替え） === */
+  const origKeys=['ア','イ','ウ','エ'];
+  const vals=origKeys.filter(k=>pq.choices[k]).map(k=>({origKey:k,text:pq.choices[k]}));
+  for(let i=vals.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[vals[i],vals[j]]=[vals[j],vals[i]];}
+  const shuffled={};let newAnswer=pq.answer;
+  const ansText=pq.choices[pq.answer];
+  origKeys.forEach((k,i)=>{if(i<vals.length){shuffled[k]=vals[i];if(vals[i].text===ansText)newAnswer=k;}});
+  _pqState[uid]={answer:newAnswer,pendingKey:null};
+
+  /* === choiceAnalysis をシャッフル後のラベルにマッピング === */
+  const analysisMap={};
+  if(pq.choiceAnalysis)pq.choiceAnalysis.forEach(a=>{analysisMap[pq.choices[a.choice]]=a;});
+
+  /* === 選択肢HTML === */
+  let choicesHtml='';
+  origKeys.forEach(k=>{
+    if(!shuffled[k])return;
+    const a=analysisMap[shuffled[k].text];
+    const hintId=uid+'-hint-'+k;
+    const hintText=a?a.explanation:'';
+    choicesHtml+=`<div class="choice-item" id="${uid}-ci-${k}" data-key="${k}">
+      <div class="choice-main" onclick="selectPractice('${uid}','${k}')">
+        <span class="choice-label">${k}.</span>
+        <span class="choice-text">${shuffled[k].text}</span>
+        ${hintText?`<button class="choice-hint-btn" onclick="event.stopPropagation();toggleHint(event,'${hintId}')">ヒント</button>`:''}
+      </div>
+      ${hintText?`<div class="choice-hint" id="${hintId}" data-hint="${hintText.replace(/"/g,'&quot;')}"></div>`:''}
+    </div>`;
+  });
+
+  /* === この問題は何を聞いている？ === */
+  const qExpHtml=pq.questionExplained?`
+    <div class="reveal-block">
+      <div class="question-guide">
+        <div class="question-guide-title">この問題は何を聞いている？</div>
+        <div class="question-guide-text" data-tw="${pq.questionExplained.replace(/"/g,'&quot;')}"></div>
+      </div>
+    </div>`:'';
+
+  /* === 考え方のヒント === */
+  const stratHtml=pq.solvingStrategy?`
+      <div class="strategy-hint-wrap">
+        <button class="strategy-hint-btn" onclick="togglePqStrategy(this,'${uid}')">
+          <span class="strategy-hint-icon">▶</span> 考え方のヒント
+        </button>
+        <div class="strategy-hint-body" id="${uid}-strat-body">
+          <ol class="strategy-steps" id="${uid}-strat-steps"></ol>
+        </div>
+      </div>`:'';
+
+  div.innerHTML=`<div class="section-card">
+    <span class="step-badge step-practice">Step ${learnStep+1}</span>
+    <div class="section-title practice-title">練習問題 ${num}</div>
+
+    <!-- ブロック1: 問題文（モバイルでスティッキー） -->
+    <div class="reveal-block revealed sticky-q">
+      <div class="q-source">${pq.source}</div>
+      <div class="q-text" data-tw="${pq.questionText.replace(/"/g,'&quot;')}"></div>
+    </div>
+
+    <!-- ブロック2: この問題は何を聞いている？ -->
+    ${qExpHtml}
+
+    <!-- ブロック3: ことば復習 -->
+    <div class="reveal-block">
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          <span class="acc-icon">▶</span>
+          <span class="acc-label">ことばを復習する</span>
+          <span class="acc-tag words">用語</span>
+        </div>
+        <div class="accordion-body">
+          ${(currentStage.mainQuestion.wordExplanations||[]).map(w=>`<div class="word-item">
+            <div class="word-term">${w.word}${w.reading&&w.reading!==w.word?` <span class="word-reading">（${w.reading}）</span>`:''}</div>
+            <div class="word-desc">${w.explanation}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- ブロック4: 選択肢（回答を待つ） -->
+    <div class="reveal-block" data-wait="answer">
+      <div style="margin-top:8px;margin-bottom:8px;font-size:.9rem;color:#ffd700;font-weight:bold">さあ、答えを選ぼう！</div>
+      ${stratHtml}
+      <div id="${uid}-choices">${choicesHtml}</div>
+      <div class="answer-confirm" id="${uid}-confirm">
+        <div class="confirm-text">この答えでいい？</div>
+        <div id="${uid}-confirm-label" style="font-size:.85rem;color:#aaa;margin:8px 0"></div>
+        <button class="confirm-btn confirm-yes" onclick="confirmPractice('${uid}')">この答えで決定！</button>
+        <button class="confirm-btn confirm-retry" onclick="cancelPractice('${uid}')">選び直す</button>
+      </div>
+    </div>
+
+    <!-- ブロック5: 正解/不正解バナー + 全選択肢の解説 -->
+    <div class="reveal-block" id="${uid}-result">
+      <div id="${uid}-banner"></div>
+      <div style="margin-top:12px;font-size:.9rem;font-weight:bold;color:#ffb74d;margin-bottom:8px">解説</div>
+      <div class="practice-explanation" id="${uid}-exp" data-tw="${pq.shortExplanation.replace(/"/g,'&quot;')}"></div>
+    </div>
+
+    <!-- ブロック6: 理解度確認 -->
+    <div class="reveal-block" id="${uid}-done-block">
+      <div class="confirm-box">
+        <div class="confirm-text">${num<2?'理解できた？もう1問やってみよう！':'理解できた？カードを獲得しよう！'}</div>
+        <button class="confirm-btn confirm-yes" onclick="nextStep()">${num<2?'次の練習問題へ →':'カード獲得へ →'}</button>
+        <button class="confirm-btn confirm-retry" onclick="retryStep()">もう一度読む</button>
+      </div>
+    </div>
+  </div>`;
+  if(pq.solvingStrategy)window['_pqStrat_'+uid]=pq.solvingStrategy.steps;
+  c.appendChild(div);
+  updateTapIndicator();
+  const firstTw=div.querySelector('.reveal-block.revealed [data-tw]');
+  if(firstTw){typewriter(firstTw,firstTw.dataset.tw,35);}
+}
+
+function togglePqStrategy(btn,uid){
+  const wasOpen=btn.classList.contains('open');
+  btn.classList.toggle('open');
+  const body=document.getElementById(uid+'-strat-body');
+  if(!body)return;
+  if(!wasOpen){
+    body.classList.add('open');
+    if(!btn.dataset.rewarded){btn.dataset.rewarded='1';const r=btn.getBoundingClientRect();rollTapReward(r.left+r.width/2,r.top+r.height/2);}
+    const ol=document.getElementById(uid+'-strat-steps');
+    const steps=window['_pqStrat_'+uid];
+    if(ol&&steps&&!ol.dataset.filled){
+      ol.dataset.filled='1';ol.innerHTML='';let idx=0;
+      function showNext(){if(idx>=steps.length)return;const li=document.createElement('li');li.style.opacity='0';ol.appendChild(li);
+        li.animate([{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'translateY(0)'}],{duration:300,fill:'forwards'});
+        typewriter(li,steps[idx],30,()=>{idx++;setTimeout(showNext,200);});}
+      showNext();
+    }
+  }else{body.classList.remove('open');}
+}
+
+function selectPractice(uid,key){
+  if(document.querySelector('#'+uid+'-choices .choice-item.correct'))return;
+  playSfx('select');
+  document.querySelectorAll('#'+uid+'-choices .choice-item.selected').forEach(ci=>ci.classList.remove('selected'));
+  _pqState[uid].pendingKey=key;
+  document.getElementById(uid+'-ci-'+key).classList.add('selected');
+  const conf=document.getElementById(uid+'-confirm');
+  document.getElementById(uid+'-confirm-label').textContent='選んだ答え: '+key;
+  conf.style.display='block';
+  setTimeout(()=>conf.scrollIntoView({behavior:'smooth',block:'nearest'}),100);
+}
+
+function confirmPractice(uid){
+  const ps=_pqState[uid];
+  if(!ps||!ps.pendingKey)return;
+  playSfx('confirm');
+  const key=ps.pendingKey,ans=ps.answer;
+  const correct=key===ans;
+  document.getElementById(uid+'-confirm').style.display='none';
+  document.querySelectorAll('#'+uid+'-choices .choice-item').forEach(ci=>{
+    ci.classList.remove('selected');
+    ci.classList.add('answered');
+    const k=ci.dataset.key;
+    if(k===ans)ci.classList.add('correct');
+    else if(k===key&&!correct)ci.classList.add('wrong');
+  });
+  const banner=document.getElementById(uid+'-banner');
+  banner.className='result-banner '+(correct?'correct':'wrong');
+  if(correct){
+    playSfx('correct');
+    banner.textContent='正解！';
+    const ci=document.getElementById(uid+'-ci-'+ans);
+    if(ci){const r=ci.getBoundingClientRect();gainTapExp(r.left+r.width/2,r.top+r.height/2,15);}
+  }else{
+    playSfx('wrong');
+    const lost=Math.floor(state.gold*0.3);
+    if(lost>0){state.gold-=lost;saveState();}
+    banner.textContent='不正解… 正解は '+ans+(lost>0?' （GOLD -'+lost+'）':'');
+  }
+  /* 全選択肢のヒントを開く */
+  document.querySelectorAll('#'+uid+'-choices .choice-hint').forEach(h=>h.classList.add('open'));
+  const expEl=document.getElementById(uid+'-exp');
+  expEl.style.display='block';expEl.classList.add('visible');
+  typewriter(expEl,expEl.dataset.tw,30);
+  ps.pendingKey=null;
+  resumeReveal();
+  setTimeout(()=>revealNext(),300);
+}
+
+function cancelPractice(uid){
+  const ps=_pqState[uid];
+  if(!ps)return;
+  document.querySelectorAll('#'+uid+'-choices .choice-item.selected').forEach(ci=>ci.classList.remove('selected'));
+  document.getElementById(uid+'-confirm').style.display='none';
+  ps.pendingKey=null;
+}
+
+/* ===== カード獲得 ===== */
+function renderReward(c,stage){
+  const cr=stage.cardReward;
+  const isNew=!state.clearedStages.includes(stage.stageId);
+  if(isNew){
+    state.clearedStages.push(stage.stageId);state.exp+=cr.exp;state.gold+=cr.gold;
+    if(!state.ownedCards.includes(cr.cardName))state.ownedCards.push(cr.cardName);
+    saveState();
+  }
+  playSfx('victory');
+  const stars='★'.repeat(cr.rarity)+'☆'.repeat(5-cr.rarity);
+  const div=document.createElement('div');
+  revealPaused=false;
+  const tipHtml=!state.bossCleared?`<div style="background:rgba(255,215,0,.1);border:1px solid #5a4a00;border-radius:8px;padding:10px;margin-top:12px;font-size:.8rem;color:#ffd700;text-align:center">ボス戦に備えてアイテムを買っておこう！<br><span style="color:#aaa">ボス戦準備画面でショップが開けるよ</span></div>`:'';
+  div.innerHTML=`<div class="section-card">
+    <span class="step-badge step-reward">Step ${learnStep+1}</span>
+
+    <div class="reveal-block revealed">
+      <div class="section-title reward-title" data-tw="ステージクリア！カード獲得！"></div>
+    </div>
+
+    <div class="reveal-block">
+      <div class="reward-card">
+        <div class="reward-rarity">${stars}</div>
+        <div class="reward-card-name">${cr.cardName}</div>
+        <div class="reward-summary" data-tw="${cr.summary.replace(/"/g,'&quot;')}"></div>
+        <div class="reward-stats">
+          <div class="reward-stat"><div class="reward-stat-value exp">+${cr.exp}</div><div class="reward-stat-label">EXP</div></div>
+          <div class="reward-stat"><div class="reward-stat-value gold">+${cr.gold}</div><div class="reward-stat-label">GOLD</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="reveal-block">
+      ${tipHtml}
+      <button class="next-btn" onclick="showScreen('screen-map')">ステージ選択に戻る</button>
+    </div>
+  </div>`;
+  c.appendChild(div);
+  updateTapIndicator();
+  const firstTw=div.querySelector('.reveal-block.revealed [data-tw]');
+  if(firstTw){typewriter(firstTw,firstTw.dataset.tw,35);}
+  // カード獲得時のEXPパーティクル演出
+  if(isNew){
+    setTimeout(()=>{
+      const card=div.querySelector('.reward-card');
+      if(card){const r=card.getBoundingClientRect();gainTapExp(r.left+r.width/2,r.top+r.height/2,cr.exp);}
+    },800);
+  }
+}
+
+/* ===== ショップ & アイテム ===== */
+function buyItem(itemId){
+  const item=SHOP_ITEMS.find(i=>i.id===itemId);
+  if(!item||state.gold<item.price)return;
+  if(state.inventory.length>=2){alert('持ち物がいっぱいです（最大2個）');return}
+  playSfx('buy');
+  state.gold-=item.price;state.inventory.push(itemId);saveState();updateHeader();
+  renderBossPrep();
+}
+function removeItem(index){
+  const item=SHOP_ITEMS.find(i=>i.id===state.inventory[index]);
+  if(item){playSfx('gold');state.gold+=item.price;state.inventory.splice(index,1);saveState();updateHeader();renderBossPrep();}
+}
+
+/* ===== ボス戦準備画面 ===== */
+function showBossPrep(){
+  document.getElementById('boss-prep-title').textContent=BOSS_DATA.bossName+' 戦準備';
+  showScreen('screen-boss-prep');renderBossPrep();
+}
+function renderBossPrep(){
+  const c=document.getElementById('boss-prep-content');
+  const bagHtml=state.inventory.length>0
+    ?state.inventory.map((id,i)=>{const it=SHOP_ITEMS.find(s=>s.id===id);return`<div class="boss-bag-item"><img src="${it.icon}" class="boss-bag-item-icon"> ${it.name} <span style="color:#888;font-size:.7rem;cursor:pointer" onclick="removeItem(${i})">[売却+${it.price}G]</span></div>`}).join('')
+    :'<div class="boss-bag-empty">アイテムなし</div>';
+  const spriteHtml=BOSS_DATA.bossSprite?`<img src="${BOSS_DATA.bossSprite}" alt="${BOSS_DATA.bossName}" class="boss-sprite boss-sprite-anim">`:'';
+  c.innerHTML=`
+    ${spriteHtml}
+    <div style="text-align:center;font-size:1.2rem;font-weight:bold;color:#ff5252;margin-bottom:8px">${BOSS_DATA.bossName}</div>
+    <div class="shop-warning">ボス戦ではミスは許されない！<br>アイテムを買って万全の準備をしよう！</div>
+    <div class="shop-gold">所持ゴールド: ${state.gold} G</div>
+    <div class="boss-bag"><div class="boss-bag-title">持ち物（${state.inventory.length}/2）</div>${bagHtml}</div>
+    ${SHOP_ITEMS.map(it=>{
+      const canBuy=state.gold>=it.price&&state.inventory.length<2;
+      return`<div class="shop-item"><div class="shop-item-icon"><img src="${it.icon}" alt="${it.name}"></div><div class="shop-item-info"><div class="shop-item-name">${it.name}</div><div class="shop-item-desc">${it.desc}</div><div class="shop-item-price">${it.price} G</div></div><button class="shop-buy-btn" ${canBuy?'':'disabled'} onclick="buyItem('${it.id}')">購入</button></div>`;
+    }).join('')}
+    <button class="next-btn" style="margin-top:16px" onclick="confirmBossStart()">バトル開始！</button>
+    <button class="next-btn secondary" style="margin-top:8px" onclick="showScreen('screen-map')">やめる</button>`;
+}
+
+/* ===== ボスバトル ===== */
+let bossQIndex=0,bossCorrect=0,bossActiveQs=[],bossBag=[];
+function confirmBossStart(){
+  const bagHtml=state.inventory.length>0
+    ?state.inventory.map(id=>{const it=SHOP_ITEMS.find(s=>s.id===id);return it?`<img src="${it.icon}" class="modal-bag-item-icon">${it.name}`:''}).join('<br>')
+    :'なし';
+  const spriteHtml=BOSS_DATA.bossSprite?`<img src="${BOSS_DATA.bossSprite}" style="width:80px;image-rendering:pixelated;margin-bottom:8px">`:'';
+  const overlay=document.createElement('div');
+  overlay.className='modal-overlay';
+  overlay.innerHTML=`<div class="modal-box">
+    ${spriteHtml}
+    <h3>${BOSS_DATA.bossName}に挑む！</h3>
+    <div class="modal-bag">持ち物<br>${bagHtml}</div>
+    <div class="modal-note">全問連続正解で撃破！</div>
+    <div class="modal-btns">
+      <button class="modal-btn-back" id="modal-cancel">やめる</button>
+      <button class="modal-btn-go" id="modal-go">バトル開始</button>
+    </div>
+  </div>`;
+  document.body.appendChild(overlay);
+  document.getElementById('modal-cancel').onclick=()=>{playSfx('select');overlay.remove()};
+  document.getElementById('modal-go').onclick=()=>{playSfx('confirm');overlay.remove();startBoss()};
+}
+function startBoss(){
+  bossQIndex=0;bossCorrect=0;
+  bossBag=state.inventory.slice();
+  /* 章内ステージの practiceQuestions を収集 */
+  const pool=[];
+  COURSE_DATA.forEach(st=>{
+    if(st.practiceQuestions){
+      st.practiceQuestions.forEach(pq=>{
+        pool.push({questionText:pq.questionText,choices:pq.choices,answer:pq.answer,shortExplanation:pq.shortExplanation});
+      });
+    }
+  });
+  if(pool.length===0&&BOSS_DATA.questions)BOSS_DATA.questions.forEach(q=>pool.push(q));
+  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+  const cnt=Math.min(Math.floor(Math.random()*4)+3,pool.length);
+  bossActiveQs=pool.slice(0,cnt);
+  document.getElementById('boss-title').textContent=BOSS_DATA.bossName;showScreen('screen-boss');renderBossQ();
+}
+let bossSelectedEl=null,bossSelectedKey=null,bossSelectedAns=null;
+function renderSidebarItems(){
+  /* サイドバーのマイクラ風2スロットアイテムバー */
+  const bar=document.getElementById('sp-item-bar');
+  if(!bar)return;
+  let slots='';
+  for(let i=0;i<2;i++){
+    const id=state.inventory[i];
+    if(id){const it=SHOP_ITEMS.find(s=>s.id===id);slots+=`<div class="mc-slot"><img src="${it.icon}" alt="${it.name}"></div>`;}
+    else{slots+=`<div class="mc-slot empty"></div>`;}
+  }
+  bar.innerHTML=slots;
+}
+function updateItemBar(){
+  renderSidebarItems();
+}
+function renderBossQ(){
+  const c=document.getElementById('boss-content'),total=bossActiveQs.length;
+  if(bossQIndex>=total){renderBossResult(c);return}
+  const q=bossActiveQs[bossQIndex];
+  const hp=((total-bossCorrect)/total*100).toFixed(0);
+  const hasGlasses=bossBag.includes('sage_glasses');
+  const spriteHtml=BOSS_DATA.bossSprite?`<img src="${BOSS_DATA.bossSprite}" alt="${BOSS_DATA.bossName}" class="boss-sprite-sm boss-sprite-anim" id="boss-battle-sprite">`:'';
+  bossSelectedEl=null;bossSelectedKey=null;bossSelectedAns=null;
+  c.innerHTML=`<div class="boss-header-row fade-in" id="boss-header-row">
+    <div class="boss-info-col">
+      <div class="boss-name" style="margin-bottom:4px">${BOSS_DATA.bossName}</div>
+      <div class="boss-desc" style="font-size:.75rem;color:#aaa;margin-bottom:2px">HP</div>
+      <div class="boss-hp-container"><div class="boss-hp-bar"><div class="boss-hp-fill" style="width:${hp}%"></div></div><div class="boss-hp-text">${total-bossCorrect}/${total}</div></div>
+      ${bossQIndex===0?`<div style="color:#ff5252;font-weight:bold;font-size:.8rem;margin-top:6px">${total}問連続正解で撃破！</div>`:''}
+    </div>
+    <div class="boss-sprite-col">
+      ${spriteHtml}
+    </div>
+  </div>
+    <div class="boss-q-counter">第${bossQIndex+1}問 / ${total}</div>
+    <div class="section-card fade-in"><div class="q-text" id="boss-q-text"></div>
+    <ul class="q-choices" id="boss-ch" style="display:none">${Object.entries(q.choices).map(([k,v])=>`<li class="choice-item" data-key="${k}" onclick="pickBoss(this,'${k}','${q.answer}')"><div class="choice-main"><span class="choice-label">${k}.</span><span class="choice-text">${v}</span></div></li>`).join('')}</ul>
+    ${hasGlasses?`<button class="boss-use-glasses" style="display:none" onclick="useGlasses()">賢者のメガネを使う</button>`:''}
+    <div id="boss-confirm" style="display:none;margin-top:12px;text-align:center">
+      <div style="color:#ffd700;font-weight:bold;margin-bottom:8px">この答えでいい？</div>
+      <div style="display:flex;gap:10px;justify-content:center">
+        <button class="next-btn secondary" style="flex:1;max-width:120px" onclick="cancelBossPick()">選び直す</button>
+        <button class="next-btn" style="flex:1;max-width:120px;background:#ff5252" onclick="confirmBossPick()">決定！</button>
+      </div>
+    </div>
+    <div id="boss-fb" style="display:none;margin-top:12px"></div>
+    <button class="next-btn" id="boss-next" style="display:none" onclick="nextBossQ()">次の問題 →</button></div>`;
+  /* タイプライター演出 → 完了後に選択肢を表示 */
+  const twEl=document.getElementById('boss-q-text');
+  typewriter(twEl,q.questionText,30,()=>{
+    const ch=document.getElementById('boss-ch');if(ch)ch.style.display='';
+    const gb=document.querySelector('.boss-use-glasses');if(gb)gb.classList.add('visible');
+  });
+}
+function triggerScreenShake(){
+  const el=document.getElementById('boss-content');
+  if(!el)return;
+  el.classList.remove('screen-shake');
+  void el.offsetWidth;/* reflow */
+  el.classList.add('screen-shake');
+  el.addEventListener('animationend',()=>el.classList.remove('screen-shake'),{once:true});
+}
+function pickBoss(el,key,ans){
+  if(document.querySelector('#boss-ch .choice-item.correct'))return;
+  if(el.classList.contains('choice-hidden'))return;
+  playSfx('select');
+  /* 前回のハイライトを解除 */
+  document.querySelectorAll('#boss-ch .choice-item').forEach(li=>li.classList.remove('selected'));
+  el.classList.add('selected');
+  bossSelectedEl=el;bossSelectedKey=key;bossSelectedAns=ans;
+  document.getElementById('boss-confirm').style.display='block';
+}
+function cancelBossPick(){
+  document.querySelectorAll('#boss-ch .choice-item').forEach(li=>li.classList.remove('selected'));
+  bossSelectedEl=null;bossSelectedKey=null;bossSelectedAns=null;
+  document.getElementById('boss-confirm').style.display='none';
+}
+function confirmBossPick(){
+  if(!bossSelectedEl)return;
+  playSfx('confirm');
+  document.getElementById('boss-confirm').style.display='none';
+  selBoss(bossSelectedEl,bossSelectedKey,bossSelectedAns);
+}
+function useGlasses(){
+  const idx=bossBag.indexOf('sage_glasses');if(idx===-1)return;
+  playSfx('magic');
+  bossBag.splice(idx,1);
+  /* inventoryからも消す */
+  const si=state.inventory.indexOf('sage_glasses');if(si!==-1){state.inventory.splice(si,1);saveState();}
+  const q=bossActiveQs[bossQIndex],ans=q.answer;
+  const wrongKeys=Object.keys(q.choices).filter(k=>k!==ans);
+  /* ランダムに不正解2つを消す */
+  for(let i=wrongKeys.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[wrongKeys[i],wrongKeys[j]]=[wrongKeys[j],wrongKeys[i]];}
+  const hideKeys=wrongKeys.slice(0,2);
+  document.querySelectorAll('#boss-ch .choice-item').forEach(li=>{if(hideKeys.includes(li.dataset.key))li.classList.add('choice-hidden')});
+  const btn=document.querySelector('.boss-use-glasses');if(btn)btn.remove();
+  updateItemBar();
+}
+function selBoss(el,key,ans){
+  if(document.querySelector('#boss-ch .choice-item.correct'))return;
+  if(el.classList.contains('choice-hidden'))return;
+  const ok=key===ans;if(ok)bossCorrect++;
+  const total=bossActiveQs.length;
+  document.querySelectorAll('#boss-ch .choice-item').forEach(li=>{
+    if(li.dataset.key===ans)li.classList.add('correct');
+    else if(li.dataset.key===key&&!ok)li.classList.add('wrong');
+    li.style.pointerEvents='none';
+  });
+  const q=bossActiveQs[bossQIndex],fb=document.getElementById('boss-fb');fb.style.display='block';
+  const glassesBtn=document.querySelector('.boss-use-glasses');if(glassesBtn)glassesBtn.remove();
+  if(ok){
+    playSfx('correct');playSfx('hit');
+    /* 正解報酬: EXP + ゴールド */
+    const bossExp=15,bossGold=30+Math.floor(Math.random()*20);
+    const oldLv=calcLevel(state.exp).level;
+    state.exp+=bossExp;state.gold+=bossGold;saveState();
+    const newLv=calcLevel(state.exp).level;
+    if(newLv>oldLv)showLevelUp(newLv);
+    fb.innerHTML=`<div class="result-banner correct" style="font-size:1.1rem">正解！ボスにダメージ！</div><div style="color:#7ecfff;font-size:.8rem;margin-top:4px">+${bossExp} EXP / +${bossGold} G</div><div style="color:#aaa;margin-top:8px;font-size:.85rem">${q.shortExplanation}</div>`;
+    document.getElementById('boss-next').style.display='block';
+    const hpP=((total-bossCorrect)/total*100).toFixed(0);
+    const hf=document.querySelector('.boss-hp-fill');if(hf){hf.style.width=hpP+'%';hf.style.transition='width .5s ease'}
+    const ht=document.querySelector('.boss-hp-text');if(ht)ht.textContent=`${total-bossCorrect}/${total}`;
+    /* ヒットアニメーション + 画面揺れ */
+    const sp=document.getElementById('boss-battle-sprite');
+    if(sp){sp.classList.remove('boss-sprite-anim');sp.classList.add('boss-sprite-hit');sp.addEventListener('animationend',()=>{sp.classList.remove('boss-sprite-hit');sp.classList.add('boss-sprite-anim')},{once:true});}
+    triggerScreenShake();
+  }else{
+    playSfx('wrong');
+    /* いのちのいしチェック */
+    const stoneIdx=bossBag.indexOf('life_stone');
+    if(stoneIdx!==-1){
+      playSfx('buff');
+      bossBag.splice(stoneIdx,1);
+      const si=state.inventory.indexOf('life_stone');if(si!==-1){state.inventory.splice(si,1);saveState();}
+      updateItemBar();
+      fb.innerHTML=`<div class="result-banner" style="background:#1a1a00;border:2px solid #ffd700;color:#ffd700;font-size:1.1rem;box-shadow:0 0 16px rgba(255,215,0,.4)">命のたまが砕けた！</div><div style="color:#aaa;margin-top:8px;font-size:.85rem">${q.shortExplanation}</div><div style="color:#ffd700;margin-top:8px;font-weight:bold">不正解だが、命のたまの力で耐えた！</div>`;
+      document.getElementById('boss-next').style.display='block';
+    }else{
+      fb.innerHTML=`<div class="result-banner wrong" style="font-size:1.1rem">不正解… ${BOSS_DATA.bossName}の反撃！</div><div style="color:#aaa;margin-top:8px;font-size:.85rem">${q.shortExplanation}</div><div style="color:#ff5252;margin-top:10px;font-weight:bold;font-size:1rem">全問正解しないと撃破できない！</div>`;
+      document.getElementById('boss-next').style.display='none';
+      const btns=document.createElement('div');btns.style.cssText='margin-top:12px;display:flex;flex-direction:column;gap:8px';
+      const rb=document.createElement('button');rb.className='next-btn secondary';rb.textContent='準備画面に戻る';rb.onclick=function(){showBossPrep()};
+      const bb=document.createElement('button');bb.className='next-btn secondary';bb.style.opacity='.7';bb.textContent='ステージ選択に戻る';bb.onclick=function(){showScreen('screen-map')};
+      btns.appendChild(rb);btns.appendChild(bb);fb.parentNode.appendChild(btns);
+    }
+  }
+}
+function nextBossQ(){playSfx('confirm');bossQIndex++;renderBossQ();window.scrollTo({top:0,behavior:'smooth'})}
+function renderBossResult(c){
+  playSfx('victory');
+  const rw=BOSS_DATA.rewards,total=bossActiveQs.length;
+  if(!state.bossCleared){state.bossCleared=true;state.exp+=rw.exp;state.gold+=rw.gold;if(!state.ownedCards.includes(rw.bonusCard.cardName))state.ownedCards.push(rw.bonusCard.cardName);saveState()}
+  const spriteWin=BOSS_DATA.bossSprite?`<img src="${BOSS_DATA.bossSprite}" alt="${BOSS_DATA.bossName}" class="boss-sprite" style="opacity:.4;filter:grayscale(1)">`:'';
+  c.innerHTML=`<div class="boss-result win fade-in">
+    ${spriteWin}
+    <h2>撃破！ ${BOSS_DATA.bossName}を倒した！</h2>
+    <div class="boss-score">${bossCorrect}/${total}問正解 - PERFECT!</div>
+    <p>「${rw.clearTitle}」の称号を獲得！</p>
+    <div class="reward-card" style="margin:16px auto;max-width:300px"><div class="reward-rarity">${'★'.repeat(rw.bonusCard.rarity)+'☆'.repeat(5-rw.bonusCard.rarity)}</div><div class="reward-card-name">${rw.bonusCard.cardName}</div><div class="reward-summary">${rw.bonusCard.summary}</div><div class="reward-stats"><div class="reward-stat"><div class="reward-stat-value exp">+${rw.exp}</div><div class="reward-stat-label">EXP</div></div><div class="reward-stat"><div class="reward-stat-value gold">+${rw.gold}</div><div class="reward-stat-label">GOLD</div></div></div></div>
+    <button class="next-btn" onclick="showScreen('screen-map')">ステージ選択に戻る</button></div>`;
+}
+
+/* ===== カード図鑑 ===== */
+function renderCollection(){
+  const g=document.getElementById('collection-grid');g.innerHTML='';
+  [...COURSE_DATA.map(s=>s.cardReward),BOSS_DATA.rewards.bonusCard].forEach(cr=>{
+    const o=state.ownedCards.includes(cr.cardName);
+    const d=document.createElement('div');d.className='coll-card '+(o?'owned':'not-owned');
+    d.innerHTML=`<div class="coll-card-rarity">${'★'.repeat(cr.rarity)+'☆'.repeat(5-cr.rarity)}</div><div class="coll-card-name">${o?cr.cardName:'？？？'}</div><div style="font-size:.7rem;color:#888;margin-top:4px">${o?cr.summary:''}</div>`;
+    g.appendChild(d);
+  });
+}
+
+/* ===== JSONファイルからリッチデータ読み込み ===== */
+async function loadCourseDataFromJSON(){
+  try{
+    const files=[
+      'course/chapter1_stages1-4.json',
+      'course/chapter1_stages5-8.json',
+      'course/chapter1_stages9-11.json'
+    ];
+    const [r1,r2,r3]=await Promise.all(files.map(f=>fetch(f)));
+    if(!r1.ok||!r2.ok||!r3.ok) throw new Error('Fetch failed');
+    const [d1,d2,d3]=await Promise.all([r1.json(),r2.json(),r3.json()]);
+    COURSE_DATA=d1.stages.concat(d2.stages).concat(d3.stages);
+
+    const bossResp=await fetch('course/chapter1_stage12_boss.json');
+    if(bossResp.ok){
+      const bossJSON=await bossResp.json();
+      const bs=bossJSON.stages[0];
+      BOSS_DATA={stageId:bs.stageId,title:bs.title,isBossBattle:true,passingScore:bs.passingScore,bossName:bs.bossName,bossDescription:bs.bossDescription,questions:bs.questions,rewards:bs.rewards};
+    }
+    console.log('コースデータをJSONファイルから読み込みました（ふりがな付き）');
+    renderStageGrid();
+  }catch(e){
+    console.warn('JSONファイル読み込み失敗、インラインデータを使用:',e);
+  }
+}
+
+updateHeader();renderStageGrid();
+loadCourseDataFromJSON();
+</script>
+</body>
+</html>
