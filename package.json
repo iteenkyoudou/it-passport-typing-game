@@ -1,0 +1,12 @@
+{
+  "name": "it-passport-typing-game",
+  "version": "1.0.0",
+  "description": "ITパスポート試験対策タイピングゲーム",
+  "scripts": {
+    "start": "python3 -m http.server 8000",
+    "dev": "python3 -m http.server 8000"
+  },
+  "keywords": ["ITパスポート", "タイピング", "学習ゲーム"],
+  "author": "",
+  "license": "MIT"
+}

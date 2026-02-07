@@ -829,6 +829,13 @@ function showScreen(id){
 /* ===== ステージ選択 ===== */
 function renderStageGrid(){
   const grid=document.getElementById('stage-grid');grid.innerHTML='';
+
+  // データがまだ読み込まれていない場合はローディング表示
+  if(COURSE_DATA.length === 0 && !BOSS_DATA.bossName) {
+    grid.innerHTML = '<div style="text-align:center; padding:50px; color:#aaa; font-size:18px;">📚 データを読み込み中...</div>';
+    return;
+  }
+
   COURSE_DATA.forEach((st,i)=>{
     const unlocked=i===0||state.clearedStages.includes(COURSE_DATA[i-1].stageId);
     const cleared=state.clearedStages.includes(st.stageId);
@@ -1916,31 +1923,47 @@ function renderCollection(){
 
 /* ===== JSONファイルからリッチデータ読み込み ===== */
 async function loadCourseDataFromJSON(){
+  console.log('JSONファイル読み込み開始...');
   try{
     const files=[
       'course/chapter1_stages1-4.json',
       'course/chapter1_stages5-8.json',
       'course/chapter1_stages9-11.json'
     ];
-    const [r1,r2,r3]=await Promise.all(files.map(f=>fetch(f)));
-    if(!r1.ok||!r2.ok||!r3.ok) throw new Error('Fetch failed');
-    const [d1,d2,d3]=await Promise.all([r1.json(),r2.json(),r3.json()]);
+    console.log('ファイル読み込み中:', files);
+
+    const responses = await Promise.all(files.map(f=>fetch(f)));
+    console.log('fetch完了, ステータス:', responses.map(r => r.status));
+
+    if(!responses[0].ok||!responses[1].ok||!responses[2].ok) {
+      throw new Error(`Fetch failed: ${responses.map(r => r.status).join(', ')}`);
+    }
+
+    const [d1,d2,d3]=await Promise.all(responses.map(r => r.json()));
+    console.log('JSONパース完了');
+
     COURSE_DATA=d1.stages.concat(d2.stages).concat(d3.stages);
+    console.log('COURSE_DATA設定完了:', COURSE_DATA.length, 'ステージ');
 
     const bossResp=await fetch('course/chapter1_stage12_boss.json');
     if(bossResp.ok){
       const bossJSON=await bossResp.json();
       const bs=bossJSON.stages[0];
       BOSS_DATA={stageId:bs.stageId,title:bs.title,isBossBattle:true,passingScore:bs.passingScore,bossName:bs.bossName,bossDescription:bs.bossDescription,questions:bs.questions,rewards:bs.rewards};
+      console.log('BOSS_DATA設定完了');
     }
     console.log('コースデータをJSONファイルから読み込みました（ふりがな付き）');
     renderStageGrid();
   }catch(e){
-    console.warn('JSONファイル読み込み失敗、インラインデータを使用:',e);
+    console.error('JSONファイル読み込みエラー詳細:', e);
+    // エラー時はデフォルトデータを設定
+    const grid = document.getElementById('stage-grid');
+    grid.innerHTML = '<div style="text-align:center; padding:50px; color:#f44; font-size:18px;">⚠️ データ読み込みエラー<br>コンソールを確認してください</div>';
   }
 }
 
-updateHeader();renderStageGrid();
+updateHeader();
+renderStageGrid(); // 初期ローディング表示
 loadCourseDataFromJSON();
 </script>
 </body>
