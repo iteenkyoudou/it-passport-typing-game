@@ -2563,6 +2563,111 @@ function normalize(str) {
   return str.trim().toLowerCase().replace(/\s+/g, '');
 }
 
+// ---------- ローマ字入力対応 ----------
+const ROMAJI_MAP = {
+  // ストラテジ系
+  'ゼロ':'zero','最大':'saidai','最小':'saishou','マイナス':'mainasu',
+  '利益':'rieki','売上':'uriage','原価':'genka','資産':'shisan',
+  '財務諸表':'zaimushohyou','事業計画':'jigyoukeikaku','経営方針':'keieihoushin','業務報告':'gyoumuhoukoku',
+  '個人情報':'kojinjouhou','著作権':'chosakuken','不正アクセス':'fuseiakusesu','特許':'tokkyo',
+  '特許権':'tokkyoken','商標権':'shouhyouken','意匠権':'ishouken','実用新案権':'jitsuyoushinanken',
+  'ライセンス':'raisensu','リース':'riisu','レンタル':'rentaru','サブスク':'sabusuku',
+  '守秘':'shuhi','説明':'setsumei','報告':'houkoku','管理':'kanri',
+  'コンプライアンス':'konpuraiansu','ガバナンス':'gabanansu','アカウンタビリティ':'akauntabirithi','マネジメント':'manejimento',
+  'コーポレートガバナンス':'koporeetogabanansu','リスクマネジメント':'risukumanejimento',
+  'ファイブフォース':'faibufoosu',
+  'ベンチマーキング':'benchimaaakingu','ブレインストーミング':'bureinnsutoomingu','リエンジニアリング':'rienjiniaringu',
+  'アウトソーシング':'autosooshingu','インソーシング':'insooshingu','オフショア':'ofushoa',
+  'イノベーション':'inobeeshon','インキュベーション':'inkyubeeshon','マイグレーション':'maigreeshon','オプティマイゼーション':'oputimaizeeshon',
+  'IT戦略':'itsenryaku','IT予算':'ityosan','IT投資':'ittoushi','IT基盤':'itkiban',
+  'ネットワーク':'nettowaku','スケール':'sukeeru','レバレッジ':'rebarejji','シナジー':'shinajii',
+  '技術のSカーブ':'gijutsunoesukabu',
+  'ベンチャーキャピタル':'benchaakyapitaru','クラウドファンディング':'kuraudofandingu','エンジェル投資':'enjerutoushi',
+  'マーケティングミックス':'maketingumikkusu','マーケティングリサーチ':'maketingurisaachi',
+  'ポートフォリオ':'potoforio','リスク':'risuku','プロジェクト':'purojekuto','タレント':'tarento',
+  'プロダクトライフサイクル':'purodakutoraifusaikuru','バリューチェーン':'baryuucheen','サプライチェーン':'sapuraicheen','ビジネスモデル':'bijinesumoderu',
+  // マネジメント系
+  'アローダイアグラム':'aroodaiaguramu','ガントチャート':'gantochaato','フローチャート':'furoochaato',
+  'クリティカル':'kuritikaru','ベスト':'besuto','ショート':'shooto','メイン':'mein',
+  'ガント':'ganto','パレート':'pareeto','レーダー':'reedaa','フロー':'furoo',
+  'ウォーターフォール':'wootaafooru','アジャイル':'ajairu','スパイラル':'supairaru','プロトタイプ':'purototaipu',
+  'プロトタイピング':'purototaipingu',
+  'テスト':'tesuto','レビュー':'rebyuu','監査':'kansa','設計':'sekkei',
+  '単体':'tantai','結合':'ketsugou','システム':'shisutemu','受入':'ukeire',
+  '運用':'unyou','開発':'kaihatsu','企画':'kikaku',
+  '可用性':'kayousei','安全性':'anzensei','信頼性':'shinraisei','透明性':'toumeisei',
+  '問題':'mondai','インシデント':'inshidento','変更':'henkou','構成':'kousei',
+  'サービスデスク':'saabisudesuku','ヘルプデスク':'herupudesuku','コールセンター':'koorusentaa','サポートセンター':'sapotosentaa',
+  'プロジェクト憲章':'purojekutokenshou','要件定義書':'youkenteigisho','設計書':'sekkeisho','仕様書':'shiyousho',
+  'ステークホルダー':'suteekuhorudaa','シェアホルダー':'sheahorudaa','プロジェクトマネージャー':'purojekutomanejaa','スポンサー':'suponsaa',
+  'クラッシング':'kurasshingu','ファストトラッキング':'fasutotorakkingu','リスケジュール':'risukejuuru','バッファ':'baffa',
+  'タイムボックス':'taimubokkusu','スプリント':'supurinto',
+  // テクノロジ系
+  'ビット':'bitto','バイト':'baito','ワード':'waado','ニブル':'niburu','ピクセル':'pikuseru',
+  'デバイスドライバ':'debaisudoraiba','ファームウェア':'faamuwea','ミドルウェア':'midoruwea','アプリケーション':'apurikeeshon',
+  'プロトコル':'purotokoru','アルゴリズム':'arugorizumu','インターフェース':'intaafeisu','アーキテクチャ':'aakitekucha',
+  'ファイアウォール':'faiawooru','ウイルス対策':'uirusutaisaku','プロキシ':'purokishi',
+  'マルウェア':'maruwea','フリーウェア':'furiiwea',
+  'フィッシング':'fisshingu','スパム':'supamu','ブルートフォース':'buruutofoosu',
+  'ソーシャルエンジニアリング':'soosharuenjiniaringu',
+  'ランサムウェア':'ransamu wea'.replace(' ',''),'スパイウェア':'supaiwea','アドウェア':'adowea',
+  'トロイの木馬':'toroinomokuba','キーロガー':'kiirogaa',
+  'SQLインジェクション':'squrinjekushon',
+  'クロスサイトスクリプティング':'kurosusaitosukuriputingu','バッファオーバーフロー':'baffaoobaafluroo',
+  'ワーム':'waamu',
+  '多要素':'tayouso','二段階':'nidankai','生体':'seitai','ワンタイム':'wantaimu',
+  '暗号化':'angouka','圧縮':'asshuku','変換':'henkan','符号化':'fugouka',
+  '共通鍵':'kyoutsuukagi','公開鍵':'koukaikagi','秘密鍵':'himitsukagi','ハイブリッド':'haiburiddo',
+  'デジタル署名':'dejitarushomei','電子透かし':'denshisukashi','ハッシュ関数':'hasshukansuu','SSL証明書':'sslshoumeisho',
+  'データベース':'deetabeesu','スプレッドシート':'supureddoshiito','ファイルサーバ':'fairusaaba',
+  'リレーショナル':'rireeshonaru','階層型':'kaisougata','ネットワーク型':'nettowaakugata','オブジェクト指向':'obujekutoshikou',
+  '主キー':'shukii','外部キー':'gaibukii','候補キー':'kohokii','複合キー':'fukugoukii',
+  '正規化':'seikika','最適化':'saitekika','標準化':'hyoujunka','構造化':'kouzouka',
+  'リカバリ':'rikabari','バックアップ':'bakkuappu','リストア':'risutoa','ロールバック':'roorubakku',
+  'バグ':'bagu','ログ':'rogu','パッチ':'pacchi','デバッグ':'debaggu',
+  'パレート図':'pareetozu',
+  'クラウド':'kuraudo','エッジ':'ejji','グリッド':'guriddo','オンプレミス':'onpuremisu','マネージド':'manejido',
+  '機械学習':'kikaigakushuu','深層学習':'shinsougakushuu','自然言語処理':'shizengengoshori','画像認識':'gazoununshiki',
+  'ディープラーニング':'diipuraaningu','強化学習':'kyoukagakushuu','教師あり学習':'kyoushiarigakushuu',
+  'ビッグデータ':'biggudeta','メタデータ':'metadeeta','オープンデータ':'oopundeeta','マスタデータ':'masutadeeta',
+  'ブロックチェーン':'burokkucheen',
+  '利用':'riyou','削除':'sakujo',
+  '仮想化':'kasouka'
+};
+
+function normalizeRomaji(str) {
+  let s = str.toLowerCase().replace(/\s+/g, '');
+  // 代替ローマ字の正規化（長い置換から先に）
+  s = s.replace(/sya/g,'sha').replace(/syu/g,'shu').replace(/syo/g,'sho');
+  s = s.replace(/tya/g,'cha').replace(/tyu/g,'chu').replace(/tyo/g,'cho');
+  s = s.replace(/zya/g,'ja').replace(/zyu/g,'ju').replace(/zyo/g,'jo');
+  s = s.replace(/si/g,'shi').replace(/ti/g,'chi').replace(/tu/g,'tsu').replace(/hu/g,'fu').replace(/zi/g,'ji');
+  s = s.replace(/nn/g,'n');
+  s = s.replace(/ou/g,'o').replace(/uu/g,'u');
+  return s;
+}
+
+function toRomaji(text) {
+  const n = normalize(text);
+  // ROMAJI_MAPにあればそれを返す
+  if (ROMAJI_MAP[text]) return normalizeRomaji(ROMAJI_MAP[text]);
+  // 英数字のみならそのまま
+  if (/^[a-z0-9.&\-]+$/i.test(n)) return n;
+  return null;
+}
+
+function matchesRomaji(inputVal, choiceText) {
+  const romaji = toRomaji(choiceText);
+  if (!romaji) return false;
+  return normalizeRomaji(inputVal) === romaji;
+}
+
+function romajiStartsWith(inputVal, choiceText) {
+  const romaji = toRomaji(choiceText);
+  if (!romaji) return false;
+  return romaji.startsWith(normalizeRomaji(inputVal));
+}
+
 // ---------- サウンド制御 ----------
 let isMutedAll = false;
 let isMutedBgm = false;
@@ -3776,27 +3881,53 @@ function showQuestion() {
 }
 
 // ---------- 入力判定 ----------
+function findChoiceMatch(inputVal, choices) {
+  // 直接一致を先に試す
+  const direct = choices.find(c => normalize(c) === inputVal);
+  if (direct) return direct;
+  // ローマ字一致を試す
+  if (inputVal.length > 0) {
+    const romaji = choices.find(c => matchesRomaji(inputVal, c));
+    if (romaji) return romaji;
+  }
+  return null;
+}
+
 typingInput.addEventListener('input', () => {
   const q = questions[currentIndex];
   const inputVal = normalize(typingInput.value);
   const answerVal = normalize(q.answer);
 
   document.querySelectorAll('.choice-chip').forEach(chip => {
-    const chipVal = normalize(chip.dataset.value);
-    if (chipVal.startsWith(inputVal) && inputVal.length > 0) {
+    const chipText = chip.dataset.value;
+    const chipVal = normalize(chipText);
+    const directMatch = chipVal.startsWith(inputVal) && inputVal.length > 0;
+    const romajiMatch = inputVal.length > 0 && romajiStartsWith(inputVal, chipText);
+    if (directMatch || romajiMatch) {
       chip.classList.add('highlight');
     } else {
       chip.classList.remove('highlight');
     }
   });
 
+  // 直接一致チェック
   if (inputVal === answerVal) {
     handleCorrect(q);
-  } else {
-    const wrongChoice = q.choices.find(c => normalize(c) === inputVal && normalize(c) !== answerVal);
-    if (wrongChoice) {
-      handleWrong(q, wrongChoice);
-    }
+    return;
+  }
+  // ローマ字一致チェック
+  if (inputVal.length > 0 && matchesRomaji(inputVal, q.answer)) {
+    handleCorrect(q);
+    return;
+  }
+  // 不正解選択肢チェック（直接 + ローマ字）
+  const wrongChoice = q.choices.find(c => {
+    const isAnswer = normalize(c) === answerVal;
+    if (isAnswer) return false;
+    return normalize(c) === inputVal || matchesRomaji(inputVal, c);
+  });
+  if (wrongChoice) {
+    handleWrong(q, wrongChoice);
   }
 });
 
@@ -3806,10 +3937,10 @@ typingInput.addEventListener('keydown', (e) => {
     const inputVal = normalize(typingInput.value);
     const answerVal = normalize(q.answer);
 
-    if (inputVal === answerVal) {
+    if (inputVal === answerVal || matchesRomaji(inputVal, q.answer)) {
       handleCorrect(q);
     } else if (inputVal.length > 0) {
-      const matched = q.choices.find(c => normalize(c) === inputVal);
+      const matched = findChoiceMatch(inputVal, q.choices);
       if (matched) {
         if (normalize(matched) === answerVal) {
           handleCorrect(q);
