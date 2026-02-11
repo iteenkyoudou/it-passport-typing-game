@@ -2576,7 +2576,7 @@ const ROMAJI_MAP = {
   'コンプライアンス':'konpuraiansu','ガバナンス':'gabanansu','アカウンタビリティ':'akauntabirithi','マネジメント':'manejimento',
   'コーポレートガバナンス':'koporeetogabanansu','リスクマネジメント':'risukumanejimento',
   'ファイブフォース':'faibufoosu',
-  'ベンチマーキング':'benchimaaakingu','ブレインストーミング':'bureinnsutoomingu','リエンジニアリング':'rienjiniaringu',
+  'ベンチマーキング':'benchimaakingu','ブレインストーミング':'bureinnsutoomingu','リエンジニアリング':'rienjiniaringu',
   'アウトソーシング':'autosooshingu','インソーシング':'insooshingu','オフショア':'ofushoa',
   'イノベーション':'inobeeshon','インキュベーション':'inkyubeeshon','マイグレーション':'maigreeshon','オプティマイゼーション':'oputimaizeeshon',
   'IT戦略':'itsenryaku','IT予算':'ityosan','IT投資':'ittoushi','IT基盤':'itkiban',
@@ -2584,7 +2584,7 @@ const ROMAJI_MAP = {
   '技術のSカーブ':'gijutsunoesukabu',
   'ベンチャーキャピタル':'benchaakyapitaru','クラウドファンディング':'kuraudofandingu','エンジェル投資':'enjerutoushi',
   'マーケティングミックス':'maketingumikkusu','マーケティングリサーチ':'maketingurisaachi',
-  'ポートフォリオ':'potoforio','リスク':'risuku','プロジェクト':'purojekuto','タレント':'tarento',
+  'ポートフォリオ':'pootoforio','リスク':'risuku','プロジェクト':'purojekuto','タレント':'tarento',
   'プロダクトライフサイクル':'purodakutoraifusaikuru','バリューチェーン':'baryuucheen','サプライチェーン':'sapuraicheen','ビジネスモデル':'bijinesumoderu',
   // マネジメント系
   'アローダイアグラム':'aroodaiaguramu','ガントチャート':'gantochaato','フローチャート':'furoochaato',
@@ -2610,10 +2610,10 @@ const ROMAJI_MAP = {
   'マルウェア':'maruwea','フリーウェア':'furiiwea',
   'フィッシング':'fisshingu','スパム':'supamu','ブルートフォース':'buruutofoosu',
   'ソーシャルエンジニアリング':'soosharuenjiniaringu',
-  'ランサムウェア':'ransamu wea'.replace(' ',''),'スパイウェア':'supaiwea','アドウェア':'adowea',
+  'ランサムウェア':'ransamuwea','スパイウェア':'supaiwea','アドウェア':'adowea',
   'トロイの木馬':'toroinomokuba','キーロガー':'kiirogaa',
-  'SQLインジェクション':'squrinjekushon',
-  'クロスサイトスクリプティング':'kurosusaitosukuriputingu','バッファオーバーフロー':'baffaoobaafluroo',
+  'SQLインジェクション':'sqlinjekushon',
+  'クロスサイトスクリプティング':'kurosusaitosukuriputingu','バッファオーバーフロー':'baffaoobaafuroo',
   'ワーム':'waamu',
   '多要素':'tayouso','二段階':'nidankai','生体':'seitai','ワンタイム':'wantaimu',
   '暗号化':'angouka','圧縮':'asshuku','変換':'henkan','符号化':'fugouka',
@@ -2627,7 +2627,7 @@ const ROMAJI_MAP = {
   'バグ':'bagu','ログ':'rogu','パッチ':'pacchi','デバッグ':'debaggu',
   'パレート図':'pareetozu',
   'クラウド':'kuraudo','エッジ':'ejji','グリッド':'guriddo','オンプレミス':'onpuremisu','マネージド':'manejido',
-  '機械学習':'kikaigakushuu','深層学習':'shinsougakushuu','自然言語処理':'shizengengoshori','画像認識':'gazoununshiki',
+  '機械学習':'kikaigakushuu','深層学習':'shinsougakushuu','自然言語処理':'shizengengoshori','画像認識':'gazouninshiki',
   'ディープラーニング':'diipuraaningu','強化学習':'kyoukagakushuu','教師あり学習':'kyoushiarigakushuu',
   'ビッグデータ':'biggudeta','メタデータ':'metadeeta','オープンデータ':'oopundeeta','マスタデータ':'masutadeeta',
   'ブロックチェーン':'burokkucheen',
@@ -2649,8 +2649,8 @@ function normalizeRomaji(str) {
 
 function toRomaji(text) {
   const n = normalize(text);
-  // ROMAJI_MAPにあればそれを返す
-  if (ROMAJI_MAP[text]) return normalizeRomaji(ROMAJI_MAP[text]);
+  // ROMAJI_MAPにあればそのまま返す（normalizeRomajiは適用しない）
+  if (ROMAJI_MAP[text]) return ROMAJI_MAP[text];
   // 英数字のみならそのまま
   if (/^[a-z0-9.&\-]+$/i.test(n)) return n;
   return null;
@@ -2659,13 +2659,17 @@ function toRomaji(text) {
 function matchesRomaji(inputVal, choiceText) {
   const romaji = toRomaji(choiceText);
   if (!romaji) return false;
-  return normalizeRomaji(inputVal) === romaji;
+  const rawInput = inputVal.toLowerCase().replace(/\s+/g, '');
+  // 生の入力で一致、または正規化後に一致
+  return rawInput === romaji || normalizeRomaji(inputVal) === normalizeRomaji(romaji);
 }
 
 function romajiStartsWith(inputVal, choiceText) {
   const romaji = toRomaji(choiceText);
   if (!romaji) return false;
-  return romaji.startsWith(normalizeRomaji(inputVal));
+  const rawInput = inputVal.toLowerCase().replace(/\s+/g, '');
+  // 生の入力でプレフィックス一致、または正規化後にプレフィックス一致
+  return romaji.startsWith(rawInput) || normalizeRomaji(romaji).startsWith(normalizeRomaji(inputVal));
 }
 
 // ---------- サウンド制御 ----------
@@ -4370,14 +4374,14 @@ async function saveMissionRecord(record) {
     await saveRankingsToCloud(top10);
   } catch (error) {
     console.error('ランキング保存時のクラウド取得エラー:', error);
-    // フォールバック: ローカルキャッシュベースで保存
-    const records = getMissionRecords();
+    // フォールバック: ローカルキャッシュのコピーにマージして保存
+    const records = [...getMissionRecords()];
     records.push(record);
     records.sort((a, b) => (b.gold || 0) - (a.gold || 0));
     const top10 = records.slice(0, 10);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(top10));
     cachedCloudRankings = top10;
-    saveRankingsToCloud(top10);
+    await saveRankingsToCloud(top10);
   }
 }
 
@@ -4670,7 +4674,7 @@ function showNameInput(record) {
   playerNameInput.focus();
 }
 
-function finishNameInput(name) {
+async function finishNameInput(name) {
   nameInputOverlay.style.display = 'none';
   if (name) {
     savePlayerName(name);
@@ -4678,7 +4682,7 @@ function finishNameInput(name) {
   } else {
     pendingRecord.name = getSavedPlayerName() || '';
   }
-  saveMissionRecord(pendingRecord);
+  await saveMissionRecord(pendingRecord);
   unlockTitle(pendingRecord.name);
   showMissionResultScreen(pendingRecord);
   pendingRecord = null;
