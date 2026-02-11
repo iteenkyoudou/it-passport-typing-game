@@ -55,12 +55,14 @@ h1{
 .card:hover .card-btn{
   background:#ffe44d;box-shadow:0 4px 15px rgba(255,215,0,.3);
 }
-.demo-link{
-  display:block;text-align:center;margin-top:8px;
-  font-size:.8rem;color:#aaa;text-decoration:none;
-  transition:color .2s;
+.cta{
+  margin-top:40px;max-width:500px;text-align:center;
+  background:rgba(255,215,0,.05);border:1px solid #333;border-radius:12px;
+  padding:20px 24px;
 }
-.demo-link:hover{color:#ffd700;}
+.cta p{font-size:.9rem;color:#ccc;line-height:1.8;}
+.cta strong{color:#ffd700;}
+.cta-sub{font-size:.8rem;color:#888;margin-top:8px;}
 footer{
   margin-top:48px;font-size:.75rem;color:#555;text-align:center;
 }
@@ -70,18 +72,16 @@ footer{
 <h1>ITパスポート対策</h1>
 <p class="subtitle">楽しく学べる2つのモードを選択してください</p>
 <div class="cards">
-  <a href="course.html" class="card">
+  <a href="course.html?demo=true" class="card">
     <div class="card-icon">📖</div>
-    <div class="card-title">対策講座</div>
-    <div class="card-desc">全8章・80ステージ以上の問題に挑戦。<br>ボス戦・カード収集・実績解除で<br>モチベーションを維持しながら学べます。</div>
+    <div class="card-title">対策講座（デモ版）</div>
+    <div class="card-desc">4択問題でITパスポートの過去問に挑戦。<br>ボス戦・カード収集・実績解除など<br>ゲーム感覚で楽しく学べます。</div>
     <div class="card-tags">
       <span class="tag">4択問題</span>
-      <span class="tag">全8章</span>
       <span class="tag">ボス戦</span>
       <span class="tag">カード収集</span>
     </div>
-    <div class="card-btn">対策講座を始める</div>
-    <span class="demo-link" onclick="event.preventDefault();event.stopPropagation();location.href='course.html?demo=true'">デモ版で体験する</span>
+    <div class="card-btn">デモ版を体験する</div>
   </a>
   <a href="typing.html" class="card">
     <div class="card-icon">⌨️</div>
@@ -94,6 +94,10 @@ footer{
     </div>
     <div class="card-btn">タイピングゲームを始める</div>
   </a>
+</div>
+<div class="cta">
+  <p>本気でITパスポート合格を目指すなら、全8章・80ステージ以上の<strong>製品版</strong>に挑戦しよう！</p>
+  <p class="cta-sub">お申し込みはお問い合わせください。</p>
 </div>
 <footer>&copy; ITパスポート対策</footer>
 </body>
