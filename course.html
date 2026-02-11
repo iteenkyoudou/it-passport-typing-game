@@ -1299,11 +1299,6 @@ window.addEventListener('DOMContentLoaded', () => {
     document.querySelector('.account-modal-title').textContent='デモ版 - アカウント名を入力';
     document.querySelector('.account-modal-desc').innerHTML='ステージ1・ステージ2・ボス戦が体験できます。<br>アカウント名を入力してプレイしてください。';
     document.title='【デモ版】ITパスポート対策講座';
-    // サイドバーにデモ版バッジ
-    const badge=document.createElement('div');
-    badge.style.cssText='background:#ff5252;color:#fff;text-align:center;padding:6px;font-size:.75rem;font-weight:bold;letter-spacing:2px;';
-    badge.textContent='DEMO VERSION';
-    document.getElementById('side-panel').prepend(badge);
     // ヘッダーにデモ版表示
     document.querySelector('.app-title').textContent='【デモ版】ITパスポート対策講座';
     // 「章の選択に戻る」ボタンを非表示
@@ -3442,11 +3437,6 @@ function renderBossResult(c){
       <div class="boss-score">${bossCorrect}/${total}問正解 - PERFECT!</div>
       <p>「${rw.clearTitle}」の称号を獲得！</p>
       <div class="reward-card" style="margin:16px auto;max-width:300px">${BOSS_DATA.bossSprite?`<img src="${BOSS_DATA.bossSprite}" alt="" class="reward-card-emblem">`:''}<div class="reward-rarity">${'★'.repeat(rw.bonusCard.rarity)+'☆'.repeat(5-rw.bonusCard.rarity)}</div><div class="reward-card-name">${rw.bonusCard.cardName}</div><div class="reward-summary">${rw.bonusCard.summary}</div><div class="reward-stats"><div class="reward-stat"><div class="reward-stat-value exp">+${Math.floor(rw.exp*chapterExpMult())}</div><div class="reward-stat-label">EXP</div></div><div class="reward-stat"><div class="reward-stat-value gold">+${rw.gold}</div><div class="reward-stat-label">GOLD</div></div></div></div>
-      ${IS_DEMO?`<div style="background:rgba(255,215,0,.1);border:2px solid #ffd700;border-radius:12px;padding:16px;margin:16px 0;text-align:center">
-        <div style="font-size:1.1rem;font-weight:bold;color:#ffd700;margin-bottom:8px">デモ版クリアおめでとう！</div>
-        <div style="font-size:.85rem;color:#ccc;line-height:1.7">製品版では全8章・80ステージ以上の問題に挑戦できます。</div>
-        <a href="${location.pathname}" style="display:inline-block;margin-top:12px;padding:10px 24px;background:#ffd700;color:#000;font-weight:bold;border-radius:8px;text-decoration:none;font-size:.9rem">製品版で始める</a>
-      </div>`:''}
       <button class="next-btn" onclick="showScreen('screen-map')">ステージ選択に戻る</button></div>`;
     if(newMax>oldMax){setTimeout(()=>showInventoryExpand(newMax),1500);}
   });
