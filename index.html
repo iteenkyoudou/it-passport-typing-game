@@ -4354,18 +4354,35 @@ function getMissionRecords() {
   }
 }
 
-function saveMissionRecord(record) {
-  const records = getMissionRecords();
-  records.push(record);
-  // 稼いだゴールドでソート（多い順）
-  records.sort((a, b) => (b.gold || 0) - (a.gold || 0));
-  const top10 = records.slice(0, 10);
-  // ローカルにも保存（オフライン時のフォールバック）
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(top10));
-  // キャッシュを更新
-  cachedCloudRankings = top10;
-  // クラウドに保存
-  saveRankingsToCloud(top10);
+async function saveMissionRecord(record) {
+  // クラウドから最新データを取得してからマージ（他端末のデータを上書きしない）
+  try {
+    const doc = await db.collection('game_data').doc('rankings').get();
+    let records = [];
+    if (doc.exists) {
+      records = doc.data().records || [];
+    }
+    records.push(record);
+    // 稼いだゴールドでソート（多い順）
+    records.sort((a, b) => (b.gold || 0) - (a.gold || 0));
+    const top10 = records.slice(0, 10);
+    // ローカルにも保存（オフライン時のフォールバック）
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(top10));
+    // キャッシュを更新
+    cachedCloudRankings = top10;
+    // クラウドに保存
+    await saveRankingsToCloud(top10);
+  } catch (error) {
+    console.error('ランキング保存時のクラウド取得エラー:', error);
+    // フォールバック: ローカルキャッシュベースで保存
+    const records = getMissionRecords();
+    records.push(record);
+    records.sort((a, b) => (b.gold || 0) - (a.gold || 0));
+    const top10 = records.slice(0, 10);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(top10));
+    cachedCloudRankings = top10;
+    saveRankingsToCloud(top10);
+  }
 }
 
 // クラウドからランキングデータをロード
