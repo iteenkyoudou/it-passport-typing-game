@@ -1571,6 +1571,17 @@ SFX.typing.volume=0.15;
 SFX.hit.volume=0.5;
 function playSfx(key){const a=SFX[key];if(!a)return;a.currentTime=0;a.play().catch(()=>{});}
 
+/* スマホ用: 最初のユーザー操作時に全音声をアンロック */
+let _sfxUnlocked=false;
+function unlockAudioForMobile(){
+  if(_sfxUnlocked)return;
+  _sfxUnlocked=true;
+  Object.values(SFX).forEach(a=>{a.play().then(()=>{a.pause();a.currentTime=0;}).catch(()=>{});});
+  if(_timerBgm){_timerBgm.play().then(()=>{_timerBgm.pause();_timerBgm.currentTime=0;}).catch(()=>{});}
+}
+document.addEventListener('click',unlockAudioForMobile,{once:true});
+document.addEventListener('touchstart',unlockAudioForMobile,{once:true});
+
 /* タイマーBGM（ループ・控えめ音量） */
 const _timerBgm=new Audio('制限時間タイマー.mp3');
 _timerBgm.loop=true;_timerBgm.volume=0.08;_timerBgm.preload='auto';
