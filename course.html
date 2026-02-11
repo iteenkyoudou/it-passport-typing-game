@@ -66,8 +66,14 @@ button{cursor:pointer;font-family:inherit}
 }
 .sp-account-title{
   font-size:.75rem;color:#ffd700;text-align:center;
-  padding-bottom:12px;border-bottom:1px solid #555;
+  padding-bottom:8px;
 }
+.sp-logout-btn{
+  display:block;margin:4px auto 0;padding:4px 16px;font-size:.7rem;
+  background:transparent;color:#999;border:1px solid #555;border-radius:8px;
+  cursor:pointer;transition:all .2s;
+}
+.sp-logout-btn:hover{color:#fff;border-color:#e57373;background:rgba(229,115,115,.15)}
 .sp-section{text-align:center}
 .sp-level-label{font-size:.65rem;color:#aaa;letter-spacing:2px;text-transform:uppercase}
 .sp-level-num{font-size:2.8rem;font-weight:bold;color:#fff;line-height:1.1}
@@ -78,7 +84,7 @@ button{cursor:pointer;font-family:inherit}
 .sp-bar-text{font-size:.65rem;color:#777}
 .sp-row{display:flex;justify-content:space-between;align-items:center;padding:2px 0}
 .sp-label{font-size:.7rem;color:#aaa}.sp-val{font-weight:bold}
-.sp-val.exp-color{color:#7ecfff}.sp-val.gold-color{color:#ffd700}
+.sp-val.exp-color{color:#7ecfff}.sp-val.gold-color{color:#ffd700}.sp-val.playtime-color{color:#a0e8af}
 .sp-title-label{font-size:.8rem;color:#ffd700;font-weight:bold;letter-spacing:1px}
 .sp-title-next{font-size:.6rem;color:#888;margin-top:2px}
 .sp-divider{height:1px;background:#555}
@@ -94,6 +100,73 @@ button{cursor:pointer;font-family:inherit}
 
 .main-container{max-width:800px;margin:0 auto;padding:16px}
 .screen{display:none}.screen.active{display:block}
+
+/* ===== チャプター選択 ===== */
+.chapter-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:24px}
+.chapter-card{
+  background:#000;border:2px solid #888;border-radius:10px;padding:16px;
+  transition:all .2s;position:relative;overflow:hidden;cursor:pointer;
+}
+.chapter-card:hover:not(.locked){border-color:#ffd700;transform:translateY(-3px)}
+.chapter-card.locked{opacity:.35;cursor:not-allowed}
+.chapter-card.cleared{border-color:#4caf50}
+.chapter-card.cleared::after{content:'✓';position:absolute;top:8px;right:12px;font-size:1.4rem;color:#4caf50}
+.chapter-card.current{border-color:#ffd700;box-shadow:0 0 12px rgba(255,215,0,.3)}
+.chapter-num{font-size:.75rem;color:#888;margin-bottom:4px}
+.chapter-card-title{font-size:1rem;font-weight:bold;color:#fff;margin-bottom:4px}
+.chapter-card-desc{font-size:.8rem;color:#aaa;margin-bottom:6px}
+.chapter-domain{font-size:.7rem;padding:2px 8px;border-radius:10px;display:inline-block}
+.chapter-domain.tech{background:rgba(33,150,243,.2);color:#42a5f5}
+.chapter-domain.strat{background:rgba(255,152,0,.2);color:#ffb74d}
+.chapter-domain.mgmt{background:rgba(76,175,80,.2);color:#81c784}
+.chapter-domain.exam{background:rgba(156,39,176,.2);color:#ce93d8}
+.mock-exam-start{text-align:center;padding:30px 20px}
+.mock-exam-start h2{color:#ce93d8;margin-bottom:12px;font-size:1.5rem}
+.mock-exam-start .exam-desc{color:#ccc;font-size:.95rem;line-height:1.7;margin-bottom:20px}
+.mock-exam-start .exam-ratio{display:flex;justify-content:center;gap:12px;margin:16px 0;flex-wrap:wrap}
+.mock-exam-start .exam-ratio-item{background:rgba(255,255,255,.06);border-radius:8px;padding:10px 16px;text-align:center;min-width:100px}
+.mock-exam-start .exam-ratio-label{font-size:.7rem;color:#aaa;margin-bottom:4px}
+.mock-exam-start .exam-ratio-num{font-size:1.3rem;font-weight:bold}
+.mock-category-select{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0;max-width:400px;margin-left:auto;margin-right:auto}
+.mock-cat-btn{background:rgba(255,255,255,.06);border:2px solid transparent;border-radius:12px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s}
+.mock-cat-btn:hover{background:rgba(255,255,255,.1);transform:translateY(-2px)}
+.mock-cat-btn.selected{border-color:#ab47bc;background:rgba(171,71,188,.15)}
+.mock-cat-icon{font-size:1.5rem;margin-bottom:4px}
+.mock-cat-name{font-size:.9rem;font-weight:bold;color:#e0e0e0;margin-bottom:2px}
+.mock-cat-detail{font-size:.7rem;color:#999}
+.mock-exam-q{padding:12px}
+.mock-exam-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:.85rem;color:#aaa}
+.mock-exam-progress{width:100%;height:6px;background:#333;border-radius:3px;margin-bottom:16px;overflow:hidden}
+.mock-exam-progress-fill{height:100%;background:linear-gradient(90deg,#ce93d8,#ab47bc);border-radius:3px;transition:width .3s}
+.mock-exam-qtext{font-size:1.15rem;line-height:1.7;padding:14px;background:rgba(255,255,255,.04);border-radius:8px;margin-bottom:16px}
+.mock-exam-choices{display:flex;flex-direction:column;gap:10px}
+.mock-exam-choice{padding:14px 18px;background:rgba(255,255,255,.06);border:2px solid transparent;border-radius:10px;cursor:pointer;font-size:1rem;text-align:left;transition:background .2s,border-color .2s}
+.mock-exam-choice:hover{background:rgba(255,255,255,.1);border-color:rgba(206,147,216,.4)}
+.mock-exam-result{text-align:center;padding:30px 20px}
+.mock-exam-result h2{margin-bottom:16px;font-size:1.5rem}
+.mock-exam-result .result-score{font-size:3rem;font-weight:bold;margin:16px 0}
+.mock-exam-result .result-pass{color:#81c784;font-size:1.3rem;font-weight:bold;margin-bottom:20px}
+.mock-exam-result .result-fail{color:#ff5252;font-size:1.3rem;font-weight:bold;margin-bottom:20px}
+.mock-exam-result .result-breakdown{display:flex;justify-content:center;gap:16px;margin:20px 0;flex-wrap:wrap}
+.mock-exam-result .breakdown-item{background:rgba(255,255,255,.06);border-radius:10px;padding:14px 20px;min-width:120px}
+.mock-exam-result .breakdown-label{font-size:.75rem;color:#aaa;margin-bottom:6px}
+.mock-exam-result .breakdown-score{font-size:1.2rem;font-weight:bold}
+.mock-exam-loading{text-align:center;padding:60px 20px;color:#aaa;font-size:1.1rem}
+/* ===== 問題タイマー ===== */
+.q-timer{margin:8px 0 4px;display:flex;align-items:center;gap:8px}
+.q-timer-bar{flex:1;height:6px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden}
+.q-timer-fill{height:100%;border-radius:3px;transition:width 1s linear;background:#4caf50}
+.q-timer-fill.warning{background:#ff9800}
+.q-timer-fill.danger{background:#f44336}
+.q-timer-fill.expired{background:#666;width:0%!important;transition:none}
+.q-timer-text{font-size:.75rem;font-weight:bold;color:#aaa;min-width:32px;text-align:right}
+.q-timer-text.warning{color:#ff9800}
+.q-timer-text.danger{color:#f44336}
+.q-timer-text.expired{color:#666}
+.q-timer-expired-msg{text-align:center;color:#f44;font-weight:bold;font-size:.9rem;margin:8px 0;animation:timer-flash .5s ease-in-out 2}
+.chapter-progress{font-size:.7rem;color:#888;margin-top:6px}
+.chapter-back-btn{background:none;border:1px solid #666;color:#aaa;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:.85rem;margin-bottom:16px}
+.chapter-back-btn:hover{border-color:#fff;color:#fff}
 
 /* ===== ステージ選択 ===== */
 .chapter-title{text-align:center;margin:16px 0 8px;font-size:1.4rem;color:#ffd700}
@@ -211,6 +284,13 @@ button{cursor:pointer;font-family:inherit}
   font-weight:bold;font-size:1.1rem;text-align:center;
   animation:fadeIn .3s ease;
 }
+.retry-message{
+  background:rgba(244,67,54,.12);border:2px solid #f44336;border-radius:8px;
+  padding:12px 16px;margin-bottom:10px;color:#ef9a9a;
+  font-weight:bold;font-size:.95rem;text-align:center;
+  animation:shakeX .4s ease-in-out;
+}
+@keyframes shakeX{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
 .result-banner.correct{background:#0a2a0a;border:2px solid #4caf50;color:#81c784;box-shadow:0 0 16px rgba(76,175,80,.4)}
 .result-banner.wrong{background:#2a0a0a;border:2px solid #f44336;color:#ef9a9a;box-shadow:0 0 16px rgba(244,67,54,.4)}
 .analysis-item{padding:10px 14px;margin:6px 0;background:#111;border-radius:8px}
@@ -281,6 +361,12 @@ button{cursor:pointer;font-family:inherit}
 .boss-hp-fill{height:100%;background:linear-gradient(90deg,#f44336,#ff5252);transition:width .5s ease;border-radius:5px}
 .boss-hp-text{font-size:.8rem;color:#ff8a80}
 .boss-q-counter{text-align:center;color:#aaa;font-size:.85rem;margin:12px 0}
+.boss-sticky-q{position:sticky;top:0;z-index:50;background:#000;padding:8px 12px 4px;border-bottom:2px solid #ff5252;box-shadow:0 4px 12px rgba(0,0,0,.9)}
+.boss-sticky-q .boss-q-counter{margin:0 0 6px}
+.boss-sticky-q .q-text{max-height:35vh;overflow-y:auto;font-size:1.2rem;line-height:1.7;margin-bottom:4px;padding:10px 14px}
+@media(max-width:768px){
+  .boss-sticky-q .q-text{max-height:30vh;font-size:1.05rem;line-height:1.6;padding:8px 10px}
+}
 .boss-result{text-align:center;padding:30px}
 .boss-result h2{font-size:1.5rem;margin-bottom:8px}
 .boss-result.win h2{color:#ffd700}
@@ -290,10 +376,14 @@ button{cursor:pointer;font-family:inherit}
 
 /* ===== カード図鑑 ===== */
 .collection-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
-.coll-card{background:#000;border:1px solid #666;border-radius:8px;padding:12px;text-align:center;font-size:.8rem}
+.coll-card{background:#000;border:1px solid #666;border-radius:8px;padding:12px;text-align:center;font-size:.8rem;position:relative;overflow:hidden}
 .coll-card.owned{border-color:#ffd700}.coll-card.not-owned{opacity:.35}
 .coll-card-name{font-weight:bold;color:#ffd700;margin-bottom:4px}
 .coll-card-rarity{color:#ffb74d;font-size:.7rem}
+.card-boss-emblem{display:block;width:56px;height:56px;object-fit:contain;image-rendering:pixelated;margin:6px auto 8px;opacity:.7;filter:drop-shadow(0 0 4px rgba(255,215,0,.3))}
+.coll-card.not-owned .card-boss-emblem{filter:brightness(0) invert(.3)}
+.reward-card-emblem{display:block;width:72px;height:72px;object-fit:contain;image-rendering:pixelated;margin:8px auto 10px;opacity:.8;filter:drop-shadow(0 0 6px rgba(255,215,0,.4));animation:emblemGlow 2s ease-in-out infinite alternate}
+@keyframes emblemGlow{0%{filter:drop-shadow(0 0 4px rgba(255,215,0,.3))}100%{filter:drop-shadow(0 0 10px rgba(255,215,0,.6))}}
 
 /* ===== ことばステップ ===== */
 .vocab-intro{font-size:.9rem;color:#ccc;margin-bottom:16px;line-height:1.8;background:#111;padding:14px;border-radius:8px;border-left:3px solid #ffd700}
@@ -473,6 +563,7 @@ button{cursor:pointer;font-family:inherit}
   #sp-level-area{grid-row:1;grid-column:1;text-align:left}
   #sp-title-area{grid-row:1;grid-column:2;text-align:center;overflow:hidden}
   #sp-gold-area{grid-row:1;grid-column:3;text-align:right}
+  #sp-playtime-area{display:none}
   /* Row 2: EXP | Items | Progress */
   #sp-exp-area{grid-row:2;grid-column:1;text-align:left}
   #sp-items-area{grid-row:2;grid-column:2;text-align:center}
@@ -484,9 +575,14 @@ button{cursor:pointer;font-family:inherit}
   .sp-cur-label{font-size:.55rem;margin-bottom:1px}
   .sp-title-label{font-size:.65rem;text-overflow:ellipsis;overflow:hidden}
   .sp-row{gap:3px}
+  .mc-item-bar{gap:2px}
+  .mc-slot{width:26px;height:26px}
+  .mc-slot img{width:20px;height:20px}
+}
+@media(max-width:380px){
+  .mc-slot{width:22px;height:22px}
+  .mc-slot img{width:17px;height:17px}
   .mc-item-bar{gap:1px}
-  .mc-slot{width:28px;height:28px}
-  .mc-slot img{width:22px;height:22px}
 }
 /* スマホ: 問題文スティッキー */
 @media(max-width:768px){
@@ -532,9 +628,81 @@ button{cursor:pointer;font-family:inherit}
 .boss-bag-title{font-size:.85rem;color:#ffd700;font-weight:bold;margin-bottom:8px}
 .boss-bag-item{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:.85rem;color:#fff}
 .boss-bag-empty{font-size:.8rem;color:#888}
-.boss-use-glasses{background:#4fc3f7;color:#1a1a2e;border:none;border-radius:6px;padding:6px 14px;font-weight:bold;cursor:pointer;font-size:.8rem;margin-top:8px;display:none}
-.boss-use-glasses.visible{display:inline-block}
+.boss-item-btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;justify-content:center}
+.boss-use-glasses,.boss-use-kendama,.boss-use-watch{border:none;border-radius:8px;padding:8px 16px;font-weight:bold;cursor:pointer;font-size:.85rem;animation:itemBtnIn .3s ease-out;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:transform .15s,opacity .15s}
+.boss-use-glasses:hover,.boss-use-kendama:hover,.boss-use-watch:hover{transform:scale(1.05)}
+.boss-use-glasses{background:#4fc3f7;color:#1a1a2e}
+.boss-use-kendama{background:#ff9800;color:#1a1a2e}
+.boss-use-watch{background:#7ecfff;color:#1a1a2e}
+@keyframes itemBtnIn{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:translateY(0)}}
 .choice-hidden{opacity:.3;pointer-events:none;text-decoration:line-through}
+
+/* ===== アイテム使用エフェクト ===== */
+/* 全画面フラッシュ共通 */
+.item-flash{position:fixed;top:0;left:0;width:100%;height:100%;z-index:9997;pointer-events:none}
+/* 賢者のメガネ: 青い洞察の波動 */
+.item-flash-glasses{animation:glassesFlash .8s ease forwards}
+@keyframes glassesFlash{0%{background:rgba(79,195,247,0)}12%{background:rgba(79,195,247,.3)}100%{background:rgba(79,195,247,0)}}
+.choice-item.item-glow-glasses{
+  border-color:#4fc3f7!important;
+  box-shadow:0 0 12px rgba(79,195,247,.6),0 0 24px rgba(79,195,247,.3),inset 0 0 8px rgba(79,195,247,.15);
+  animation:glassesGlow 1.5s ease-in-out infinite alternate;
+}
+@keyframes glassesGlow{
+  0%{box-shadow:0 0 8px rgba(79,195,247,.4),0 0 16px rgba(79,195,247,.2)}
+  100%{box-shadow:0 0 16px rgba(79,195,247,.7),0 0 32px rgba(79,195,247,.4),inset 0 0 12px rgba(79,195,247,.2)}
+}
+/* 2倍のけん玉: オレンジの炎 */
+.item-flash-kendama{animation:kendamaFlash .8s ease forwards}
+@keyframes kendamaFlash{0%{background:rgba(255,152,0,0)}12%{background:rgba(255,152,0,.3)}100%{background:rgba(255,152,0,0)}}
+.choice-item.item-glow-kendama{
+  border-color:#ff9800!important;
+  box-shadow:0 0 12px rgba(255,152,0,.5),0 0 24px rgba(255,87,34,.3);
+  animation:kendamaGlow 1s ease-in-out infinite alternate;
+}
+@keyframes kendamaGlow{
+  0%{box-shadow:0 0 8px rgba(255,152,0,.4),0 0 16px rgba(255,87,34,.2)}
+  100%{box-shadow:0 0 18px rgba(255,152,0,.7),0 0 36px rgba(255,87,34,.4)}
+}
+/* シャッフルタイマー: 青い凍結 */
+.item-flash-watch{animation:watchFlash 1s ease forwards}
+@keyframes watchFlash{0%{background:rgba(126,207,255,0)}8%{background:rgba(126,207,255,.35)}40%{background:rgba(126,207,255,.15)}100%{background:rgba(126,207,255,0)}}
+.choice-item.item-glow-watch{
+  border-color:#7ecfff!important;opacity:.5;
+  box-shadow:0 0 16px rgba(126,207,255,.5);
+  filter:brightness(1.3) saturate(.5);
+  transition:all .4s ease;
+}
+/* 命のたま: 金色のシールド */
+.item-flash-stone{animation:stoneFlash 1s ease forwards}
+@keyframes stoneFlash{0%{background:rgba(255,215,0,0)}10%{background:rgba(255,215,0,.4)}30%{background:rgba(255,215,0,.2)}100%{background:rgba(255,215,0,0)}}
+/* アイテムバナー */
+.item-banner{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9998;
+  pointer-events:none;text-align:center;animation:itemBannerIn .6s ease-out forwards;
+}
+.item-banner-icon{font-size:3rem;margin-bottom:4px;filter:drop-shadow(0 0 12px rgba(255,255,255,.6))}
+.item-banner-text{
+  font-size:1.4rem;font-weight:bold;letter-spacing:3px;
+  text-shadow:0 0 20px currentColor,0 0 40px currentColor;
+}
+.item-banner-sub{font-size:.8rem;margin-top:6px;opacity:.8}
+@keyframes itemBannerIn{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}
+  30%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}
+  100%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+}
+.item-banner.fade-out{animation:itemBannerOut .4s ease-in forwards}
+@keyframes itemBannerOut{0%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.3)}}
+
+/* アイテム枠拡張通知 */
+.inventory-expand-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:9999;animation:fadeIn .3s}
+.inventory-expand-box{background:linear-gradient(135deg,#1a1a2e,#2a2a4e);border:2px solid #ffd700;border-radius:16px;padding:24px 32px;text-align:center;max-width:320px;box-shadow:0 0 30px rgba(255,215,0,.3);animation:popIn .4s ease-out}
+.inventory-expand-icon{font-size:3rem;margin-bottom:8px}
+.inventory-expand-title{font-size:1.2rem;font-weight:bold;color:#ffd700;margin-bottom:8px}
+.inventory-expand-detail{font-size:.9rem;color:#fff;margin-bottom:16px;line-height:1.6}
+@keyframes popIn{0%{transform:scale(.5);opacity:0}100%{transform:scale(1);opacity:1}}
+
 /* ===== モーダル ===== */
 .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:1000;animation:fadeIn .2s}
 .modal-box{background:#1a1a2e;border:2px solid #ff5252;border-radius:12px;padding:24px;max-width:340px;width:90%;text-align:center}
@@ -557,15 +725,197 @@ button{cursor:pointer;font-family:inherit}
 .boss-header-row{display:flex;align-items:center;justify-content:center;gap:24px;padding:12px 20px;background:#111;border:2px solid #ff5252;border-radius:12px;margin-bottom:12px}
 .boss-info-col{text-align:center;min-width:0}
 .boss-sprite-col{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px}
+/* ===== CSSメカドラゴン ===== */
+.css-dragon{width:100px;height:100px;position:relative;image-rendering:pixelated}
+.css-dragon .d-body{position:absolute;width:50px;height:36px;background:#c62828;border-radius:8px 12px 6px 10px;top:36px;left:24px;box-shadow:inset -4px -4px 0 #8e0000,inset 4px 4px 0 #e53935}
+.css-dragon .d-head{position:absolute;width:30px;height:26px;background:#d32f2f;border-radius:6px 16px 4px 4px;top:22px;left:56px;box-shadow:inset -3px -3px 0 #8e0000,inset 3px 3px 0 #ef5350}
+.css-dragon .d-eye{position:absolute;width:6px;height:6px;background:#ffd700;border-radius:50%;top:27px;left:72px;box-shadow:0 0 6px #ffd700,0 0 12px rgba(255,215,0,.4)}
+.css-dragon .d-eye::after{content:'';position:absolute;width:3px;height:6px;background:#000;border-radius:1px;left:2px;top:0}
+.css-dragon .d-horn1{position:absolute;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-bottom:12px solid #ff8a80;top:12px;left:62px;transform:rotate(-10deg)}
+.css-dragon .d-horn2{position:absolute;width:0;height:0;border-left:3px solid transparent;border-right:3px solid transparent;border-bottom:10px solid #ff8a80;top:14px;left:72px;transform:rotate(10deg)}
+.css-dragon .d-mouth{position:absolute;width:14px;height:4px;background:#8e0000;border-radius:0 0 3px 1px;top:40px;left:68px}
+.css-dragon .d-mouth::after{content:'';position:absolute;width:6px;height:3px;background:#ff6f00;border-radius:0 2px 2px 0;left:14px;top:0;box-shadow:6px -1px 0 #ff8f00,12px -2px 0 #ffa000;opacity:.8}
+.css-dragon .d-wing{position:absolute;width:0;height:0;border-left:28px solid #ef5350;border-top:18px solid transparent;border-bottom:6px solid transparent;top:18px;left:16px;filter:drop-shadow(-2px 2px 0 #b71c1c)}
+.css-dragon .d-wing2{position:absolute;width:0;height:0;border-left:20px solid #e53935;border-top:14px solid transparent;border-bottom:4px solid transparent;top:22px;left:22px}
+.css-dragon .d-tail{position:absolute;width:30px;height:8px;background:#c62828;border-radius:10px 0 4px 6px;top:50px;left:-2px;transform:rotate(8deg);box-shadow:inset -3px -2px 0 #8e0000}
+.css-dragon .d-tail::after{content:'';position:absolute;width:10px;height:6px;background:#ff5252;border-radius:0 6px 6px 0;right:-8px;top:1px;transform:rotate(-20deg)}
+.css-dragon .d-leg1{position:absolute;width:8px;height:14px;background:#b71c1c;border-radius:0 0 3px 3px;top:68px;left:34px}
+.css-dragon .d-leg2{position:absolute;width:8px;height:14px;background:#b71c1c;border-radius:0 0 3px 3px;top:68px;left:54px}
+.css-dragon .d-claw1{position:absolute;width:12px;height:4px;background:#8e0000;border-radius:2px;top:80px;left:32px}
+.css-dragon .d-claw2{position:absolute;width:12px;height:4px;background:#8e0000;border-radius:2px;top:80px;left:52px}
+.css-dragon .d-gear{position:absolute;width:10px;height:10px;border:2px solid #78909c;border-radius:50%;top:42px;left:44px;box-shadow:0 0 4px rgba(120,144,156,.6)}
+.css-dragon .d-gear::after{content:'';position:absolute;width:6px;height:2px;background:#78909c;top:4px;left:-4px}
+.css-dragon .d-bolt{position:absolute;width:4px;height:4px;background:#4fc3f7;border-radius:50%;box-shadow:0 0 4px #4fc3f7;top:50px;left:30px}
+.css-dragon .d-bolt2{position:absolute;width:3px;height:3px;background:#4fc3f7;border-radius:50%;box-shadow:0 0 3px #4fc3f7;top:38px;left:50px}
 /* ===== 画面揺れ ===== */
 @keyframes screenShake{0%{transform:translate(0,0)}10%{transform:translate(-8px,4px)}20%{transform:translate(6px,-6px)}30%{transform:translate(-4px,6px)}40%{transform:translate(4px,-2px)}50%{transform:translate(-2px,4px)}60%{transform:translate(6px,-4px)}70%{transform:translate(-4px,2px)}80%{transform:translate(2px,-6px)}90%{transform:translate(-2px,2px)}100%{transform:translate(0,0)}}
 .screen-shake{animation:screenShake .4s ease}
+
+/* ===== ボス戦 VS演出 ===== */
+.boss-vs-overlay{
+  position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;
+  background:#000;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;pointer-events:none;
+}
+.boss-vs-flash{
+  position:absolute;top:0;left:0;width:100%;height:100%;
+  background:radial-gradient(circle,rgba(255,82,82,.3) 0%,transparent 70%);
+  animation:vsFlashPulse 1s ease-in-out infinite;
+}
+@keyframes vsFlashPulse{0%,100%{opacity:.3}50%{opacity:.8}}
+.boss-vs-text{
+  font-size:4rem;font-weight:900;color:#ff5252;letter-spacing:12px;
+  text-shadow:0 0 40px rgba(255,82,82,.8),0 0 80px rgba(255,82,82,.4),0 0 120px rgba(255,82,82,.2);
+  animation:vsTextIn .6s cubic-bezier(.17,.67,.3,1.33) both;
+  z-index:1;
+}
+@keyframes vsTextIn{0%{transform:scale(0) rotate(-10deg);opacity:0}60%{transform:scale(1.3) rotate(3deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+.boss-vs-name{
+  font-size:1.2rem;color:#fff;margin-top:16px;letter-spacing:4px;opacity:0;
+  animation:vsNameIn .5s ease .4s forwards;z-index:1;
+}
+@keyframes vsNameIn{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
+.boss-vs-line{
+  width:0;height:2px;background:linear-gradient(90deg,transparent,#ff5252,transparent);
+  margin-top:12px;animation:vsLineIn .6s ease .3s forwards;z-index:1;
+}
+@keyframes vsLineIn{0%{width:0}100%{width:60%}}
+
+/* ===== ボス戦 戦闘雰囲気 ===== */
+.boss-battle-atmosphere{
+  position:relative;
+}
+.boss-battle-atmosphere::before{
+  content:'';position:fixed;top:0;left:0;width:100%;height:100%;
+  pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse at center,transparent 50%,rgba(255,0,0,.08) 100%);
+  animation:atmPulse 3s ease-in-out infinite;
+}
+@keyframes atmPulse{0%,100%{opacity:.5}50%{opacity:1}}
+#screen-boss .main-container{position:relative;z-index:1}
+
+/* ===== ダメージ数字 ===== */
+.boss-dmg-num{
+  position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);
+  pointer-events:none;z-index:200;
+  font-size:4rem;font-weight:900;color:#ff5252;
+  text-shadow:0 0 20px rgba(255,82,82,.8),0 0 40px rgba(255,82,82,.3),3px 3px 0 #000;
+  animation:dmgFloat 1.8s ease-out forwards;
+}
+@keyframes dmgFloat{
+  0%{opacity:1;transform:translate(-50%,-50%) scale(2)}
+  20%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  60%{opacity:1;transform:translate(-50%,-70%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-100%) scale(.7)}
+}
+.boss-dmg-critical{
+  font-size:5.5rem;color:#ffd700;
+  text-shadow:0 0 30px rgba(255,215,0,.8),0 0 60px rgba(255,215,0,.4),3px 3px 0 #000;
+}
+
+/* ===== ボス反撃演出 ===== */
+.boss-counterattack-flash{
+  position:fixed;top:0;left:0;width:100%;height:100%;z-index:9990;
+  pointer-events:none;animation:counterFlash .6s ease forwards;
+}
+@keyframes counterFlash{
+  0%{background:rgba(255,0,0,0)}
+  15%{background:rgba(255,0,0,.4)}
+  30%{background:rgba(255,0,0,.1)}
+  45%{background:rgba(255,0,0,.3)}
+  100%{background:rgba(0,0,0,0)}
+}
+.boss-sprite-attack{animation:bossAttack .6s ease !important}
+@keyframes bossAttack{
+  0%{transform:translateX(0) scale(1)}
+  20%{transform:translateX(20px) scale(1.2)}
+  40%{transform:translateX(-60px) scale(1.3);filter:brightness(2) drop-shadow(0 0 20px #f00)}
+  60%{transform:translateX(10px) scale(1.1)}
+  100%{transform:translateX(0) scale(1);filter:brightness(1)}
+}
+
+/* ===== コンボカウンター ===== */
+.boss-combo{
+  position:absolute;top:8px;right:16px;z-index:10;
+  text-align:right;opacity:0;transition:opacity .3s;
+}
+.boss-combo.active{opacity:1}
+.boss-combo-count{
+  font-size:2rem;font-weight:900;color:#ffd700;line-height:1;
+  text-shadow:0 0 15px rgba(255,215,0,.6),2px 2px 0 #000;
+}
+.boss-combo-label{font-size:.65rem;color:#ffb74d;letter-spacing:2px;font-weight:bold}
+.boss-combo-pop{animation:comboPop .3s ease}
+@keyframes comboPop{0%{transform:scale(1.5)}50%{transform:scale(.9)}100%{transform:scale(1)}}
+
+/* ===== HP低下時の脈動 ===== */
+.boss-hp-fill.hp-danger{
+  background:linear-gradient(90deg,#ff1744,#ff5252) !important;
+  animation:hpDangerPulse .8s ease-in-out infinite;
+}
+@keyframes hpDangerPulse{0%,100%{opacity:1;box-shadow:0 0 8px rgba(255,23,68,.6)}50%{opacity:.6;box-shadow:0 0 16px rgba(255,23,68,1)}}
+.boss-hp-fill.hp-critical{
+  background:linear-gradient(90deg,#d50000,#ff1744) !important;
+  animation:hpCriticalPulse .4s ease-in-out infinite;
+}
+@keyframes hpCriticalPulse{0%,100%{opacity:1;box-shadow:0 0 12px rgba(213,0,0,.8)}50%{opacity:.4;box-shadow:0 0 20px rgba(213,0,0,1)}}
+
+/* ===== ボス撃破エクスプロージョン ===== */
+.boss-explosion-overlay{
+  position:fixed;top:0;left:0;width:100%;height:100%;z-index:9998;
+  pointer-events:none;
+}
+.boss-explosion-particle{
+  position:absolute;width:6px;height:6px;border-radius:50%;
+  pointer-events:none;
+}
+.boss-explosion-flash{
+  position:fixed;top:0;left:0;width:100%;height:100%;z-index:9997;
+  pointer-events:none;animation:bossExplodeFlash 1s ease forwards;
+}
+@keyframes bossExplodeFlash{
+  0%{background:rgba(255,255,255,0)}
+  8%{background:rgba(255,255,255,.9)}
+  20%{background:rgba(255,82,82,.4)}
+  40%{background:rgba(255,215,0,.2)}
+  100%{background:rgba(0,0,0,0)}
+}
+.boss-sprite-defeat{animation:bossDefeat 1.5s ease forwards !important}
+@keyframes bossDefeat{
+  0%{transform:scale(1);filter:brightness(1)}
+  20%{transform:scale(1.1);filter:brightness(3) drop-shadow(0 0 30px #fff)}
+  40%{transform:scale(1.05);filter:brightness(2) drop-shadow(0 0 20px #ff0)}
+  60%{transform:scale(.9) rotate(5deg);filter:brightness(1.5);opacity:.8}
+  80%{transform:scale(.7) rotate(-3deg);filter:brightness(1);opacity:.4}
+  100%{transform:scale(0) rotate(10deg);opacity:0}
+}
+
 /* ===== マイクラ風アイテムボックス ===== */
 .mc-item-bar{display:flex;gap:2px;justify-content:center}
 .mc-slot{width:36px;height:36px;background:#555;border:2px solid #222;border-top-color:#373737;border-left-color:#373737;border-right-color:#8b8b8b;border-bottom-color:#8b8b8b;display:flex;align-items:center;justify-content:center;position:relative}
 .mc-slot.empty{background:#555}
 .mc-slot img{width:28px;height:28px;object-fit:contain;image-rendering:pixelated}
 .mc-slot-label{position:absolute;bottom:-1px;right:1px;font-size:8px;color:#fff;text-shadow:1px 1px 0 #000;font-weight:bold}
+/* ===== 実績通知 ===== */
+.achievement-notify{position:fixed;top:0;left:0;width:100%;height:100%;display:flex;align-items:flex-start;justify-content:center;z-index:10000;pointer-events:none;padding-top:60px}
+.achievement-notify-box{background:linear-gradient(135deg,#1a1a2e,#2a1a3e);border:2px solid #c084fc;border-radius:16px;padding:20px 28px;text-align:center;max-width:300px;box-shadow:0 0 30px rgba(192,132,252,.4),0 8px 32px rgba(0,0,0,.6);animation:popIn .4s ease-out}
+.achievement-notify-icon{font-size:2.5rem;margin-bottom:4px}
+.achievement-notify-label{font-size:.7rem;color:#c084fc;letter-spacing:2px;font-weight:bold;text-transform:uppercase}
+.achievement-notify-name{font-size:1.2rem;font-weight:bold;color:#fff;margin:4px 0}
+.achievement-notify-desc{font-size:.8rem;color:#aaa}
+.achievement-notify.fade-out{animation:fadeOut .5s ease forwards}
+@keyframes fadeOut{to{opacity:0;transform:translateY(-20px)}}
+/* ===== 実績バッジ一覧 ===== */
+.badge-cat{margin-bottom:20px}
+.badge-cat-title{font-size:.85rem;color:#c084fc;font-weight:bold;border-bottom:1px solid #333;padding-bottom:4px;margin-bottom:10px;letter-spacing:1px}
+.badge-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.badge-item{background:#1a1a2e;border:2px solid #333;border-radius:12px;padding:12px 10px;text-align:center;transition:all .3s}
+.badge-item.unlocked{border-color:#c084fc;box-shadow:0 0 12px rgba(192,132,252,.2)}
+.badge-item.locked{opacity:.5;filter:grayscale(.8)}
+.badge-icon{font-size:2rem;margin-bottom:4px}
+.badge-name{font-size:.85rem;font-weight:bold;color:#fff;margin-bottom:2px}
+.badge-desc{font-size:.7rem;color:#aaa;line-height:1.3}
+@media(max-width:768px){.badge-row{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}.badge-item{padding:10px 6px}}
 </style>
 </head>
 <body>
@@ -587,6 +937,7 @@ button{cursor:pointer;font-family:inherit}
   <div class="sp-section" id="sp-account-area">
     <div class="sp-account-name" id="sp-account-name">ゲストユーザー（仮）</div>
     <div class="sp-account-title" id="sp-account-title">駆け出しの学び手（仮）</div>
+    <button class="sp-logout-btn" onclick="handleLogout()">ログアウト</button>
   </div>
 
   <div class="sp-section" id="sp-level-area">
@@ -600,7 +951,7 @@ button{cursor:pointer;font-family:inherit}
   </div>
 
   <div class="sp-section" id="sp-items-area">
-    <div style="font-size:.65rem;color:#aaa;margin-bottom:4px;letter-spacing:1px">ITEMS</div>
+    <div style="font-size:.65rem;color:#aaa;margin-bottom:2px;letter-spacing:1px" id="sp-items-label">ITEMS</div>
     <div id="sp-item-bar" class="mc-item-bar"></div>
   </div>
 
@@ -613,6 +964,10 @@ button{cursor:pointer;font-family:inherit}
 
   <div class="sp-section" id="sp-gold-area">
     <div class="sp-row"><span class="sp-label">GOLD</span><span class="sp-val gold-color" id="sp-gold">0</span></div>
+  </div>
+
+  <div class="sp-section" id="sp-playtime-area">
+    <div class="sp-row"><span class="sp-label">PLAY TIME</span><span class="sp-val playtime-color" id="sp-playtime">0:00</span></div>
   </div>
 
   <div class="sp-divider"></div>
@@ -628,13 +983,28 @@ button{cursor:pointer;font-family:inherit}
   <div class="app-title">ITパスポート対策講座</div>
 </div>
 
-<div id="screen-map" class="screen active">
+<div id="screen-chapters" class="screen active">
   <div class="main-container">
-    <div class="chapter-title">第1章 コンピュータの世界</div>
-    <div class="chapter-desc">毎日使ってるスマホやパソコン、中身を知ろう</div>
-    <div class="stage-grid" id="stage-grid"></div>
-    <div style="margin-top:20px">
+    <div class="chapter-title">ITパスポート対策講座</div>
+    <div class="chapter-desc">全8章で試験範囲を完全カバー！</div>
+    <div class="chapter-grid" id="chapter-grid"></div>
+    <div style="margin-top:20px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
       <button class="next-btn secondary" onclick="showScreen('screen-collection')">カード図鑑</button>
+      <button class="next-btn secondary" onclick="showScreen('screen-badges')">実績バッジ</button>
+    </div>
+    <div class="content-spacer"></div>
+  </div>
+</div>
+
+<div id="screen-map" class="screen">
+  <div class="main-container">
+    <button class="chapter-back-btn" onclick="showScreen('screen-chapters')">← 章の選択に戻る</button>
+    <div class="chapter-title" id="map-chapter-title"></div>
+    <div class="chapter-desc" id="map-chapter-desc"></div>
+    <div class="stage-grid" id="stage-grid"></div>
+    <div style="margin-top:20px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="next-btn secondary" onclick="showScreen('screen-collection')">カード図鑑</button>
+      <button class="next-btn secondary" onclick="showScreen('screen-badges')">実績バッジ</button>
     </div>
     <div class="content-spacer"></div>
   </div>
@@ -673,10 +1043,25 @@ button{cursor:pointer;font-family:inherit}
 <div id="screen-boss" class="screen">
   <div class="main-container">
     <div class="learn-header">
-      <button class="back-btn" onclick="showScreen('screen-map')">← 戻る</button>
+      <button class="back-btn" onclick="confirmBossExit()">← 戻る</button>
       <div><div class="learn-stage-title" style="color:#ff5252" id="boss-title">章ボス</div></div>
     </div>
+    <div id="boss-exit-confirm" style="display:none;margin-bottom:12px;padding:16px;background:#1a0a0a;border:2px solid #ff5252;border-radius:10px;text-align:center;animation:fadeIn .3s">
+      <div style="font-size:1rem;font-weight:bold;color:#ff5252;margin-bottom:6px">ボス戦から離脱しますか？</div>
+      <div style="font-size:.85rem;color:#ccc;margin-bottom:14px">戦闘の進行はリセットされます。<br>使用済みのアイテムは戻りません。</div>
+      <div style="display:flex;gap:10px;justify-content:center">
+        <button class="next-btn secondary" style="flex:1;max-width:130px" onclick="dismissBossExit()">戦闘に戻る</button>
+        <button class="next-btn" style="flex:1;max-width:130px;background:#ff5252" onclick="executeBossExit()">離脱する</button>
+      </div>
+    </div>
     <div id="boss-content"></div>
+    <div class="content-spacer"></div>
+  </div>
+</div>
+
+<div id="screen-mock-exam" class="screen">
+  <div class="main-container">
+    <div id="mock-exam-content"></div>
     <div class="content-spacer"></div>
   </div>
 </div>
@@ -684,10 +1069,22 @@ button{cursor:pointer;font-family:inherit}
 <div id="screen-collection" class="screen">
   <div class="main-container">
     <div class="learn-header">
-      <button class="back-btn" onclick="showScreen('screen-map')">← 戻る</button>
+      <button class="back-btn" onclick="showScreen('screen-chapters')">← 戻る</button>
       <div><div class="learn-stage-title">カード図鑑</div></div>
     </div>
     <div class="collection-grid" id="collection-grid"></div>
+    <div class="content-spacer"></div>
+  </div>
+</div>
+
+<div id="screen-badges" class="screen">
+  <div class="main-container">
+    <div class="learn-header">
+      <button class="back-btn" onclick="showScreen('screen-chapters')">← 戻る</button>
+      <div><div class="learn-stage-title">実績バッジ</div></div>
+    </div>
+    <div class="badge-progress" id="badge-progress"></div>
+    <div class="badge-grid" id="badge-grid"></div>
     <div class="content-spacer"></div>
   </div>
 </div>
@@ -707,9 +1104,11 @@ button{cursor:pointer;font-family:inherit}
 </div>
 
 <script>
+/* ===== デモモード判定 ===== */
+const IS_DEMO = new URLSearchParams(location.search).has('demo');
+
 /* ===== アカウント管理 ===== */
 const ACCOUNT_KEY = 'course_accountName';
-const SAVEDATA_KEY = 'course_saveData';
 
 // アカウント名取得
 function getAccountName() {
@@ -721,27 +1120,75 @@ function setAccountName(name) {
   localStorage.setItem(ACCOUNT_KEY, name);
 }
 
+// アカウント別セーブデータキー
+function getSaveDataKey() {
+  const name = getAccountName();
+  return name ? 'course_saveData_' + name : 'course_saveData';
+}
+
 // セーブデータのデフォルト値
 function getDefaultSaveData() {
   return {
     level: 1,
     exp: 0,
     gold: 0,
-    clearedStages: [],
+    chapters: {},
     ownedCards: [],
-    bossCleared: false,
     titles: ['駆け出しの学び手'],
     currentTitle: '駆け出しの学び手',
-    inventory: []
+    inventory: [],
+    achievements: [],
+    usedItemTypes: [],
+    playTime: 0,
+    cardChapterMap: {}
   };
+}
+
+// 旧セーブデータ→新形式へのマイグレーション
+function migrateSaveData(data) {
+  if (!data.chapters) {
+    data.chapters = {};
+    if (data.clearedStages || data.bossCleared) {
+      data.chapters[1] = {
+        clearedStages: data.clearedStages || [],
+        bossCleared: data.bossCleared || false
+      };
+    }
+    delete data.clearedStages;
+    delete data.bossCleared;
+  }
+  if(!data.achievements)data.achievements=[];
+  if(!data.usedItemTypes)data.usedItemTypes=[];
+  if(data.playTime==null)data.playTime=0;
+  if(!data.cardChapterMap)data.cardChapterMap={};
+  return data;
+}
+
+// 現在の章の進捗を取得するヘルパー
+function chapterState() {
+  if (!currentChapter) return { clearedStages: [], bossCleared: false };
+  const cid = currentChapter.id;
+  if (!state.chapters[cid]) {
+    state.chapters[cid] = { clearedStages: [], bossCleared: false };
+  }
+  return state.chapters[cid];
 }
 
 // セーブデータ読み込み
 function loadSaveData() {
   try {
-    const data = localStorage.getItem(SAVEDATA_KEY);
+    const key = getSaveDataKey();
+    let data = localStorage.getItem(key);
+    // 旧共通キーからの一回限りマイグレーション
+    if (!data && key !== 'course_saveData') {
+      const oldData = localStorage.getItem('course_saveData');
+      if (oldData && !localStorage.getItem('course_saveData_migrated')) {
+        localStorage.setItem('course_saveData_migrated', '1');
+        data = oldData;
+      }
+    }
     if (!data) return getDefaultSaveData();
-    return JSON.parse(data);
+    return migrateSaveData(JSON.parse(data));
   } catch (e) {
     console.error('セーブデータの読み込みに失敗:', e);
     return getDefaultSaveData();
@@ -750,7 +1197,7 @@ function loadSaveData() {
 
 // セーブデータ保存
 function saveSaveData(data) {
-  localStorage.setItem(SAVEDATA_KEY, JSON.stringify(data));
+  localStorage.setItem(getSaveDataKey(), JSON.stringify(data));
 }
 
 // ログイン処理
@@ -763,20 +1210,26 @@ function handleLogin() {
     return;
   }
 
-  // アカウント名を保存
+  // アカウント名を保存（この後 getSaveDataKey() がアカウント別キーを返す）
   setAccountName(accountName);
 
-  // セーブデータを初期化（既存データがあればそれを使用）
-  const saveData = loadSaveData();
+  // アカウント固有のセーブデータを読み込み
+  state = loadSaveData();
 
   // モーダルを閉じる
   document.getElementById('account-modal').classList.add('hidden');
 
-  // アカウント情報を表示
+  // 表示を更新
   updateAccountDisplay();
+  if(typeof updateHeader==='function') updateHeader();
+  updatePlayTimeDisplay();
 
-  // ゲーム開始
-  initGame();
+  // デモ版: チャプター選択をスキップし第1章に直行
+  if(IS_DEMO){
+    selectChapter(1);
+  }else{
+    showScreen('screen-chapters');
+  }
 }
 
 // アカウント情報表示更新
@@ -788,18 +1241,95 @@ function updateAccountDisplay() {
   document.getElementById('sp-account-title').textContent = saveData.currentTitle || '駆け出しの学び手';
 }
 
+// ログアウト処理
+function handleLogout() {
+  // 現在のデータを保存してからログアウト
+  saveState();
+  // アカウント名をクリア
+  localStorage.removeItem(ACCOUNT_KEY);
+  // stateをデフォルトにリセット
+  state = getDefaultSaveData();
+  // ログインモーダルを表示
+  document.getElementById('account-modal').classList.remove('hidden');
+  document.getElementById('account-input').value = '';
+  // サイドパネル表示をリセット
+  updateAccountDisplay();
+  updatePlayTimeDisplay();
+}
+
+// プレイ時間フォーマット（秒→ "X時間Y分" or "Y分"）
+function formatPlayTime(seconds){
+  const h=Math.floor(seconds/3600);
+  const m=Math.floor((seconds%3600)/60);
+  if(h>0)return `${h}時間${m}分`;
+  return `${m}分`;
+}
+
+// プレイ時間表示更新
+function updatePlayTimeDisplay(){
+  const el=document.getElementById('sp-playtime');
+  if(el&&typeof state!=='undefined')el.textContent=formatPlayTime(state.playTime||0);
+}
+
+// プレイ時間タイマー（30秒ごとに加算・保存）
+let _playTimeInterval=null;
+function startPlayTimeTracker(){
+  if(_playTimeInterval)return;
+  _playTimeInterval=setInterval(()=>{
+    if(typeof state==='undefined'||!getAccountName())return;
+    state.playTime=(state.playTime||0)+30;
+    updatePlayTimeDisplay();
+    saveSaveData(state);
+  },30000);
+}
+
+// ページ非表示時はカウント停止、表示時に再開
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){
+    if(_playTimeInterval){clearInterval(_playTimeInterval);_playTimeInterval=null;}
+  }else{
+    startPlayTimeTracker();
+  }
+});
+
 // ページ読み込み時の処理
 window.addEventListener('DOMContentLoaded', () => {
+  // デモ版: モーダル・サイドバー・UIの表示を変更
+  if(IS_DEMO){
+    document.querySelector('.account-modal-title').textContent='デモ版 - アカウント名を入力';
+    document.querySelector('.account-modal-desc').innerHTML='ステージ1・ステージ2・ボス戦が体験できます。<br>アカウント名を入力してプレイしてください。';
+    document.title='【デモ版】ITパスポート対策講座';
+    // サイドバーにデモ版バッジ
+    const badge=document.createElement('div');
+    badge.style.cssText='background:#ff5252;color:#fff;text-align:center;padding:6px;font-size:.75rem;font-weight:bold;letter-spacing:2px;';
+    badge.textContent='DEMO VERSION';
+    document.getElementById('side-panel').prepend(badge);
+    // ヘッダーにデモ版表示
+    document.querySelector('.app-title').textContent='【デモ版】ITパスポート対策講座';
+    // 「章の選択に戻る」ボタンを非表示
+    const backBtn=document.querySelector('.chapter-back-btn');
+    if(backBtn)backBtn.style.display='none';
+    // カード図鑑・実績バッジボタンを非表示
+    document.querySelectorAll('#screen-map .next-btn.secondary').forEach(b=>b.style.display='none');
+  }
+
   const accountName = getAccountName();
 
   if (!accountName) {
-    // ログインしていない場合、モーダルを表示
     document.getElementById('account-modal').classList.remove('hidden');
   } else {
-    // ログイン済みの場合、モーダルを非表示
     document.getElementById('account-modal').classList.add('hidden');
     updateAccountDisplay();
+    if(IS_DEMO){
+      selectChapter(1);
+    }else{
+      showScreen('screen-chapters');
+    }
   }
+
+  // プレイ時間の初期表示＆タイマー開始
+  updatePlayTimeDisplay();
+  startPlayTimeTracker();
 
   // ログインボタンのイベント
   document.getElementById('account-login-btn').addEventListener('click', handleLogin);
@@ -811,21 +1341,208 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ===== コースデータ ===== */
-// インラインデータは削除。JSONファイルから読み込む。
-let COURSE_DATA =
-[];
-
+let COURSE_DATA = [];
 let BOSS_DATA = {};
+let currentChapter = null;
+
+/* ===== チャプター定義 ===== */
+const CHAPTERS = [
+  {
+    id:1, title:'第1章 コンピュータの世界',
+    description:'毎日使ってるスマホやパソコン、中身を知ろう',
+    domain:'テクノロジ系', domainClass:'tech',
+    stageCount:11,
+    bossName:'メカドラゴン',
+    bossSprite:'ボス/character_monster_dragon_01_red.png',
+    files:{
+      stages:['course/chapter1_stages1-4.json','course/chapter1_stages5-8.json','course/chapter1_stages9-11.json'],
+      boss:'course/chapter1_boss.json'
+    }
+  },
+  {
+    id:2, title:'第2章 ネットワークの冒険',
+    description:'インターネットの世界を探検しよう',
+    domain:'テクノロジ系', domainClass:'tech',
+    stageCount:8,
+    bossName:'ネットワイバーン',
+    bossSprite:'ボス/character_monster_dragon_01_white.png',
+    files:{
+      stages:['course/chapter2_stages1-4.json','course/chapter2_stages5-8.json'],
+      boss:'course/chapter2_boss.json'
+    }
+  },
+  {
+    id:3, title:'第3章 セキュリティの砦',
+    description:'大切な情報を守る方法を学ぼう',
+    domain:'テクノロジ系', domainClass:'tech',
+    stageCount:8,
+    bossName:'ダークファイアウォール',
+    bossSprite:'ボス/character_darkknight_04.png',
+    files:{
+      stages:['course/chapter3_stages1-4.json','course/chapter3_stages5-8.json'],
+      boss:'course/chapter3_boss.json'
+    }
+  },
+  {
+    id:4, title:'第4章 データとアルゴリズム',
+    description:'データの整理と考える力を身につけよう',
+    domain:'テクノロジ系', domainClass:'tech',
+    stageCount:8,
+    bossName:'データゴーレム',
+    bossSprite:'ボス/character_hero_red.png',
+    files:{
+      stages:['course/chapter4_stages1-4.json','course/chapter4_stages5-8.json'],
+      boss:'course/chapter4_boss.json'
+    }
+  },
+  {
+    id:5, title:'第5章 企業と法律の世界',
+    description:'会社のルールと法律を知ろう',
+    domain:'ストラテジ系', domainClass:'strat',
+    stageCount:8,
+    bossName:'法律キメラ',
+    bossSprite:'ボス/character_daiakuma_01_02_black.png',
+    files:{
+      stages:['course/chapter5_stages1-4.json','course/chapter5_stages5-8.json'],
+      boss:'course/chapter5_boss.json'
+    }
+  },
+  {
+    id:6, title:'第6章 経営戦略の達人',
+    description:'ビジネスの作戦を考えよう',
+    domain:'ストラテジ系', domainClass:'strat',
+    stageCount:8,
+    bossName:'ストラテジードラゴン',
+    bossSprite:'ボス/character_monster_dragon_02_yellow.png',
+    files:{
+      stages:['course/chapter6_stages1-4.json','course/chapter6_stages5-8.json'],
+      boss:'course/chapter6_boss.json'
+    }
+  },
+  {
+    id:7, title:'第7章 システム戦略と企画',
+    description:'ITで仕事を変える方法を学ぼう',
+    domain:'ストラテジ系', domainClass:'strat',
+    stageCount:8,
+    bossName:'プランニングフェニックス',
+    bossSprite:'ボス/character_daitenshi_02_02_brown.png',
+    files:{
+      stages:['course/chapter7_stages1-4.json','course/chapter7_stages5-8.json'],
+      boss:'course/chapter7_boss.json'
+    }
+  },
+  {
+    id:8, title:'第8章 プロジェクトとサービス',
+    description:'チームで作るシステム開発を学ぼう',
+    domain:'マネジメント系', domainClass:'mgmt',
+    stageCount:8,
+    bossName:'マネジメントハイドラ',
+    bossSprite:'ボス/character_datenshi_01_01_black.png',
+    files:{
+      stages:['course/chapter8_stages1-4.json','course/chapter8_stages5-8.json'],
+      boss:'course/chapter8_boss.json'
+    }
+  },
+  {
+    id:9, title:'第9章 模擬試験',
+    description:'本番さながらの100問に挑戦！',
+    domain:'総合', domainClass:'exam',
+    stageCount:0,
+    isMockExam:true,
+    bossName:'',
+    bossSprite:'',
+    files:{stages:[],boss:''}
+  }
+];
 
 /* ===== アイテム定義 ===== */
 const ITEM_ICONS={
   life_stone:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfQAAAKpCAYAAABKLt4+AAAAAXNSR0IArs4c6QAADMxJREFUeJzt1yFuZfcZh+F7LG+h8DKrgQYDCwIsVfIKwsIGdAUer8D1CgaElc0KLI1kKQGFAwwTmUQXdg++hWWtzsl0Pvu9z7OCn46O/q++ZQf/y/5yesF6h6fj9AReuf3lMj1htcPT9AJesbPpAQDAHyfoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQsEwP2Oy776cXrPfrL8fpCafi7OZxegKv3Mv91fSE0/Hd92+vNb/+Mr1gNRc6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAELNMD/oDj9IC1zm4epycAfHMv91fTE7Z4c310oQNAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0DA+W5/Ob1hm8PT9IKTcXd9MT1htduH5+kJm7zcX01PWO3s5nF6wib+a/6rN9hGFzoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQsu93uOD1ii7Obx+kJq91dX0xP2OT24Xl6wmov91fTEzZZ/vLjMr1hreM///Em35D7n3+fnnAyvCHfhgsdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACzqcHwP/D2c3j9IRNXu6vjtMb1nqr3xpqXOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQcD49APiPs5vH6QnAG+VCB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAgPPd/nKZHrHFy/3VcXrDWre7x+kJm9xdX0xPWO324Xl6AsA35UIHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAgPPd4Wl6A/CG3V1fTE84GbcPz9MTNnm5v5qesN7+cpmesJYLHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAs6nB2y2v1ymJ6z1cn91nN6wyfXv0wsAvq3D0/SC1VzoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQcD49gNfv9uF5egJ8dR8+fp6esNrx0/vpCdvsL5fpCasdnqYXrOZCB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgABBB4AAQQeAAEEHgIDz3f7d9IZtDl+O0xPWOrt5nJ7AK3d3fTE9YbUPHz9PT+C1OzxNLzgJLnQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAhYdrvdcXrEFssPP01POBl//9tfpyecjA8fP09POBnHT++nJ6y3f7dMT9jk8GV6wUlwoQNAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0DAstvtjtMjtlh++Gl6Anx1x0/vpyecjv27ZXrCaocv0wt4xVzoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQsOz276Y3bHP4cpyeAF/dn/68TE9Y7V+/TS8Adi50AEgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAI+Dewi3GmZnUriQAAAABJRU5ErkJggg==',
-  sage_glasses:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfQAAAEdCAYAAAD6nZXAAAAAAXNSR0IArs4c6QAABT1JREFUeJzt17ttG1EURdEZg2pAlagJxQ5cpwPHroKVqAEC41QgTAey4ftma60KDvi5G2/fOJtjesDC9ukBnJb/1WP+VyfxZXoAAPD3BB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAvbpASdwTA+44zsD/ic38CS80AEgQNABIEDQASBA0AEgQNABIEDQASBA0AEgQNABIEDQASBA0AEgQNABIEDQASBA0AEgQNABIEDQASBA0AEgQNABIEDQASBA0AEgQNABIEDQASBA0AEgQNABIEDQASBA0AEgQNABIEDQASBA0AEgQNABIEDQASBA0AEgQNABIEDQASBA0AEgQNABIGCfHvAbx/SAOyt+RgCflUY84IUOAAGCDgABgg4AAYIOAAGCDgABgg4AAYIOAAGCDgABgg4AAYIOAAGCDgABgg4AAYIOAAGCDgABgg4AAYIOAAGCDgABgg4AAYIOAAGCDgABgg4AAYIOAAGCDgABgg4AAYIOAAGCDgABgg4AAYIOAAGCDgABgg4AAYIOAAGCDgABgg4AAYIOAAH7tm3H9AiI2qcHLMzdgX/MCx0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAL2bduO6RHvHcdSc5ZzfbtNT1jWy/PT9AROyt15zM35s5Xujhc6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAEXKYHrO76dpuewHnt0wMWdkwPWJm7w0d4oQNAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAwGV6wL3r2216AvDJuDsUeKEDQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0DA5fXrt316xHsvz0/H9AbOabXf8s8f36cnLGu178rd4aNW+i17oQNAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAwC9uWitvipNWkAAAAABJRU5ErkJggg=='
+  sage_glasses:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfQAAAEdCAYAAAD6nZXAAAAAAXNSR0IArs4c6QAABT1JREFUeJzt17ttG1EURdEZg2pAlagJxQ5cpwPHroKVqAEC41QgTAey4ftma60KDvi5G2/fOJtjesDC9ukBnJb/1WP+VyfxZXoAAPD3BB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAvbpASdwTA+44zsD/ic38CS80AEgQNABIEDQASBA0AEgQNABIEDQASBA0AEgQNABIEDQASBA0AEgQNABIEDQASBA0AEgQNABIEDQASBA0AEgQNABIEDQASBA0AEgQNABIEDQASBA0AEgQNABIEDQASBA0AEgQNABIEDQASBA0AEgQNABIEDQASBA0AEgQNABIEDQASBA0AEgQNABIGCfHvAbx/SAOyt+RgCflUY84IUOAAGCDgABgg4AAYIOAAGCDgABgg4AAYIOAAGCDgABgg4AAYIOAAGCDgABgg4AAYIOAAGCDgABgg4AAYIOAAGCDgABgg4AAYIOAAGCDgABgg4AAYIOAAGCDgABgg4AAYIOAAGCDgABgg4AAYIOAAGCDgABgg4AAYIOAAGCDgABgg4AAYIOAAH7tm3H9AiI2qcHLMzdgX/MCx0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAL2bduO6RHvHcdSc5ZzfbtNT1jWy/PT9AROyt15zM35s5Xujhc6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAEXKYHrO76dpuewHnt0wMWdkwPWJm7w0d4oQNAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAwGV6wL3r2216AvDJuDsUeKEDQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0DA5fXrt316xHsvz0/H9AbOabXf8s8f36cnLGu178rd4aNW+i17oQNAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAwC9uWitvipNWkAAAAABJRU5ErkJggg==',
+  double_kendama:'kendama_blue.png',
+  time_watch:'udedokei_gold.png'
 };
 const SHOP_ITEMS=[
   {id:'life_stone',name:'命のたま',price:500,desc:'不正解でもリセットされない（自動使用）',icon:ITEM_ICONS.life_stone},
-  {id:'sage_glasses',name:'賢者のメガネ',price:300,desc:'選択肢を2つに絞るヒントが使える',icon:ITEM_ICONS.sage_glasses}
+  {id:'sage_glasses',name:'賢者のメガネ',price:300,desc:'選択肢を2つに絞るヒントが使える',icon:ITEM_ICONS.sage_glasses},
+  {id:'double_kendama',name:'2倍のけん玉',price:400,desc:'次の正解が2倍ダメージになる（手動使用）',icon:ITEM_ICONS.double_kendama},
+  {id:'time_watch',name:'シャッフルタイマー',price:600,desc:'問題を別の問題に交換できる',icon:ITEM_ICONS.time_watch}
 ];
+
+/* ===== 実績バッジシステム ===== */
+const ACHIEVEMENTS=[
+  {id:'first_clear',name:'はじめの一歩',desc:'初めてステージをクリアした',icon:'👣',cat:'進行'},
+  {id:'first_boss',name:'ドラゴンスレイヤー',desc:'初めてボスを撃破した',icon:'🐉',cat:'ボス'},
+  {id:'boss_perfect',name:'パーフェクトキル',desc:'ボス戦で全問正解した',icon:'💯',cat:'ボス'},
+  {id:'boss_no_items',name:'素手の勇者',desc:'アイテム未使用でボスを撃破した',icon:'✊',cat:'ボス'},
+  {id:'all_bosses',name:'全章制覇',desc:'全8章のボスを撃破した',icon:'👑',cat:'ボス'},
+  {id:'combo_3',name:'トリプルコンボ',desc:'ボス戦で3連続正解を達成',icon:'🔥',cat:'連続正解'},
+  {id:'combo_5',name:'ペンタコンボ',desc:'ボス戦で5連続正解を達成',icon:'⚡',cat:'連続正解'},
+  {id:'combo_10',name:'ゴッドコンボ',desc:'ボス戦で10連続正解を達成',icon:'🌟',cat:'連続正解'},
+  {id:'practice_perfect',name:'練習の鬼',desc:'練習問題を全問一発正解した',icon:'📝',cat:'学習'},
+  {id:'use_all_items',name:'アイテムマスター',desc:'全4種のアイテムを使用した',icon:'🎒',cat:'アイテム'},
+  {id:'first_purchase',name:'お買い物デビュー',desc:'ショップで初めて買い物した',icon:'🛒',cat:'アイテム'},
+  {id:'half_clear',name:'折り返し地点',desc:'全ステージの半分をクリアした',icon:'🏃',cat:'進行'},
+  {id:'all_stages',name:'コンプリート',desc:'全ステージをクリアした',icon:'🏆',cat:'進行'},
+  {id:'level_50',name:'半人前卒業',desc:'レベル50に到達した',icon:'⭐',cat:'レベル'},
+  {id:'level_100',name:'百の境地',desc:'レベル100に到達した',icon:'🌙',cat:'レベル'},
+  {id:'level_200',name:'二百の高み',desc:'レベル200に到達した',icon:'☀️',cat:'レベル'},
+  {id:'gold_1000',name:'千金持ち',desc:'ゴールドを1000以上所持した',icon:'💰',cat:'ゴールド'},
+  {id:'gold_5000',name:'大富豪',desc:'ゴールドを5000以上所持した',icon:'💎',cat:'ゴールド'}
+];
+let practiceFirstTryCount=0;
+let bossItemsUsedThisFight=false;
+
+function unlockAchievement(id){
+  if(!state.achievements)state.achievements=[];
+  if(state.achievements.includes(id))return false;
+  const a=ACHIEVEMENTS.find(x=>x.id===id);if(!a)return false;
+  state.achievements.push(id);saveState();
+  showAchievementNotification(a);
+  return true;
+}
+function showAchievementNotification(a){
+  playSfx('victory');
+  const ov=document.createElement('div');ov.className='achievement-notify';
+  ov.innerHTML=`<div class="achievement-notify-box">
+    <div class="achievement-notify-icon">${a.icon}</div>
+    <div class="achievement-notify-label">実績解除！</div>
+    <div class="achievement-notify-name">${a.name}</div>
+    <div class="achievement-notify-desc">${a.desc}</div>
+  </div>`;
+  document.body.appendChild(ov);
+  setTimeout(()=>{ov.classList.add('fade-out');setTimeout(()=>ov.remove(),600)},2800);
+}
+function checkLevelAchievements(lv){
+  if(lv>=50)unlockAchievement('level_50');
+  if(lv>=100)unlockAchievement('level_100');
+  if(lv>=200)unlockAchievement('level_200');
+}
+function checkGoldAchievements(){
+  if(state.gold>=1000)unlockAchievement('gold_1000');
+  if(state.gold>=5000)unlockAchievement('gold_5000');
+}
+function checkProgressAchievements(){
+  let total=0,cleared=0;
+  for(const ch of CHAPTERS){total+=ch.stageCount;const cs=state.chapters[ch.id];if(cs)cleared+=cs.clearedStages.length;}
+  if(cleared>=1)unlockAchievement('first_clear');
+  if(cleared>=Math.ceil(total/2))unlockAchievement('half_clear');
+  if(cleared>=total)unlockAchievement('all_stages');
+}
+function checkAllBossesAchievement(){
+  const allCleared=CHAPTERS.every(ch=>{const cs=state.chapters[ch.id];return cs&&cs.bossCleared;});
+  if(allCleared)unlockAchievement('all_bosses');
+}
+function checkItemAchievements(){
+  if(!state.usedItemTypes)state.usedItemTypes=[];
+  const allTypes=SHOP_ITEMS.map(i=>i.id);
+  if(allTypes.every(t=>state.usedItemTypes.includes(t)))unlockAchievement('use_all_items');
+}
+function trackItemUse(itemId){
+  if(!state.usedItemTypes)state.usedItemTypes=[];
+  if(!state.usedItemTypes.includes(itemId)){state.usedItemTypes.push(itemId);saveState();}
+  checkItemAchievements();
+}
 
 /* ===== 状態管理 ===== */
 let state=loadState();
@@ -859,6 +1576,12 @@ SFX.typing.volume=0.15;
 SFX.hit.volume=0.5;
 function playSfx(key){const a=SFX[key];if(!a)return;a.currentTime=0;a.play().catch(()=>{});}
 
+/* タイマーBGM（ループ・控えめ音量） */
+const _timerBgm=new Audio('制限時間タイマー.mp3');
+_timerBgm.loop=true;_timerBgm.volume=0.08;_timerBgm.preload='auto';
+function playTimerSound(){_timerBgm.currentTime=0;_timerBgm.play().catch(()=>{});}
+function stopTimerSound(){_timerBgm.pause();_timerBgm.currentTime=0;}
+
 /* ===== タイプライター演出 ===== */
 let twTimer=null,twSkipFn=null;
 function typewriter(el,text,speed,onDone){
@@ -881,7 +1604,9 @@ function skipTypewriter(){if(twSkipFn){twSkipFn();return true;}return false;}
 
 /* ===== DQ風レベル計算 ===== */
 const MAX_LEVEL=999;
-function expForLevel(lv){return Math.floor(5+lv*0.35+Math.pow(lv/60,2)*3);}
+function expForLevel(lv){return Math.floor(45+lv*0.28);}
+const CHAPTER_EXP_MULT=[0.5,0.7,0.9,1.0,1.2,1.4,1.6,1.8];
+function chapterExpMult(){const id=currentChapter?currentChapter.id:1;return CHAPTER_EXP_MULT[id-1]||1.0;}
 function calcLevel(totalExp){
   let lv=1,used=0;
   while(lv<MAX_LEVEL){
@@ -942,6 +1667,7 @@ function updateHeader(){
   el('sp-level').textContent=state.level;
   el('sp-exp').textContent=state.exp;
   el('sp-gold').textContent=state.gold;
+  updatePlayTimeDisplay();
   const pct=info.next>0?Math.min((info.cur/info.next)*100,100):100;
   el('sp-exp-bar').style.width=pct+'%';
   el('sp-exp-next').textContent=info.next>0?`次のLvまで ${info.next-info.cur}`:'MAX';
@@ -952,67 +1678,179 @@ function updateHeader(){
   const nt=getNextTitle(info.level);
   el('sp-title-next').textContent=nt?`次の称号: ${nt.name} (Lv${nt.lv})`:'最高称号に到達！';
   // カリキュラム進捗
-  const total=12;
-  const cleared=state.clearedStages.length+(state.bossCleared?1:0);
-  el('sp-cur-fill').style.width=((cleared/total)*100)+'%';
-  el('sp-cur-text').textContent=`${cleared} / ${total} クリア`;
+  if(currentChapter){
+    const cs=chapterState();
+    const total=currentChapter.stageCount+1;
+    const cleared=cs.clearedStages.length+(cs.bossCleared?1:0);
+    el('sp-cur-fill').style.width=((cleared/total)*100)+'%';
+    el('sp-cur-text').textContent=`${cleared} / ${total} クリア`;
+  }else{
+    // 全体進捗
+    let totalAll=0,clearedAll=0;
+    CHAPTERS.forEach(ch=>{
+      totalAll+=ch.stageCount+1;
+      const cs=state.chapters[ch.id];
+      if(cs){clearedAll+=cs.clearedStages.length+(cs.bossCleared?1:0);}
+    });
+    el('sp-cur-fill').style.width=(totalAll>0?((clearedAll/totalAll)*100):0)+'%';
+    el('sp-cur-text').textContent=`${clearedAll} / ${totalAll} クリア`;
+  }
   // アイテムバー
   renderSidebarItems();
 }
 
 /* ===== 画面切り替え ===== */
 function showScreen(id){
+  // デモ版: チャプター選択・図鑑・バッジ・模試へのアクセスを制限
+  if(IS_DEMO && (id==='screen-chapters'||id==='screen-collection'||id==='screen-badges'||id==='screen-mock-exam')){
+    id='screen-map';
+  }
+  clearQuestionTimer();
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
+  if(id==='screen-chapters')renderChapterGrid();
   if(id==='screen-map')renderStageGrid();
   if(id==='screen-collection')renderCollection();
+  if(id==='screen-badges')renderBadges();
+  if(id==='screen-mock-exam')renderMockExamStart();
+}
+
+/* ===== チャプター選択 ===== */
+function renderChapterGrid(){
+  const grid=document.getElementById('chapter-grid');grid.innerHTML='';
+  CHAPTERS.forEach((ch,i)=>{
+    const cs=state.chapters[ch.id]||{clearedStages:[],bossCleared:false};
+    const unlocked=i===0||(()=>{
+      const prev=CHAPTERS[i-1];
+      const prevCs=state.chapters[prev.id];
+      return prevCs&&prevCs.bossCleared;
+    })();
+    const allCleared=ch.isMockExam?false:cs.bossCleared;
+    const progress=ch.isMockExam?0:cs.clearedStages.length+(cs.bossCleared?1:0);
+    const total=ch.isMockExam?'--':ch.stageCount+1;
+    const c=document.createElement('div');
+    c.className='chapter-card'+(unlocked?'':' locked')+(allCleared?' cleared':'');
+    c.innerHTML=`<div class="chapter-num">${ch.title.split(' ')[0]}</div>
+      <div class="chapter-card-title">${ch.title.replace(/^第\d章\s*/,'')}</div>
+      <div class="chapter-card-desc">${ch.description}</div>
+      <div class="chapter-domain ${ch.domainClass}">${ch.domain}</div>
+      <div class="chapter-progress">${ch.isMockExam?'何度でも挑戦可能':`${progress}/${total} クリア`}</div>`;
+    if(unlocked)c.onclick=()=>selectChapter(ch.id);
+    grid.appendChild(c);
+  });
+}
+
+async function selectChapter(chapterId){
+  playSfx('confirm');
+  const ch=CHAPTERS.find(c=>c.id===chapterId);
+  if(!ch)return;
+  currentChapter=ch;
+  if(ch.isMockExam){
+    showScreen('screen-mock-exam');
+    return;
+  }
+  document.getElementById('map-chapter-title').textContent=ch.title;
+  document.getElementById('map-chapter-desc').textContent=ch.description;
+  showScreen('screen-map');
+  await loadChapterData(chapterId);
 }
 
 /* ===== ステージ選択 ===== */
 function renderStageGrid(){
   const grid=document.getElementById('stage-grid');grid.innerHTML='';
 
+  if(!currentChapter){return;}
+
   // データがまだ読み込まれていない場合はローディング表示
   if(COURSE_DATA.length === 0 && !BOSS_DATA.bossName) {
-    grid.innerHTML = '<div style="text-align:center; padding:50px; color:#aaa; font-size:18px;">📚 データを読み込み中...</div>';
+    grid.innerHTML = '<div style="text-align:center; padding:50px; color:#aaa; font-size:18px;">データを読み込み中...</div>';
     return;
   }
 
+  const cs=chapterState();
   COURSE_DATA.forEach((st,i)=>{
-    const unlocked=i===0||state.clearedStages.includes(COURSE_DATA[i-1].stageId);
-    const cleared=state.clearedStages.includes(st.stageId);
+    const unlocked=IS_DEMO?true:(i===0||cs.clearedStages.includes(COURSE_DATA[i-1].stageId));
+    const cleared=cs.clearedStages.includes(st.stageId);
     const c=document.createElement('div');
     c.className='stage-card'+(unlocked?'':' locked')+(cleared?' cleared':'');
     c.innerHTML=`<div class="stage-num">Stage ${st.stageId}</div><div class="stage-name">${st.title}</div><div class="stage-sub">${st.subtitle}</div><div class="stage-category">${st.subcategory}</div>`;
     if(unlocked)c.onclick=()=>startStage(st.stageId);
     grid.appendChild(c);
   });
-  const bu=state.clearedStages.length>=11;
+  const bu=IS_DEMO?true:cs.clearedStages.length>=currentChapter.stageCount;
+  const bossStageNum=IS_DEMO?COURSE_DATA.length+1:currentChapter.stageCount+1;
   const bc=document.createElement('div');
-  bc.className='stage-card boss'+(bu?'':' locked')+(state.bossCleared?' cleared':'');
-  bc.innerHTML=`<div class="stage-num">Stage 12</div><div class="stage-name">${BOSS_DATA.bossName}</div><div class="stage-sub">${BOSS_DATA.bossDescription}</div><div class="stage-category" style="color:#ff5252">BOSS</div>`;
+  bc.className='stage-card boss'+(bu?'':' locked')+(cs.bossCleared?' cleared':'');
+  bc.innerHTML=`<div class="stage-num">Stage ${bossStageNum}</div><div class="stage-name">${BOSS_DATA.bossName||'???'}</div><div class="stage-sub">${BOSS_DATA.bossDescription||''}</div><div class="stage-category" style="color:#ff5252">BOSS</div>`;
   if(bu)bc.onclick=()=>showBossPrep();
   grid.appendChild(bc);
 }
 
+/* ===== 問題タイマー（60秒制限） ===== */
+const Q_TIME_LIMIT=60;
+let _qTimerInterval=null,_qTimerRemaining=0;
+function startQuestionTimer(seconds,onExpire,barEl,textEl){
+  clearQuestionTimer();
+  _qTimerRemaining=seconds;
+  playTimerSound();
+  if(barEl){barEl.style.transition='none';barEl.style.width='100%';barEl.classList.remove('warning','danger','expired');void barEl.offsetWidth;barEl.style.transition='width 1s linear';}
+  if(textEl){textEl.textContent=seconds+'秒';textEl.classList.remove('warning','danger','expired');}
+  _qTimerInterval=setInterval(()=>{
+    _qTimerRemaining--;
+    const pct=(_qTimerRemaining/seconds*100);
+    if(barEl){
+      barEl.style.width=pct+'%';
+      barEl.classList.remove('warning','danger');
+      if(_qTimerRemaining<=10)barEl.classList.add('danger');
+      else if(_qTimerRemaining<=20)barEl.classList.add('warning');
+    }
+    if(textEl){
+      textEl.textContent=_qTimerRemaining+'秒';
+      textEl.classList.remove('warning','danger');
+      if(_qTimerRemaining<=10)textEl.classList.add('danger');
+      else if(_qTimerRemaining<=20)textEl.classList.add('warning');
+    }
+    if(_qTimerRemaining<=0){
+      clearQuestionTimer();
+      if(barEl)barEl.classList.add('expired');
+      if(textEl){textEl.textContent='0秒';textEl.classList.add('expired');}
+      if(onExpire)onExpire();
+    }
+  },1000);
+}
+function clearQuestionTimer(){if(_qTimerInterval){clearInterval(_qTimerInterval);_qTimerInterval=null;}_qTimerRemaining=0;stopTimerSound();}
+function getTimerHtml(id){return `<div class="q-timer" id="${id}"><div class="q-timer-bar"><div class="q-timer-fill" id="${id}-fill"></div></div><div class="q-timer-text" id="${id}-text">60秒</div></div>`;}
+
 /* ===== 学習フロー ===== */
 let currentStage=null,learnStep=0;
-const LEARN_STEPS=['vocab','question','knowledge','practice1','practice2','reward'];
-const STEP_NAMES={vocab:'ことばを知ろう',question:'問題に挑戦',knowledge:'知識を広げよう',practice1:'練習問題①',practice2:'練習問題②',reward:'カード獲得'};
+const PRACTICE_COUNT=4; // 1回のプレイで出題する練習問題数
+let currentLearnSteps=[];
+let currentStepNames={};
 
 function startStage(id){
   playSfx('confirm');
   currentStage=COURSE_DATA.find(s=>s.stageId===id);
   if(!currentStage)return;
-  learnStep=0;
+  learnStep=0;practiceFirstTryCount=0;
 
-  // 練習問題をシャッフル
-  if(currentStage.practiceQuestions&&currentStage.practiceQuestions.length>0){
-    const shuffled=[...currentStage.practiceQuestions];
-    for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]];}
-    currentStage.shuffledPracticeQuestions=shuffled;
-  }
+  // 練習問題をシャッフルしてPRACTICE_COUNT問を選出
+  const allPrac=currentStage.practiceQuestions||[];
+  const shuffled=[...allPrac];
+  for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]];}
+  currentStage.selectedPracticeQuestions=shuffled.slice(0,PRACTICE_COUNT);
+
+  // 選出数に応じてステップを動的生成
+  const circled='①②③④⑤⑥⑦⑧⑨⑩';
+  const pracSteps=[];
+  const pracNames={};
+  currentStage.selectedPracticeQuestions.forEach((_,i)=>{
+    const key='practice'+(i+1);
+    pracSteps.push(key);
+    pracNames[key]='練習問題'+circled[i];
+  });
+  currentLearnSteps=['vocab','question','knowledge',...pracSteps,'reward'];
+  currentStepNames={vocab:'ことばを知ろう',question:'問題に挑戦',knowledge:'知識を広げよう',...pracNames,reward:'カード獲得'};
 
   document.getElementById('learn-title').textContent=`Stage ${id}: ${currentStage.title}`;
   document.getElementById('learn-sub').textContent=currentStage.subtitle;
@@ -1022,19 +1860,21 @@ function startStage(id){
 
 function renderLearnStep(){
   const c=document.getElementById('learn-content');
-  const pct=((learnStep+1)/LEARN_STEPS.length*100).toFixed(0);
+  const pct=((learnStep+1)/currentLearnSteps.length*100).toFixed(0);
   document.getElementById('learn-progress').style.width=pct+'%';
-  const stepName=STEP_NAMES[LEARN_STEPS[learnStep]]||'';
-  document.getElementById('learn-progress-label').textContent=`${learnStep+1}/${LEARN_STEPS.length} ${stepName}`;
+  const stepName=currentStepNames[currentLearnSteps[learnStep]]||'';
+  document.getElementById('learn-progress-label').textContent=`${learnStep+1}/${currentLearnSteps.length} ${stepName}`;
   c.innerHTML='';
-  const step=LEARN_STEPS[learnStep];
+  const step=currentLearnSteps[learnStep];
   const mq=currentStage.mainQuestion;
-  const pracQs=currentStage.shuffledPracticeQuestions||currentStage.practiceQuestions||[];
+  const pracQs=currentStage.selectedPracticeQuestions||[];
   if(step==='vocab')renderVocab(c,currentStage);
   else if(step==='question')renderIntegratedQuestion(c,mq);
   else if(step==='knowledge')renderKnowledge(c,currentStage.relatedKnowledge);
-  else if(step==='practice1')renderPractice(c,pracQs[0],1);
-  else if(step==='practice2')renderPractice(c,pracQs[1],2);
+  else if(step.startsWith('practice')){
+    const idx=parseInt(step.replace('practice',''))-1;
+    if(pracQs[idx])renderPractice(c,pracQs[idx],idx+1);
+  }
   else if(step==='reward')renderReward(c,currentStage);
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -1042,7 +1882,7 @@ function renderLearnStep(){
 function nextStep(){
   playSfx('confirm');
   learnStep++;
-  if(learnStep>=LEARN_STEPS.length){showScreen('screen-map');return}
+  if(learnStep>=currentLearnSteps.length){showScreen('screen-map');return}
   renderLearnStep();
 }
 
@@ -1085,6 +1925,17 @@ function revealNext(e){
   next.classList.add('revealed');
   setTimeout(()=>{next.scrollIntoView({behavior:'smooth',block:'nearest'})},150);
   if(next.dataset.wait){revealPaused=true;}
+  // タイマー開始（data-timer属性付きブロック）
+  if(next.dataset.timer){
+    const tid=next.dataset.timer;
+    if(tid==='main'){
+      const fill=document.getElementById('main-timer-fill'),txt=document.getElementById('main-timer-text');
+      startQuestionTimer(Q_TIME_LIMIT,()=>onMainTimerExpire(),fill,txt);
+    }else if(tid.startsWith('pq-')){
+      const fill=document.getElementById(tid+'-timer-fill'),txt=document.getElementById(tid+'-timer-text');
+      startQuestionTimer(Q_TIME_LIMIT,()=>onPracticeTimerExpire(tid),fill,txt);
+    }
+  }
   updateTapIndicator();
   // タイプライター要素があれば開始
   const twEl=next.querySelector('[data-tw]');
@@ -1213,7 +2064,7 @@ function gainTapExp(x,y,amount){
   const area=document.getElementById('sp-exp-area');
   if(area){area.classList.add('sp-flash');setTimeout(()=>area.classList.remove('sp-flash'),300);}
   const newLv=calcLevel(state.exp).level;
-  if(newLv>oldLv)showLevelUp(newLv);
+  if(newLv>oldLv){showLevelUp(newLv);checkLevelAchievements(newLv);}
 }
 
 function spawnTapRipple(x,y){
@@ -1330,6 +2181,8 @@ function renderIntegratedQuestion(c,mq){
     }
   });
 
+  window._mainShuffledAnswer=shuffledAnswer;
+
   // choiceAnalysisをシャッフル後のラベルにマッピング
   const analysisMap={};
   if(mq.choiceAnalysis)mq.choiceAnalysis.forEach(a=>{analysisMap[mq.choices[a.choice]]=a;});
@@ -1386,7 +2239,8 @@ function renderIntegratedQuestion(c,mq){
     </div>
 
     <!-- ブロック4: 選択肢（回答を待つ） -->
-    <div class="reveal-block" data-wait="answer">
+    <div class="reveal-block" data-wait="answer" data-timer="main">
+      ${getTimerHtml('main-timer')}
       <div style="margin-top:8px;margin-bottom:8px;font-size:.9rem;color:#ffd700;font-weight:bold">さあ、答えを選ぼう！</div>
       <div class="strategy-hint-wrap">
         <button class="strategy-hint-btn" onclick="toggleStrategyHint(this)">
@@ -1412,10 +2266,12 @@ function renderIntegratedQuestion(c,mq){
       <div id="result-banner"></div>
       <div style="margin-top:12px;font-size:.9rem;font-weight:bold;color:#fff;margin-bottom:8px">全選択肢の解説</div>
       <div id="choice-analysis-content">
-        ${mq.choiceAnalysis.map(a=>{
+        ${origKeys.filter(k=>shuffledChoices[k]).map(k=>{
+          const a=analysisMap[shuffledChoices[k]];
+          if(!a)return'';
           const isC=a.verdict.includes('正解');
           return`<div class="analysis-item ${isC?'is-correct':'is-wrong'}">
-            <span class="analysis-verdict ${isC?'correct':'wrong'}">${a.choice}. ${a.verdict}</span>
+            <span class="analysis-verdict ${isC?'correct':'wrong'}">${k}. ${a.verdict}</span>
             <div style="font-size:.85rem;color:#ccc;margin-top:4px">${a.explanation}</div>
           </div>`;
         }).join('')}
@@ -1492,6 +2348,9 @@ let pendingKey=null,pendingAnswer=null;
 function selectMain(key,answer){
   if(document.querySelector('.choice-item.correct'))return;
   playSfx('select');
+  // リトライ状態をクリア
+  document.querySelectorAll('#main-choices .choice-item.wrong').forEach(ci=>ci.classList.remove('wrong'));
+  const _rm=document.getElementById('main-retry-msg');if(_rm)_rm.style.display='none';
   // 既に選択中なら解除
   document.querySelectorAll('.choice-item.selected').forEach(ci=>ci.classList.remove('selected'));
   // 選択をハイライト
@@ -1507,12 +2366,12 @@ function selectMain(key,answer){
 
 function confirmAnswer(){
   if(!pendingKey)return;
+  clearQuestionTimer();
   playSfx('confirm');
   const key=pendingKey,answer=pendingAnswer;
   const correct=key===answer;
-  // 確認ダイアログを非表示
   document.getElementById('answer-confirm').style.display='none';
-  // 正解/不正解を反映
+  /* 共通: 全選択肢を確定表示 */
   document.querySelectorAll('.choice-item').forEach(ci=>{
     ci.classList.remove('selected');
     ci.classList.add('answered');
@@ -1522,24 +2381,29 @@ function confirmAnswer(){
   document.querySelectorAll('.choice-hint').forEach(h=>h.classList.add('open'));
   const banner=document.getElementById('result-banner');
   banner.className='result-banner '+(correct?'correct':'wrong');
+
   if(correct){
+    /* === 正解 === */
     playSfx('correct');
     banner.textContent='正解！';
     const ci=document.getElementById('ci-'+answer);
     const rect=ci?ci.getBoundingClientRect():{left:window.innerWidth/2,top:window.innerHeight/2,width:0,height:0};
     const bx=rect.left+rect.width/2,by=rect.top+rect.height/2;
     setTimeout(()=>gainTapExp(bx,by,20),200);
+    pendingKey=null;pendingAnswer=null;
+    resumeReveal();
+    setTimeout(()=>{revealNext();},300);
   }else{
+    /* === 不正解: 解説を読んでリトライ === */
     playSfx('wrong');
-    const lost=Math.floor(state.gold/2);
-    state.gold=state.gold-lost;
-    saveState();
-    banner.textContent='不正解… 正解は '+answer+(lost>0?' （GOLD -'+lost+'）':'');
+    banner.textContent='不正解…解説を読んでもう一度挑戦しよう！';
+    const confirmBlock=document.getElementById('rb-confirm');
+    confirmBlock._origHTML=confirmBlock.innerHTML;
+    confirmBlock.innerHTML='<div class="confirm-box"><div class="confirm-text" style="color:#ef9a9a">解説を読んだら、もう一度挑戦しよう！</div><button class="confirm-btn confirm-yes" onclick="retryMainQuestion()">もう一度挑戦する</button></div>';
+    pendingKey=null;pendingAnswer=null;
+    resumeReveal();
+    setTimeout(()=>{revealNext();},300);
   }
-  pendingKey=null;pendingAnswer=null;
-  // 回答後の順次表示を再開
-  resumeReveal();
-  setTimeout(()=>{revealNext();},300);
 }
 
 function cancelAnswer(){
@@ -1547,6 +2411,50 @@ function cancelAnswer(){
   document.querySelectorAll('.choice-item.selected').forEach(ci=>ci.classList.remove('selected'));
   document.getElementById('answer-confirm').style.display='none';
   pendingKey=null;pendingAnswer=null;
+}
+
+function retryMainQuestion(){
+  const cb=document.getElementById('rb-confirm');
+  if(cb._origHTML)cb.innerHTML=cb._origHTML;
+  cb.classList.remove('revealed');
+  document.getElementById('result-banner').className='result-banner';
+  document.getElementById('result-banner').textContent='';
+  const analysis=document.getElementById('rb-analysis');if(analysis)analysis.classList.remove('revealed');
+  const strategy=document.getElementById('rb-strategy');if(strategy)strategy.classList.remove('revealed');
+  document.querySelectorAll('#main-choices .choice-item').forEach(ci=>{
+    ci.classList.remove('answered','correct','wrong','selected');
+  });
+  document.querySelectorAll('#main-choices .choice-hint').forEach(h=>h.classList.remove('open'));
+  revealPaused=true;
+  updateTapIndicator();
+  document.querySelector('#main-choices').scrollIntoView({behavior:'smooth',block:'center'});
+  // リトライ時もタイマー再開
+  const fill=document.getElementById('main-timer-fill'),txt=document.getElementById('main-timer-text');
+  if(fill&&txt)startQuestionTimer(Q_TIME_LIMIT,()=>onMainTimerExpire(),fill,txt);
+}
+
+function onMainTimerExpire(){
+  stopTimerSound();
+  playSfx('wrong');
+  // 確認ダイアログを非表示
+  const conf=document.getElementById('answer-confirm');if(conf)conf.style.display='none';
+  // 全選択肢を不正解表示
+  const ans=pendingAnswer||window._mainShuffledAnswer;
+  document.querySelectorAll('#main-choices .choice-item').forEach(ci=>{
+    ci.classList.remove('selected');ci.classList.add('answered');
+    if(ci.dataset.key===ans)ci.classList.add('correct');
+  });
+  document.querySelectorAll('#main-choices .choice-hint').forEach(h=>h.classList.add('open'));
+  // タイムアップバナー
+  const banner=document.getElementById('result-banner');
+  banner.className='result-banner wrong';
+  banner.textContent='タイムアップ！ 制限時間を超えました';
+  const confirmBlock=document.getElementById('rb-confirm');
+  confirmBlock._origHTML=confirmBlock.innerHTML;
+  confirmBlock.innerHTML='<div class="confirm-box"><div class="confirm-text" style="color:#ef9a9a">解説を読んだら、もう一度挑戦しよう！</div><button class="confirm-btn confirm-yes" onclick="retryMainQuestion()">もう一度挑戦する</button></div>';
+  pendingKey=null;pendingAnswer=null;
+  resumeReveal();
+  setTimeout(()=>{revealNext();},300);
 }
 
 /* ===== 関連知識 ===== */
@@ -1598,7 +2506,7 @@ function renderPractice(c,pq,num){
   const shuffled={};let newAnswer=pq.answer;
   const ansText=pq.choices[pq.answer];
   origKeys.forEach((k,i)=>{if(i<vals.length){shuffled[k]=vals[i];if(vals[i].text===ansText)newAnswer=k;}});
-  _pqState[uid]={answer:newAnswer,pendingKey:null};
+  _pqState[uid]={answer:newAnswer,pendingKey:null,retried:false};
 
   /* === choiceAnalysis をシャッフル後のラベルにマッピング === */
   const analysisMap={};
@@ -1672,7 +2580,8 @@ function renderPractice(c,pq,num){
     </div>
 
     <!-- ブロック4: 選択肢（回答を待つ） -->
-    <div class="reveal-block" data-wait="answer">
+    <div class="reveal-block" data-wait="answer" data-timer="${uid}">
+      ${getTimerHtml(uid+'-timer')}
       <div style="margin-top:8px;margin-bottom:8px;font-size:.9rem;color:#ffd700;font-weight:bold">さあ、答えを選ぼう！</div>
       ${stratHtml}
       <div id="${uid}-choices">${choicesHtml}</div>
@@ -1729,6 +2638,9 @@ function togglePqStrategy(btn,uid){
 
 function selectPractice(uid,key){
   if(document.querySelector('#'+uid+'-choices .choice-item.correct'))return;
+  // リトライ状態をクリア
+  document.querySelectorAll('#'+uid+'-choices .choice-item.wrong').forEach(ci=>ci.classList.remove('wrong'));
+  const _rm=document.getElementById(uid+'-retry-msg');if(_rm)_rm.style.display='none';
   playSfx('select');
   document.querySelectorAll('#'+uid+'-choices .choice-item.selected').forEach(ci=>ci.classList.remove('selected'));
   _pqState[uid].pendingKey=key;
@@ -1742,10 +2654,12 @@ function selectPractice(uid,key){
 function confirmPractice(uid){
   const ps=_pqState[uid];
   if(!ps||!ps.pendingKey)return;
+  clearQuestionTimer();stopTimerSound();
   playSfx('confirm');
   const key=ps.pendingKey,ans=ps.answer;
   const correct=key===ans;
   document.getElementById(uid+'-confirm').style.display='none';
+  /* 共通: 全選択肢を確定表示 */
   document.querySelectorAll('#'+uid+'-choices .choice-item').forEach(ci=>{
     ci.classList.remove('selected');
     ci.classList.add('answered');
@@ -1753,27 +2667,40 @@ function confirmPractice(uid){
     if(k===ans)ci.classList.add('correct');
     else if(k===key&&!correct)ci.classList.add('wrong');
   });
+  document.querySelectorAll('#'+uid+'-choices .choice-hint').forEach(h=>h.classList.add('open'));
   const banner=document.getElementById(uid+'-banner');
   banner.className='result-banner '+(correct?'correct':'wrong');
+
   if(correct){
+    /* === 正解 === */
     playSfx('correct');
     banner.textContent='正解！';
+    if(!ps.retried)practiceFirstTryCount++;
+    const pracTotal=currentStage&&currentStage.selectedPracticeQuestions?currentStage.selectedPracticeQuestions.length:PRACTICE_COUNT;
+    if(practiceFirstTryCount>=pracTotal)unlockAchievement('practice_perfect');
     const ci=document.getElementById(uid+'-ci-'+ans);
     if(ci){const r=ci.getBoundingClientRect();gainTapExp(r.left+r.width/2,r.top+r.height/2,15);}
+    const expEl=document.getElementById(uid+'-exp');
+    expEl.style.display='block';expEl.classList.add('visible');
+    typewriter(expEl,expEl.dataset.tw,30);
+    ps.pendingKey=null;
+    resumeReveal();
+    setTimeout(()=>revealNext(),300);
   }else{
-    playSfx('wrong');
-    const lost=Math.floor(state.gold*0.3);
-    if(lost>0){state.gold-=lost;saveState();}
-    banner.textContent='不正解… 正解は '+ans+(lost>0?' （GOLD -'+lost+'）':'');
+    ps.retried=true;
+    /* === 不正解: 解説を読んでリトライ === */
+    playSfx('hit');
+    banner.textContent='不正解…解説を読んでもう一度挑戦しよう！';
+    const expEl=document.getElementById(uid+'-exp');
+    expEl.style.display='block';expEl.classList.add('visible');
+    typewriter(expEl,expEl.dataset.tw,30);
+    const doneBlock=document.getElementById(uid+'-done-block');
+    doneBlock._origHTML=doneBlock.innerHTML;
+    doneBlock.innerHTML='<div class="confirm-box"><div class="confirm-text" style="color:#ef9a9a">解説を読んだら、もう一度挑戦しよう！</div><button class="confirm-btn confirm-yes" onclick="retryPractice(\''+uid+'\')">もう一度挑戦する</button></div>';
+    ps.pendingKey=null;
+    resumeReveal();
+    setTimeout(()=>revealNext(),300);
   }
-  /* 全選択肢のヒントを開く */
-  document.querySelectorAll('#'+uid+'-choices .choice-hint').forEach(h=>h.classList.add('open'));
-  const expEl=document.getElementById(uid+'-exp');
-  expEl.style.display='block';expEl.classList.add('visible');
-  typewriter(expEl,expEl.dataset.tw,30);
-  ps.pendingKey=null;
-  resumeReveal();
-  setTimeout(()=>revealNext(),300);
 }
 
 function cancelPractice(uid){
@@ -1784,20 +2711,75 @@ function cancelPractice(uid){
   ps.pendingKey=null;
 }
 
+function retryPractice(uid){
+  const db=document.getElementById(uid+'-done-block');
+  if(db._origHTML)db.innerHTML=db._origHTML;
+  db.classList.remove('revealed');
+  const banner=document.getElementById(uid+'-banner');
+  banner.className='result-banner';banner.textContent='';
+  const resultBlock=document.getElementById(uid+'-result');
+  if(resultBlock)resultBlock.classList.remove('revealed');
+  const expEl=document.getElementById(uid+'-exp');
+  if(expEl){expEl.style.display='none';expEl.classList.remove('visible');expEl.textContent='';}
+  document.querySelectorAll('#'+uid+'-choices .choice-item').forEach(ci=>{
+    ci.classList.remove('answered','correct','wrong','selected');
+  });
+  document.querySelectorAll('#'+uid+'-choices .choice-hint').forEach(h=>h.classList.remove('open'));
+  revealPaused=true;
+  updateTapIndicator();
+  document.getElementById(uid+'-choices').scrollIntoView({behavior:'smooth',block:'center'});
+  // リトライ時もタイマー再開
+  const fill=document.getElementById(uid+'-timer-fill'),txt=document.getElementById(uid+'-timer-text');
+  if(fill&&txt)startQuestionTimer(Q_TIME_LIMIT,()=>onPracticeTimerExpire(uid),fill,txt);
+}
+
+function onPracticeTimerExpire(uid){
+  stopTimerSound();
+  const ps=_pqState[uid];if(!ps)return;
+  playSfx('wrong');
+  // 確認ダイアログを非表示
+  const conf=document.getElementById(uid+'-confirm');if(conf)conf.style.display='none';
+  // 全選択肢を不正解表示
+  const ans=ps.answer;
+  document.querySelectorAll('#'+uid+'-choices .choice-item').forEach(ci=>{
+    ci.classList.remove('selected');ci.classList.add('answered');
+    if(ci.dataset.key===ans)ci.classList.add('correct');
+  });
+  document.querySelectorAll('#'+uid+'-choices .choice-hint').forEach(h=>h.classList.add('open'));
+  // タイムアップバナー
+  const banner=document.getElementById(uid+'-banner');
+  banner.className='result-banner wrong';
+  banner.textContent='タイムアップ！ 制限時間を超えました';
+  const expEl=document.getElementById(uid+'-exp');
+  if(expEl){expEl.style.display='block';expEl.classList.add('visible');typewriter(expEl,expEl.dataset.tw,30);}
+  ps.retried=true;
+  const doneBlock=document.getElementById(uid+'-done-block');
+  doneBlock._origHTML=doneBlock.innerHTML;
+  doneBlock.innerHTML='<div class="confirm-box"><div class="confirm-text" style="color:#ef9a9a">解説を読んだら、もう一度挑戦しよう！</div><button class="confirm-btn confirm-yes" onclick="retryPractice(\''+uid+'\')">もう一度挑戦する</button></div>';
+  ps.pendingKey=null;
+  resumeReveal();
+  setTimeout(()=>revealNext(),300);
+}
+
 /* ===== カード獲得 ===== */
 function renderReward(c,stage){
   const cr=stage.cardReward;
-  const isNew=!state.clearedStages.includes(stage.stageId);
+  const cs=chapterState();
+  const isNew=!cs.clearedStages.includes(stage.stageId);
   if(isNew){
-    state.clearedStages.push(stage.stageId);state.exp+=cr.exp;state.gold+=cr.gold;
+    cs.clearedStages.push(stage.stageId);state.exp+=Math.floor(cr.exp*chapterExpMult());state.gold+=cr.gold;
     if(!state.ownedCards.includes(cr.cardName))state.ownedCards.push(cr.cardName);
+    if(currentChapter)state.cardChapterMap[cr.cardName]=currentChapter.id;
     saveState();
+    checkProgressAchievements();checkGoldAchievements();
   }
   playSfx('victory');
   const stars='★'.repeat(cr.rarity)+'☆'.repeat(5-cr.rarity);
   const div=document.createElement('div');
   revealPaused=false;
-  const tipHtml=!state.bossCleared?`<div style="background:rgba(255,215,0,.1);border:1px solid #5a4a00;border-radius:8px;padding:10px;margin-top:12px;font-size:.8rem;color:#ffd700;text-align:center">ボス戦に備えてアイテムを買っておこう！<br><span style="color:#aaa">ボス戦準備画面でショップが開けるよ</span></div>`:'';
+  const tipHtml=!chapterState().bossCleared?`<div style="background:rgba(255,215,0,.1);border:1px solid #5a4a00;border-radius:8px;padding:10px;margin-top:12px;font-size:.8rem;color:#ffd700;text-align:center">ボス戦に備えてアイテムを買っておこう！<br><span style="color:#aaa">ボス戦準備画面でショップが開けるよ</span></div>`:'';
+  const chSprite=currentChapter?currentChapter.bossSprite:'';
+  const emblemHtml=chSprite?`<img src="${chSprite}" alt="" class="reward-card-emblem">`:'';
   div.innerHTML=`<div class="section-card">
     <span class="step-badge step-reward">Step ${learnStep+1}</span>
 
@@ -1807,11 +2789,12 @@ function renderReward(c,stage){
 
     <div class="reveal-block">
       <div class="reward-card">
+        ${emblemHtml}
         <div class="reward-rarity">${stars}</div>
         <div class="reward-card-name">${cr.cardName}</div>
         <div class="reward-summary" data-tw="${cr.summary.replace(/"/g,'&quot;')}"></div>
         <div class="reward-stats">
-          <div class="reward-stat"><div class="reward-stat-value exp">+${cr.exp}</div><div class="reward-stat-label">EXP</div></div>
+          <div class="reward-stat"><div class="reward-stat-value exp">+${Math.floor(cr.exp*chapterExpMult())}</div><div class="reward-stat-label">EXP</div></div>
           <div class="reward-stat"><div class="reward-stat-value gold">+${cr.gold}</div><div class="reward-stat-label">GOLD</div></div>
         </div>
       </div>
@@ -1830,18 +2813,25 @@ function renderReward(c,stage){
   if(isNew){
     setTimeout(()=>{
       const card=div.querySelector('.reward-card');
-      if(card){const r=card.getBoundingClientRect();gainTapExp(r.left+r.width/2,r.top+r.height/2,cr.exp);}
+      if(card){const r=card.getBoundingClientRect();spawnParticles(r.left+r.width/2,r.top+r.height/2,0);playSfx('exp');}
     },800);
   }
 }
 
 /* ===== ショップ & アイテム ===== */
+function getMaxInventory(){
+  const ch=state.chapters||{};
+  if(ch[4]&&ch[4].bossCleared)return 4;
+  if(ch[2]&&ch[2].bossCleared)return 3;
+  return 2;
+}
 function buyItem(itemId){
   const item=SHOP_ITEMS.find(i=>i.id===itemId);
   if(!item||state.gold<item.price)return;
-  if(state.inventory.length>=2){alert('持ち物がいっぱいです（最大2個）');return}
+  const maxInv=getMaxInventory();if(state.inventory.length>=maxInv){alert('持ち物がいっぱいです（最大'+maxInv+'個）');return}
   playSfx('buy');
   state.gold-=item.price;state.inventory.push(itemId);saveState();updateHeader();
+  unlockAchievement('first_purchase');
   renderBossPrep();
 }
 function removeItem(index){
@@ -1859,15 +2849,14 @@ function renderBossPrep(){
   const bagHtml=state.inventory.length>0
     ?state.inventory.map((id,i)=>{const it=SHOP_ITEMS.find(s=>s.id===id);return`<div class="boss-bag-item"><img src="${it.icon}" class="boss-bag-item-icon"> ${it.name} <span style="color:#888;font-size:.7rem;cursor:pointer" onclick="removeItem(${i})">[売却+${it.price}G]</span></div>`}).join('')
     :'<div class="boss-bag-empty">アイテムなし</div>';
-  const spriteHtml=BOSS_DATA.bossSprite?`<img src="${BOSS_DATA.bossSprite}" alt="${BOSS_DATA.bossName}" class="boss-sprite boss-sprite-anim">`:'';
   c.innerHTML=`
-    ${spriteHtml}
+    ${getBossSpriteLg('boss-sprite-anim')}
     <div style="text-align:center;font-size:1.2rem;font-weight:bold;color:#ff5252;margin-bottom:8px">${BOSS_DATA.bossName}</div>
     <div class="shop-warning">ボス戦ではミスは許されない！<br>アイテムを買って万全の準備をしよう！</div>
     <div class="shop-gold">所持ゴールド: ${state.gold} G</div>
-    <div class="boss-bag"><div class="boss-bag-title">持ち物（${state.inventory.length}/2）</div>${bagHtml}</div>
+    <div class="boss-bag"><div class="boss-bag-title">持ち物（${state.inventory.length}/${getMaxInventory()}）</div>${bagHtml}</div>
     ${SHOP_ITEMS.map(it=>{
-      const canBuy=state.gold>=it.price&&state.inventory.length<2;
+      const canBuy=state.gold>=it.price&&state.inventory.length<getMaxInventory();
       return`<div class="shop-item"><div class="shop-item-icon"><img src="${it.icon}" alt="${it.name}"></div><div class="shop-item-info"><div class="shop-item-name">${it.name}</div><div class="shop-item-desc">${it.desc}</div><div class="shop-item-price">${it.price} G</div></div><button class="shop-buy-btn" ${canBuy?'':'disabled'} onclick="buyItem('${it.id}')">購入</button></div>`;
     }).join('')}
     <button class="next-btn" style="margin-top:16px" onclick="confirmBossStart()">バトル開始！</button>
@@ -1880,11 +2869,10 @@ function confirmBossStart(){
   const bagHtml=state.inventory.length>0
     ?state.inventory.map(id=>{const it=SHOP_ITEMS.find(s=>s.id===id);return it?`<img src="${it.icon}" class="modal-bag-item-icon">${it.name}`:''}).join('<br>')
     :'なし';
-  const spriteHtml=BOSS_DATA.bossSprite?`<img src="${BOSS_DATA.bossSprite}" style="width:80px;image-rendering:pixelated;margin-bottom:8px">`:'';
   const overlay=document.createElement('div');
   overlay.className='modal-overlay';
   overlay.innerHTML=`<div class="modal-box">
-    ${spriteHtml}
+    ${BOSS_DATA.bossSprite?`<img src="${BOSS_DATA.bossSprite}" style="width:80px;image-rendering:pixelated;margin-bottom:8px">`:''}
     <h3>${BOSS_DATA.bossName}に挑む！</h3>
     <div class="modal-bag">持ち物<br>${bagHtml}</div>
     <div class="modal-note">全問連続正解で撃破！</div>
@@ -1898,38 +2886,101 @@ function confirmBossStart(){
   document.getElementById('modal-go').onclick=()=>{playSfx('confirm');overlay.remove();startBoss()};
 }
 function startBoss(){
-  bossQIndex=0;bossCorrect=0;
+  bossQIndex=0;bossCorrect=0;bossCombo=0;bossItemsUsedThisFight=false;
+  const exitPanel=document.getElementById('boss-exit-confirm');if(exitPanel)exitPanel.style.display='none';
   bossBag=state.inventory.slice();
   /* 章内ステージの practiceQuestions を収集 */
   const pool=[];
   COURSE_DATA.forEach(st=>{
     if(st.practiceQuestions){
       st.practiceQuestions.forEach(pq=>{
-        pool.push({questionText:pq.questionText,choices:pq.choices,answer:pq.answer,shortExplanation:pq.shortExplanation});
+        pool.push({questionText:pq.questionText,choices:pq.choices,answer:pq.answer,shortExplanation:pq.shortExplanation,choiceAnalysis:pq.choiceAnalysis,solvingStrategy:pq.solvingStrategy});
       });
     }
   });
   if(pool.length===0&&BOSS_DATA.questions)BOSS_DATA.questions.forEach(q=>pool.push(q));
   for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
-  const cnt=Math.min(Math.floor(Math.random()*4)+3,pool.length);
+  const cnt=Math.min(currentChapter.id+2,pool.length);
   bossActiveQs=pool.slice(0,cnt);
-  document.getElementById('boss-title').textContent=BOSS_DATA.bossName;showScreen('screen-boss');renderBossQ();
+  document.getElementById('boss-title').textContent=BOSS_DATA.bossName;
+  /* VS演出 */
+  showBossVsIntro(()=>{
+    showScreen('screen-boss');
+    document.getElementById('screen-boss').classList.add('boss-battle-atmosphere');
+    renderBossQ();
+  });
 }
+/* ===== VS演出 ===== */
+function showBossVsIntro(callback){
+  playSfx('hit');
+  const ov=document.createElement('div');
+  ov.className='boss-vs-overlay';
+  const vsSprite=BOSS_DATA.bossSprite?`<img src="${BOSS_DATA.bossSprite}" style="width:100px;image-rendering:pixelated;margin-bottom:12px;animation:bossIdle 1.2s ease-in-out infinite">`:cssDragonHtml('boss-sprite-anim');
+  ov.innerHTML=`<div class="boss-vs-flash"></div>${vsSprite}<div class="boss-vs-text">V S</div><div class="boss-vs-line"></div><div class="boss-vs-name">${BOSS_DATA.bossName}</div>`;
+  document.body.appendChild(ov);
+  setTimeout(()=>{
+    ov.style.transition='opacity .4s';ov.style.opacity='0';
+    setTimeout(()=>{ov.remove();callback();},400);
+  },1800);
+}
+/* ===== CSSドラゴン生成 ===== */
+function cssDragonHtml(cls,id){
+  const extra=cls?' '+cls:'';const idAttr=id?` id="${id}"`:'';
+  return `<div class="css-dragon${extra}"${idAttr}><div class="d-wing"></div><div class="d-wing2"></div><div class="d-tail"></div><div class="d-body"></div><div class="d-head"></div><div class="d-eye"></div><div class="d-horn1"></div><div class="d-horn2"></div><div class="d-mouth"></div><div class="d-leg1"></div><div class="d-leg2"></div><div class="d-claw1"></div><div class="d-claw2"></div><div class="d-gear"></div><div class="d-bolt"></div><div class="d-bolt2"></div></div>`;
+}
+function getBossSpriteHtml(extraClass,id){
+  if(BOSS_DATA.bossSprite)return `<img src="${BOSS_DATA.bossSprite}" alt="${BOSS_DATA.bossName}" class="boss-sprite-sm ${extraClass||'boss-sprite-anim'}"${id?' id="'+id+'"':''}>`;
+  return cssDragonHtml(extraClass||'boss-sprite-anim',id);
+}
+function getBossSpriteLg(extraClass){
+  if(BOSS_DATA.bossSprite)return `<img src="${BOSS_DATA.bossSprite}" alt="${BOSS_DATA.bossName}" class="boss-sprite ${extraClass||'boss-sprite-anim'}">`;
+  return cssDragonHtml(extraClass||'boss-sprite-anim');
+}
+/* ===== コンボ管理 ===== */
+let bossCombo=0;
+let bossDoubleActive=false;
 let bossSelectedEl=null,bossSelectedKey=null,bossSelectedAns=null;
 function renderSidebarItems(){
-  /* サイドバーのマイクラ風2スロットアイテムバー */
+  /* サイドバーのマイクラ風アイテムバー（最大4スロット） */
   const bar=document.getElementById('sp-item-bar');
   if(!bar)return;
+  const maxSlots=getMaxInventory();
   let slots='';
-  for(let i=0;i<2;i++){
+  for(let i=0;i<maxSlots;i++){
     const id=state.inventory[i];
-    if(id){const it=SHOP_ITEMS.find(s=>s.id===id);slots+=`<div class="mc-slot"><img src="${it.icon}" alt="${it.name}"></div>`;}
+    if(id){const it=SHOP_ITEMS.find(s=>s.id===id);slots+=`<div class="mc-slot"><img src="${it.icon}" alt="${it.name}" title="${it.name}"></div>`;}
     else{slots+=`<div class="mc-slot empty"></div>`;}
   }
   bar.innerHTML=slots;
+  const label=document.getElementById('sp-items-label');
+  if(label)label.textContent=`ITEMS ${state.inventory.length}/${maxSlots}`;
 }
 function updateItemBar(){
   renderSidebarItems();
+}
+/* ===== アイテム使用エフェクト ===== */
+function showItemEffect(type,iconText,mainText,subText,color){
+  /* 全画面フラッシュ */
+  const flash=document.createElement('div');
+  flash.className='item-flash item-flash-'+type;
+  document.body.appendChild(flash);
+  setTimeout(()=>flash.remove(),1200);
+  /* バナー（アイテム名表示） */
+  const banner=document.createElement('div');
+  banner.className='item-banner';
+  banner.innerHTML=`<div class="item-banner-icon">${iconText}</div><div class="item-banner-text" style="color:${color}">${mainText}</div><div class="item-banner-sub" style="color:${color}">${subText}</div>`;
+  document.body.appendChild(banner);
+  setTimeout(()=>{banner.classList.add('fade-out');setTimeout(()=>banner.remove(),500)},1200);
+}
+function applyChoiceGlow(glowClass){
+  document.querySelectorAll('#boss-ch .choice-item').forEach(li=>{
+    if(!li.classList.contains('choice-hidden'))li.classList.add(glowClass);
+  });
+}
+function clearChoiceGlow(){
+  document.querySelectorAll('#boss-ch .choice-item').forEach(li=>{
+    li.classList.remove('item-glow-glasses','item-glow-kendama','item-glow-watch');
+  });
 }
 function renderBossQ(){
   const c=document.getElementById('boss-content'),total=bossActiveQs.length;
@@ -1937,8 +2988,10 @@ function renderBossQ(){
   const q=bossActiveQs[bossQIndex];
   const hp=((total-bossCorrect)/total*100).toFixed(0);
   const hasGlasses=bossBag.includes('sage_glasses');
-  const spriteHtml=BOSS_DATA.bossSprite?`<img src="${BOSS_DATA.bossSprite}" alt="${BOSS_DATA.bossName}" class="boss-sprite-sm boss-sprite-anim" id="boss-battle-sprite">`:'';
-  bossSelectedEl=null;bossSelectedKey=null;bossSelectedAns=null;
+  const hasKendama=bossBag.includes('double_kendama');
+  const hasWatch=bossBag.includes('time_watch');
+  const spriteHtml=getBossSpriteHtml('boss-sprite-anim','boss-battle-sprite');
+  bossSelectedEl=null;bossSelectedKey=null;bossSelectedAns=null;bossDoubleActive=false;
 
   // 選択肢をシャッフル（ラベルは固定、中身を入れ替え）
   const origKeys=['ア','イ','ウ','エ'];
@@ -1955,22 +3008,44 @@ function renderBossQ(){
   });
   // 正解ラベルを更新
   q.shuffledAnswer=shuffledAnswer;
+  // シャッフルキー→元キーのマッピングを保存（考え方表示用）
+  q._keyMap={};origKeys.forEach((k,i)=>{if(i<vals.length)q._keyMap[k]=vals[i].origKey;});
 
-  c.innerHTML=`<div class="boss-header-row fade-in" id="boss-header-row">
+  const hpNum=parseFloat(hp);
+  const hpClass=hpNum<=20?'hp-critical':hpNum<=40?'hp-danger':'';
+  const comboHtml=bossCombo>0?`<div class="boss-combo active" id="boss-combo"><div class="boss-combo-count">${bossCombo}</div><div class="boss-combo-label">COMBO</div></div>`:`<div class="boss-combo" id="boss-combo"><div class="boss-combo-count">0</div><div class="boss-combo-label">COMBO</div></div>`;
+  c.innerHTML=`<div class="boss-header-row fade-in" id="boss-header-row" style="position:relative">
+    ${comboHtml}
     <div class="boss-info-col">
       <div class="boss-name" style="margin-bottom:4px">${BOSS_DATA.bossName}</div>
       <div class="boss-desc" style="font-size:.75rem;color:#aaa;margin-bottom:2px">HP</div>
-      <div class="boss-hp-container"><div class="boss-hp-bar"><div class="boss-hp-fill" style="width:${hp}%"></div></div><div class="boss-hp-text">${total-bossCorrect}/${total}</div></div>
+      <div class="boss-hp-container"><div class="boss-hp-bar"><div class="boss-hp-fill ${hpClass}" style="width:${hp}%"></div></div><div class="boss-hp-text">${total-bossCorrect}/${total}</div></div>
       ${bossQIndex===0?`<div style="color:#ff5252;font-weight:bold;font-size:.8rem;margin-top:6px">${total}問連続正解で撃破！</div>`:''}
     </div>
     <div class="boss-sprite-col">
       ${spriteHtml}
     </div>
   </div>
-    <div class="boss-q-counter">第${bossQIndex+1}問 / ${total}</div>
-    <div class="section-card fade-in"><div class="q-text" id="boss-q-text"></div>
+    <div class="boss-sticky-q" id="boss-sticky-q">
+      <div class="boss-q-counter">第${bossQIndex+1}問 / ${total}</div>
+      <div class="q-text" id="boss-q-text"></div>
+    </div>
+    ${getTimerHtml('boss-timer')}
+    <div class="section-card fade-in">
+    ${q.solvingStrategy?`<div class="strategy-hint-wrap" id="boss-strategy-hint" style="display:none">
+      <button class="strategy-hint-btn" onclick="toggleBossHint(this)">
+        <span class="strategy-hint-icon">▶</span> 考え方のヒント
+      </button>
+      <div class="strategy-hint-body" id="boss-strategy-hint-body">
+        <ol class="strategy-steps" id="boss-strategy-hint-steps"></ol>
+      </div>
+    </div>`:''}
     <ul class="q-choices" id="boss-ch" style="display:none">${origKeys.filter(k=>shuffledChoices[k]).map(k=>`<li class="choice-item" data-key="${k}" onclick="pickBoss(this,'${k}','${shuffledAnswer}')"><div class="choice-main"><span class="choice-label">${k}.</span><span class="choice-text">${shuffledChoices[k]}</span></div></li>`).join('')}</ul>
-    ${hasGlasses?`<button class="boss-use-glasses" style="display:none" onclick="useGlasses()">賢者のメガネを使う</button>`:''}
+    <div class="boss-item-btns" style="display:none">
+    ${hasGlasses?`<button class="boss-use-glasses" onclick="useGlasses()">賢者のメガネを使う</button>`:''}
+    ${hasKendama?`<button class="boss-use-kendama" onclick="useKendama()">2倍のけん玉を使う</button>`:''}
+    ${hasWatch?`<button class="boss-use-watch" onclick="useWatch()">問題を交換する</button>`:''}
+    </div>
     <div id="boss-confirm" style="display:none;margin-top:12px;text-align:center">
       <div style="color:#ffd700;font-weight:bold;margin-bottom:8px">この答えでいい？</div>
       <div style="display:flex;gap:10px;justify-content:center">
@@ -1980,12 +3055,62 @@ function renderBossQ(){
     </div>
     <div id="boss-fb" style="display:none;margin-top:12px"></div>
     <button class="next-btn" id="boss-next" style="display:none" onclick="nextBossQ()">次の問題 →</button></div>`;
-  /* タイプライター演出 → 完了後に選択肢を表示 */
+  /* ヒント用：最初のステップ（考え方のみ）＋ひっかけポイントを保存。答えにつながる計算は見せない */
+  if(q.solvingStrategy&&q.solvingStrategy.steps&&q.solvingStrategy.steps.length){
+    window._bossStrategySteps=[q.solvingStrategy.steps[0]];
+    window._bossTrap=q.solvingStrategy.trap||'';
+  }else{
+    window._bossStrategySteps=null;window._bossTrap='';
+  }
+  /* タイプライター演出 → 完了後に選択肢とヒントボタンを表示 */
   const twEl=document.getElementById('boss-q-text');
   typewriter(twEl,q.questionText,30,()=>{
     const ch=document.getElementById('boss-ch');if(ch)ch.style.display='';
-    const gb=document.querySelector('.boss-use-glasses');if(gb)gb.classList.add('visible');
+    const sh=document.getElementById('boss-strategy-hint');if(sh)sh.style.display='';
+    const itemBtns=document.querySelector('.boss-item-btns');if(itemBtns)itemBtns.style.display='';
+    // タイマー開始
+    const bFill=document.getElementById('boss-timer-fill'),bTxt=document.getElementById('boss-timer-text');
+    startQuestionTimer(Q_TIME_LIMIT,()=>onBossTimerExpire(),bFill,bTxt);
   });
+}
+function onBossTimerExpire(){
+  stopTimerSound();
+  // タイムアップ → 不正解と同じ扱い
+  const q=bossActiveQs[bossQIndex];
+  const ans=q.shuffledAnswer;
+  // 正解を表示
+  document.querySelectorAll('#boss-ch .choice-item').forEach(li=>{
+    if(li.dataset.key===ans)li.classList.add('correct');
+    li.style.pointerEvents='none';
+  });
+  // 不正解処理（selBossの不正解パスと同等）
+  bossCombo=0;
+  playSfx('wrong');
+  triggerBossCounterattack();
+  const fb=document.getElementById('boss-fb');fb.style.display='block';
+  const itemBtns=document.querySelector('.boss-item-btns');if(itemBtns)itemBtns.style.display='none';
+  const hintWrap=document.getElementById('boss-strategy-hint');if(hintWrap)hintWrap.style.display='none';
+  document.getElementById('boss-confirm').style.display='none';
+  // いのちのいしチェック
+  const stoneIdx=bossBag.indexOf('life_stone');
+  if(stoneIdx!==-1){
+    playSfx('buff');
+    bossBag.splice(stoneIdx,1);
+    const si=state.inventory.indexOf('life_stone');if(si!==-1){state.inventory.splice(si,1);saveState();}
+    bossItemsUsedThisFight=true;trackItemUse('life_stone');
+    updateItemBar();
+    showItemEffect('stone','💎','命のたま','タイムアップを耐えた！','#ffd700');
+    fb.innerHTML='<div class="result-banner" style="background:#1a1a00;border:2px solid #ffd700;color:#ffd700;font-size:1.1rem;box-shadow:0 0 16px rgba(255,215,0,.4)">タイムアップ！ 命のたまが砕けた！</div><div style="color:#aaa;margin-top:8px;font-size:.85rem">'+(q.shortExplanation||'')+'</div><div style="color:#ffd700;margin-top:8px;font-weight:bold">命のたまの力で耐えた！</div>';
+    document.getElementById('boss-next').style.display='block';
+  }else{
+    fb.innerHTML='<div class="result-banner wrong" style="font-size:1.1rem">タイムアップ！ '+BOSS_DATA.bossName+'の反撃！</div><div style="color:#aaa;margin-top:8px;font-size:.85rem">'+(q.shortExplanation||'')+'</div><div style="color:#ff5252;margin-top:10px;font-weight:bold;font-size:1rem">全問正解しないと撃破できない！</div>';
+    document.getElementById('boss-next').style.display='none';
+    const btns=document.createElement('div');btns.style.cssText='margin-top:12px;display:flex;flex-direction:column;gap:8px';
+    const rb=document.createElement('button');rb.className='next-btn secondary';rb.textContent='準備画面に戻る';rb.onclick=function(){document.getElementById('screen-boss').classList.remove('boss-battle-atmosphere');showBossPrep()};
+    btns.appendChild(rb);fb.appendChild(btns);
+  }
+  updateBossCombo();
+  triggerScreenShake();
 }
 function triggerScreenShake(){
   const el=document.getElementById('boss-content');
@@ -2012,6 +3137,7 @@ function cancelBossPick(){
 }
 function confirmBossPick(){
   if(!bossSelectedEl)return;
+  clearQuestionTimer();stopTimerSound();
   playSfx('confirm');
   document.getElementById('boss-confirm').style.display='none';
   selBoss(bossSelectedEl,bossSelectedKey,bossSelectedAns);
@@ -2022,19 +3148,73 @@ function useGlasses(){
   bossBag.splice(idx,1);
   /* inventoryからも消す */
   const si=state.inventory.indexOf('sage_glasses');if(si!==-1){state.inventory.splice(si,1);saveState();}
-  const q=bossActiveQs[bossQIndex],ans=q.answer;
-  const wrongKeys=Object.keys(q.choices).filter(k=>k!==ans);
+  const q=bossActiveQs[bossQIndex];
+  /* シャッフル後の正解キーを使う */
+  const ans=q.shuffledAnswer||q.answer;
+  const origKeys=['ア','イ','ウ','エ'];
+  const wrongKeys=origKeys.filter(k=>k!==ans);
   /* ランダムに不正解2つを消す */
   for(let i=wrongKeys.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[wrongKeys[i],wrongKeys[j]]=[wrongKeys[j],wrongKeys[i]];}
   const hideKeys=wrongKeys.slice(0,2);
   document.querySelectorAll('#boss-ch .choice-item').forEach(li=>{if(hideKeys.includes(li.dataset.key))li.classList.add('choice-hidden')});
   const btn=document.querySelector('.boss-use-glasses');if(btn)btn.remove();
+  bossItemsUsedThisFight=true;trackItemUse('sage_glasses');
   updateItemBar();
+  showItemEffect('glasses','👓','賢者のメガネ','選択肢を見極めた！','#4fc3f7');
+  applyChoiceGlow('item-glow-glasses');
+}
+function useKendama(){
+  const idx=bossBag.indexOf('double_kendama');if(idx===-1)return;
+  playSfx('buff');
+  bossBag.splice(idx,1);
+  const si=state.inventory.indexOf('double_kendama');if(si!==-1){state.inventory.splice(si,1);saveState();}
+  bossDoubleActive=true;
+  const btn=document.querySelector('.boss-use-kendama');if(btn){btn.textContent='2倍けん玉 発動中！';btn.disabled=true;btn.style.opacity='.5';}
+  bossItemsUsedThisFight=true;trackItemUse('double_kendama');
+  updateItemBar();
+  showItemEffect('kendama','🏏','2倍のけん玉','次の攻撃は2倍ダメージ！','#ff9800');
+  applyChoiceGlow('item-glow-kendama');
+}
+function useWatch(){
+  const idx=bossBag.indexOf('time_watch');if(idx===-1)return;
+  clearQuestionTimer();stopTimerSound();
+  playSfx('magic');
+  bossBag.splice(idx,1);
+  const si=state.inventory.indexOf('time_watch');if(si!==-1){state.inventory.splice(si,1);saveState();}
+  const btn=document.querySelector('.boss-use-watch');if(btn)btn.remove();
+  bossItemsUsedThisFight=true;trackItemUse('time_watch');
+  updateItemBar();
+  showItemEffect('watch','🔄','シャッフルタイマー','問題を交換！','#7ecfff');
+  /* 現在の問題を別の問題に差し替える */
+  const curQ=bossActiveQs[bossQIndex];
+  const allPool=[];
+  COURSE_DATA.forEach(st=>{
+    if(st.practiceQuestions){
+      st.practiceQuestions.forEach(pq=>{
+        allPool.push({questionText:pq.questionText,choices:pq.choices,answer:pq.answer,shortExplanation:pq.shortExplanation,choiceAnalysis:pq.choiceAnalysis,solvingStrategy:pq.solvingStrategy});
+      });
+    }
+  });
+  if(allPool.length===0&&BOSS_DATA.questions)BOSS_DATA.questions.forEach(q=>allPool.push(q));
+  /* 既出の問題を除外して候補を作る */
+  const usedTexts=new Set(bossActiveQs.map(q=>q.questionText));
+  let candidates=allPool.filter(q=>!usedTexts.has(q.questionText));
+  if(candidates.length===0)candidates=allPool.filter(q=>q.questionText!==curQ.questionText);
+  if(candidates.length>0){
+    const newQ=candidates[Math.floor(Math.random()*candidates.length)];
+    bossActiveQs[bossQIndex]=newQ;
+  }
+  /* 同じ問題番号で再描画 */
+  setTimeout(()=>renderBossQ(),600);
 }
 function selBoss(el,key,ans){
   if(document.querySelector('#boss-ch .choice-item.correct'))return;
   if(el.classList.contains('choice-hidden'))return;
-  const ok=key===ans;if(ok)bossCorrect++;
+  clearChoiceGlow();
+  const ok=key===ans;
+  const isDouble=ok&&bossDoubleActive;
+  if(ok)bossCorrect=Math.min(bossCorrect+(isDouble?2:1),bossActiveQs.length);
+  bossDoubleActive=false;
   const total=bossActiveQs.length;
   document.querySelectorAll('#boss-ch .choice-item').forEach(li=>{
     if(li.dataset.key===ans)li.classList.add('correct');
@@ -2042,115 +3222,605 @@ function selBoss(el,key,ans){
     li.style.pointerEvents='none';
   });
   const q=bossActiveQs[bossQIndex],fb=document.getElementById('boss-fb');fb.style.display='block';
-  const glassesBtn=document.querySelector('.boss-use-glasses');if(glassesBtn)glassesBtn.remove();
+  /* 回答後はアイテムボタンを非表示 */
+  const itemBtns=document.querySelector('.boss-item-btns');if(itemBtns)itemBtns.style.display='none';
+  /* 回答後はヒントボタンを非表示 */
+  const hintWrap=document.getElementById('boss-strategy-hint');if(hintWrap)hintWrap.style.display='none';
   if(ok){
+    bossCombo++;
+    if(bossCombo>=3)unlockAchievement('combo_3');
+    if(bossCombo>=5)unlockAchievement('combo_5');
+    if(bossCombo>=10)unlockAchievement('combo_10');
     playSfx('correct');playSfx('hit');
     /* 正解報酬: EXP + ゴールド */
     const bossExp=15,bossGold=30+Math.floor(Math.random()*20);
     const oldLv=calcLevel(state.exp).level;
     state.exp+=bossExp;state.gold+=bossGold;saveState();
+    checkGoldAchievements();
     const newLv=calcLevel(state.exp).level;
-    if(newLv>oldLv)showLevelUp(newLv);
-    fb.innerHTML=`<div class="result-banner correct" style="font-size:1.1rem">正解！ボスにダメージ！</div><div style="color:#7ecfff;font-size:.8rem;margin-top:4px">+${bossExp} EXP / +${bossGold} G</div><div style="color:#aaa;margin-top:8px;font-size:.85rem">${q.shortExplanation}</div>`;
+    if(newLv>oldLv){showLevelUp(newLv);checkLevelAchievements(newLv);}
+    const comboText=bossCombo>=3?`<div style="color:#ffd700;font-size:.9rem;font-weight:bold;margin-top:4px">${bossCombo} COMBO!</div>`:'';
+    const doubleText=isDouble?'<div style="color:#ff9800;font-size:.9rem;font-weight:bold;margin-top:4px">2倍のけん玉で2倍ダメージ！</div>':'';
+    fb.innerHTML=`<div class="result-banner correct" style="font-size:1.1rem">正解！ボスにダメージ！</div>${comboText}${doubleText}<div style="color:#7ecfff;font-size:.8rem;margin-top:4px">+${bossExp} EXP / +${bossGold} G</div><div style="color:#aaa;margin-top:8px;font-size:.85rem">${q.shortExplanation}</div>`;
     document.getElementById('boss-next').style.display='block';
     const hpP=((total-bossCorrect)/total*100).toFixed(0);
-    const hf=document.querySelector('.boss-hp-fill');if(hf){hf.style.width=hpP+'%';hf.style.transition='width .5s ease'}
+    const hf=document.querySelector('.boss-hp-fill');
+    if(hf){
+      hf.style.width=hpP+'%';hf.style.transition='width .5s ease';
+      /* HP低下時の演出クラス */
+      hf.classList.remove('hp-danger','hp-critical');
+      const hpNum=parseFloat(hpP);
+      if(hpNum<=20)hf.classList.add('hp-critical');
+      else if(hpNum<=40)hf.classList.add('hp-danger');
+    }
     const ht=document.querySelector('.boss-hp-text');if(ht)ht.textContent=`${total-bossCorrect}/${total}`;
     /* ヒットアニメーション + 画面揺れ */
     const sp=document.getElementById('boss-battle-sprite');
     if(sp){sp.classList.remove('boss-sprite-anim');sp.classList.add('boss-sprite-hit');sp.addEventListener('animationend',()=>{sp.classList.remove('boss-sprite-hit');sp.classList.add('boss-sprite-anim')},{once:true});}
     triggerScreenShake();
+    /* ダメージ数字演出 */
+    showBossDamage(bossCombo>=3||isDouble);
+    if(isDouble)showBossDamage(true);
+    /* コンボ更新 */
+    updateBossCombo();
+    /* 2倍ダメージでHPが0以下になったら即撃破 */
+    if(bossCorrect>=total){setTimeout(()=>{renderBossResult(document.getElementById('boss-content'))},1200);return;}
   }else{
+    bossCombo=0;
     playSfx('wrong');
+    /* 反撃演出 */
+    triggerBossCounterattack();
     /* いのちのいしチェック */
     const stoneIdx=bossBag.indexOf('life_stone');
     if(stoneIdx!==-1){
       playSfx('buff');
       bossBag.splice(stoneIdx,1);
       const si=state.inventory.indexOf('life_stone');if(si!==-1){state.inventory.splice(si,1);saveState();}
+      bossItemsUsedThisFight=true;trackItemUse('life_stone');
       updateItemBar();
+      showItemEffect('stone','💎','命のたま','不正解を耐えた！','#ffd700');
       fb.innerHTML=`<div class="result-banner" style="background:#1a1a00;border:2px solid #ffd700;color:#ffd700;font-size:1.1rem;box-shadow:0 0 16px rgba(255,215,0,.4)">命のたまが砕けた！</div><div style="color:#aaa;margin-top:8px;font-size:.85rem">${q.shortExplanation}</div><div style="color:#ffd700;margin-top:8px;font-weight:bold">不正解だが、命のたまの力で耐えた！</div>`;
       document.getElementById('boss-next').style.display='block';
     }else{
       fb.innerHTML=`<div class="result-banner wrong" style="font-size:1.1rem">不正解… ${BOSS_DATA.bossName}の反撃！</div><div style="color:#aaa;margin-top:8px;font-size:.85rem">${q.shortExplanation}</div><div style="color:#ff5252;margin-top:10px;font-weight:bold;font-size:1rem">全問正解しないと撃破できない！</div>`;
       document.getElementById('boss-next').style.display='none';
       const btns=document.createElement('div');btns.style.cssText='margin-top:12px;display:flex;flex-direction:column;gap:8px';
-      const rb=document.createElement('button');rb.className='next-btn secondary';rb.textContent='準備画面に戻る';rb.onclick=function(){showBossPrep()};
-      const bb=document.createElement('button');bb.className='next-btn secondary';bb.style.opacity='.7';bb.textContent='ステージ選択に戻る';bb.onclick=function(){showScreen('screen-map')};
+      const rb=document.createElement('button');rb.className='next-btn secondary';rb.textContent='準備画面に戻る';rb.onclick=function(){document.getElementById('screen-boss').classList.remove('boss-battle-atmosphere');showBossPrep()};
+      const bb=document.createElement('button');bb.className='next-btn secondary';bb.style.opacity='.7';bb.textContent='ステージ選択に戻る';bb.onclick=function(){document.getElementById('screen-boss').classList.remove('boss-battle-atmosphere');showScreen('screen-map')};
       btns.appendChild(rb);btns.appendChild(bb);fb.parentNode.appendChild(btns);
     }
+    /* コンボリセット */
+    updateBossCombo();
+  }
+  /* フィードバックエリアが見えるようスクロール */
+  setTimeout(()=>{fb.scrollIntoView({behavior:'smooth',block:'nearest'})},300);
+}
+/* ===== ボス戦 考え方のヒント 開閉 ===== */
+function toggleBossHint(btn){
+  const wasOpen=btn.classList.contains('open');
+  btn.classList.toggle('open');
+  const body=document.getElementById('boss-strategy-hint-body');
+  if(!body)return;
+  if(!wasOpen){
+    body.classList.add('open');
+    /* 初回のみステップを順次表示 */
+    const ol=document.getElementById('boss-strategy-hint-steps');
+    if(ol&&window._bossStrategySteps&&!ol.dataset.filled){
+      ol.dataset.filled='1';
+      ol.innerHTML='';
+      let idx=0;
+      const steps=window._bossStrategySteps;
+      function showNext(){
+        if(idx>=steps.length){
+          /* 全ステップ表示後にひっかけポイントを追加 */
+          if(window._bossTrap){
+            const trapDiv=document.createElement('div');
+            trapDiv.className='trap-box';
+            trapDiv.innerHTML=`<div class="trap-label">ひっかけポイント</div><div>${window._bossTrap}</div>`;
+            trapDiv.style.opacity='0';
+            body.appendChild(trapDiv);
+            trapDiv.animate([{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'translateY(0)'}],{duration:300,fill:'forwards'});
+          }
+          return;
+        }
+        const li=document.createElement('li');
+        li.style.opacity='0';
+        ol.appendChild(li);
+        li.animate([{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'translateY(0)'}],{duration:300,fill:'forwards'});
+        typewriter(li,steps[idx],30,()=>{idx++;setTimeout(showNext,200);});
+      }
+      showNext();
+    }
+  }else{
+    body.classList.remove('open');
   }
 }
-function nextBossQ(){playSfx('confirm');bossQIndex++;renderBossQ();window.scrollTo({top:0,behavior:'smooth'})}
+/* ===== ダメージ数字演出 ===== */
+function calcBossDamage(isCritical){
+  const chId=currentChapter?currentChapter.id:1;
+  const lv=calcLevel(state.exp).level;
+  const base=chId*50+lv*5;
+  const variance=0.8+Math.random()*0.4;/* ±20% */
+  const comboMult=bossCombo>=5?2.0:bossCombo>=3?1.5:1.0;
+  const critMult=isCritical?2.0:1.0;
+  return Math.floor(base*variance*comboMult*critMult);
+}
+function showBossDamage(isCritical){
+  const dmg=document.createElement('div');
+  dmg.className='boss-dmg-num'+(isCritical?' boss-dmg-critical':'');
+  const dmgVal=calcBossDamage(isCritical);
+  dmg.textContent='0';
+  document.body.appendChild(dmg);
+  /* カウントアップ演出 */
+  const duration=600,startTime=performance.now();
+  function countUp(now){
+    const elapsed=now-startTime;
+    const progress=Math.min(elapsed/duration,1);
+    const eased=1-Math.pow(1-progress,3);/* easeOutCubic */
+    const current=Math.floor(dmgVal*eased);
+    dmg.textContent=current;
+    if(progress<1)requestAnimationFrame(countUp);
+  }
+  requestAnimationFrame(countUp);
+  setTimeout(()=>dmg.remove(),1500);
+}
+/* ===== コンボ更新 ===== */
+function updateBossCombo(){
+  const el=document.getElementById('boss-combo');
+  if(!el)return;
+  const cnt=el.querySelector('.boss-combo-count');
+  if(cnt)cnt.textContent=bossCombo;
+  if(bossCombo>0){
+    el.classList.add('active');
+    cnt.classList.remove('boss-combo-pop');
+    void cnt.offsetWidth;
+    cnt.classList.add('boss-combo-pop');
+  }else{
+    el.classList.remove('active');
+  }
+}
+/* ===== ボス反撃演出 ===== */
+function triggerBossCounterattack(){
+  /* 画面赤フラッシュ */
+  const flash=document.createElement('div');
+  flash.className='boss-counterattack-flash';
+  document.body.appendChild(flash);
+  setTimeout(()=>flash.remove(),600);
+  /* ボス攻撃アニメーション */
+  const sp=document.getElementById('boss-battle-sprite');
+  if(sp){
+    sp.classList.remove('boss-sprite-anim','boss-sprite-hit');
+    sp.classList.add('boss-sprite-attack');
+    sp.addEventListener('animationend',()=>{
+      sp.classList.remove('boss-sprite-attack');
+      sp.classList.add('boss-sprite-anim');
+    },{once:true});
+  }
+  triggerScreenShake();
+}
+function nextBossQ(){playSfx('confirm');clearChoiceGlow();bossQIndex++;renderBossQ();window.scrollTo({top:0,behavior:'smooth'})}
+/* ===== ボス戦離脱確認 ===== */
+function confirmBossExit(){
+  playSfx('select');
+  const panel=document.getElementById('boss-exit-confirm');
+  if(panel.style.display==='none'){
+    panel.style.display='block';
+    window.scrollTo({top:0,behavior:'smooth'});
+  }else{
+    panel.style.display='none';
+  }
+}
+function dismissBossExit(){
+  playSfx('select');
+  document.getElementById('boss-exit-confirm').style.display='none';
+}
+function executeBossExit(){
+  playSfx('confirm');
+  document.getElementById('boss-exit-confirm').style.display='none';
+  document.getElementById('screen-boss').classList.remove('boss-battle-atmosphere');
+  clearChoiceGlow();
+  showScreen('screen-map');
+}
 function renderBossResult(c){
-  playSfx('victory');
-  const rw=BOSS_DATA.rewards,total=bossActiveQs.length;
-  if(!state.bossCleared){state.bossCleared=true;state.exp+=rw.exp;state.gold+=rw.gold;if(!state.ownedCards.includes(rw.bonusCard.cardName))state.ownedCards.push(rw.bonusCard.cardName);saveState()}
-  const spriteWin=BOSS_DATA.bossSprite?`<img src="${BOSS_DATA.bossSprite}" alt="${BOSS_DATA.bossName}" class="boss-sprite" style="opacity:.4;filter:grayscale(1)">`:'';
-  c.innerHTML=`<div class="boss-result win fade-in">
-    ${spriteWin}
-    <h2>撃破！ ${BOSS_DATA.bossName}を倒した！</h2>
-    <div class="boss-score">${bossCorrect}/${total}問正解 - PERFECT!</div>
-    <p>「${rw.clearTitle}」の称号を獲得！</p>
-    <div class="reward-card" style="margin:16px auto;max-width:300px"><div class="reward-rarity">${'★'.repeat(rw.bonusCard.rarity)+'☆'.repeat(5-rw.bonusCard.rarity)}</div><div class="reward-card-name">${rw.bonusCard.cardName}</div><div class="reward-summary">${rw.bonusCard.summary}</div><div class="reward-stats"><div class="reward-stat"><div class="reward-stat-value exp">+${rw.exp}</div><div class="reward-stat-label">EXP</div></div><div class="reward-stat"><div class="reward-stat-value gold">+${rw.gold}</div><div class="reward-stat-label">GOLD</div></div></div></div>
-    <button class="next-btn" onclick="showScreen('screen-map')">ステージ選択に戻る</button></div>`;
+  /* 撃破エクスプロージョン演出 */
+  triggerBossExplosion(()=>{
+    playSfx('victory');
+    const rw=BOSS_DATA.rewards,total=bossActiveQs.length;
+    const oldMax=getMaxInventory();
+    const cs=chapterState();if(!cs.bossCleared){cs.bossCleared=true;state.exp+=Math.floor(rw.exp*chapterExpMult());state.gold+=rw.gold;if(!state.ownedCards.includes(rw.bonusCard.cardName))state.ownedCards.push(rw.bonusCard.cardName);if(currentChapter)state.cardChapterMap[rw.bonusCard.cardName]=currentChapter.id;saveState()}
+    const newMax=getMaxInventory();
+    /* 実績チェック */
+    unlockAchievement('first_boss');
+    if(bossCorrect>=total)unlockAchievement('boss_perfect');
+    if(!bossItemsUsedThisFight)unlockAchievement('boss_no_items');
+    checkAllBossesAchievement();checkGoldAchievements();
+    document.getElementById('screen-boss').classList.remove('boss-battle-atmosphere');
+    const spriteWin=BOSS_DATA.bossSprite?`<img src="${BOSS_DATA.bossSprite}" alt="${BOSS_DATA.bossName}" class="boss-sprite" style="opacity:.4;filter:grayscale(1)">`:cssDragonHtml('',null);
+    c.innerHTML=`<div class="boss-result win fade-in">
+      <div style="opacity:.4;filter:grayscale(1)">${spriteWin}</div>
+      <h2>撃破！ ${BOSS_DATA.bossName}を倒した！</h2>
+      <div class="boss-score">${bossCorrect}/${total}問正解 - PERFECT!</div>
+      <p>「${rw.clearTitle}」の称号を獲得！</p>
+      <div class="reward-card" style="margin:16px auto;max-width:300px">${BOSS_DATA.bossSprite?`<img src="${BOSS_DATA.bossSprite}" alt="" class="reward-card-emblem">`:''}<div class="reward-rarity">${'★'.repeat(rw.bonusCard.rarity)+'☆'.repeat(5-rw.bonusCard.rarity)}</div><div class="reward-card-name">${rw.bonusCard.cardName}</div><div class="reward-summary">${rw.bonusCard.summary}</div><div class="reward-stats"><div class="reward-stat"><div class="reward-stat-value exp">+${Math.floor(rw.exp*chapterExpMult())}</div><div class="reward-stat-label">EXP</div></div><div class="reward-stat"><div class="reward-stat-value gold">+${rw.gold}</div><div class="reward-stat-label">GOLD</div></div></div></div>
+      ${IS_DEMO?`<div style="background:rgba(255,215,0,.1);border:2px solid #ffd700;border-radius:12px;padding:16px;margin:16px 0;text-align:center">
+        <div style="font-size:1.1rem;font-weight:bold;color:#ffd700;margin-bottom:8px">デモ版クリアおめでとう！</div>
+        <div style="font-size:.85rem;color:#ccc;line-height:1.7">製品版では全8章・80ステージ以上の問題に挑戦できます。</div>
+        <a href="${location.pathname}" style="display:inline-block;margin-top:12px;padding:10px 24px;background:#ffd700;color:#000;font-weight:bold;border-radius:8px;text-decoration:none;font-size:.9rem">製品版で始める</a>
+      </div>`:''}
+      <button class="next-btn" onclick="showScreen('screen-map')">ステージ選択に戻る</button></div>`;
+    if(newMax>oldMax){setTimeout(()=>showInventoryExpand(newMax),1500);}
+  });
+}
+function showInventoryExpand(maxSlots){
+  playSfx('buff');
+  const ov=document.createElement('div');
+  ov.className='inventory-expand-overlay';
+  ov.innerHTML=`<div class="inventory-expand-box">
+    <div class="inventory-expand-icon">🎒</div>
+    <div class="inventory-expand-title">持ち物枠が増えた！</div>
+    <div class="inventory-expand-detail">アイテムを最大 <span style="color:#ffd700;font-size:1.3rem;font-weight:bold">${maxSlots}個</span> 持てるようになった！</div>
+    <button class="next-btn" onclick="this.closest('.inventory-expand-overlay').remove()">OK</button>
+  </div>`;
+  document.body.appendChild(ov);
+  renderSidebarItems();
+}
+/* ===== 撃破エクスプロージョン ===== */
+function triggerBossExplosion(callback){
+  const sp=document.getElementById('boss-battle-sprite');
+  if(sp){
+    sp.classList.remove('boss-sprite-anim','boss-sprite-hit');
+    sp.classList.add('boss-sprite-defeat');
+  }
+  /* 白フラッシュ */
+  setTimeout(()=>{
+    const flash=document.createElement('div');
+    flash.className='boss-explosion-flash';
+    document.body.appendChild(flash);
+    setTimeout(()=>flash.remove(),1000);
+    playSfx('hit');
+  },400);
+  /* パーティクル */
+  setTimeout(()=>{
+    const ov=document.createElement('div');
+    ov.className='boss-explosion-overlay';
+    document.body.appendChild(ov);
+    const colors=['#ff5252','#ffd700','#ff8a80','#fff','#ffb74d','#ff1744'];
+    const cx=window.innerWidth/2,cy=window.innerHeight/2-50;
+    for(let i=0;i<30;i++){
+      const p=document.createElement('div');
+      p.className='boss-explosion-particle';
+      p.style.background=colors[Math.floor(Math.random()*colors.length)];
+      p.style.boxShadow=`0 0 6px ${p.style.background}`;
+      p.style.left=cx+'px';p.style.top=cy+'px';
+      const angle=Math.random()*Math.PI*2;
+      const dist=80+Math.random()*180;
+      const dx=Math.cos(angle)*dist,dy=Math.sin(angle)*dist;
+      const dur=600+Math.random()*600;
+      p.style.transition=`all ${dur}ms cubic-bezier(.25,.46,.45,.94)`;
+      p.style.width=(4+Math.random()*6)+'px';
+      p.style.height=p.style.width;
+      ov.appendChild(p);
+      requestAnimationFrame(()=>{
+        p.style.left=(cx+dx)+'px';
+        p.style.top=(cy+dy)+'px';
+        p.style.opacity='0';
+      });
+    }
+    setTimeout(()=>ov.remove(),1200);
+  },500);
+  triggerScreenShake();
+  setTimeout(callback,1800);
+}
+
+/* ===== 実績バッジ一覧 ===== */
+function renderBadges(){
+  const g=document.getElementById('badge-grid');g.innerHTML='';
+  const prog=document.getElementById('badge-progress');
+  const unlocked=(state.achievements||[]).length;
+  const total=ACHIEVEMENTS.length;
+  prog.innerHTML=`<div style="text-align:center;margin-bottom:16px"><span style="font-size:1.2rem;font-weight:bold;color:#ffd700">${unlocked}</span><span style="color:#888"> / ${total} 解除</span></div>`;
+  const cats=[...new Set(ACHIEVEMENTS.map(a=>a.cat))];
+  cats.forEach(cat=>{
+    const catDiv=document.createElement('div');catDiv.className='badge-cat';
+    catDiv.innerHTML=`<div class="badge-cat-title">${cat}</div>`;
+    const items=ACHIEVEMENTS.filter(a=>a.cat===cat);
+    const row=document.createElement('div');row.className='badge-row';
+    items.forEach(a=>{
+      const owned=(state.achievements||[]).includes(a.id);
+      const d=document.createElement('div');d.className='badge-item'+(owned?' unlocked':' locked');
+      d.innerHTML=`<div class="badge-icon">${owned?a.icon:'?'}</div><div class="badge-name">${owned?a.name:'???'}</div><div class="badge-desc">${owned?a.desc:'まだ解除されていません'}</div>`;
+      row.appendChild(d);
+    });
+    catDiv.appendChild(row);g.appendChild(catDiv);
+  });
 }
 
 /* ===== カード図鑑 ===== */
+function getChapterSprite(cardName){
+  const chId=state.cardChapterMap[cardName];
+  if(!chId)return '';
+  const ch=CHAPTERS.find(c=>c.id===chId);
+  return ch?ch.bossSprite:'';
+}
 function renderCollection(){
   const g=document.getElementById('collection-grid');g.innerHTML='';
-  [...COURSE_DATA.map(s=>s.cardReward),BOSS_DATA.rewards.bonusCard].forEach(cr=>{
+  // 現在ロードされているチャプターのカードを表示、なければ所持カード一覧
+  const cards=[];
+  if(COURSE_DATA.length>0){
+    COURSE_DATA.forEach(s=>{if(s.cardReward)cards.push(s.cardReward)});
+    if(BOSS_DATA.rewards&&BOSS_DATA.rewards.bonusCard)cards.push(BOSS_DATA.rewards.bonusCard);
+  }
+  if(cards.length===0){
+    // データ未ロード時は所持カードのみ表示
+    state.ownedCards.forEach(name=>{
+      const sprite=getChapterSprite(name);
+      const emblem=sprite?`<img src="${sprite}" alt="" class="card-boss-emblem">`:'';
+      const d=document.createElement('div');d.className='coll-card owned';
+      d.innerHTML=`${emblem}<div class="coll-card-name">${name}</div>`;
+      g.appendChild(d);
+    });
+    if(state.ownedCards.length===0)g.innerHTML='<div style="text-align:center;padding:40px;color:#888">まだカードを持っていません</div>';
+    return;
+  }
+  const collSprite=currentChapter?currentChapter.bossSprite:'';
+  cards.forEach(cr=>{
     const o=state.ownedCards.includes(cr.cardName);
+    const sprite=collSprite||getChapterSprite(cr.cardName);
     const d=document.createElement('div');d.className='coll-card '+(o?'owned':'not-owned');
-    d.innerHTML=`<div class="coll-card-rarity">${'★'.repeat(cr.rarity)+'☆'.repeat(5-cr.rarity)}</div><div class="coll-card-name">${o?cr.cardName:'？？？'}</div><div style="font-size:.7rem;color:#888;margin-top:4px">${o?cr.summary:''}</div>`;
+    const emblem=sprite?`<img src="${sprite}" alt="" class="card-boss-emblem">`:'';
+    d.innerHTML=`${emblem}<div class="coll-card-rarity">${'★'.repeat(cr.rarity)+'☆'.repeat(5-cr.rarity)}</div><div class="coll-card-name">${o?cr.cardName:'？？？'}</div><div style="font-size:.7rem;color:#888;margin-top:4px">${o?cr.summary:''}</div>`;
     g.appendChild(d);
   });
 }
 
-/* ===== JSONファイルからリッチデータ読み込み ===== */
-async function loadCourseDataFromJSON(){
-  console.log('JSONファイル読み込み開始...');
+/* ===== 模擬試験 ===== */
+let mockExamQs=[],mockExamIndex=0,mockExamAnswers=[];
+let mockExamCategory='all'; // 'all','tech','strat','mgmt'
+const MOCK_EXAM_RATIO={tech:45,strat:35,mgmt:20};
+
+function renderMockExamStart(){
+  mockExamCategory='all';
+  const c=document.getElementById('mock-exam-content');
+  c.innerHTML=`<div class="mock-exam-start">
+    <button class="back-btn" onclick="showScreen('screen-chapters')" style="position:absolute;left:16px;top:16px">← 戻る</button>
+    <h2>模擬試験</h2>
+    <div class="exam-desc">
+      出題カテゴリを選んで挑戦しよう！<br>
+      本番と同じく、解説は試験後に確認できます。
+    </div>
+    <div class="mock-category-select" id="mock-category-select">
+      <div class="mock-cat-btn selected" onclick="selectMockCategory('all',this)" data-cat="all">
+        <div class="mock-cat-icon">📝</div>
+        <div class="mock-cat-name">全問題</div>
+        <div class="mock-cat-detail">100問（本番形式）</div>
+      </div>
+      <div class="mock-cat-btn" onclick="selectMockCategory('tech',this)" data-cat="tech">
+        <div class="mock-cat-icon" style="color:#42a5f5">💻</div>
+        <div class="mock-cat-name" style="color:#42a5f5">テクノロジ系</div>
+        <div class="mock-cat-detail">45問</div>
+      </div>
+      <div class="mock-cat-btn" onclick="selectMockCategory('strat',this)" data-cat="strat">
+        <div class="mock-cat-icon" style="color:#ffb74d">📊</div>
+        <div class="mock-cat-name" style="color:#ffb74d">ストラテジ系</div>
+        <div class="mock-cat-detail">35問</div>
+      </div>
+      <div class="mock-cat-btn" onclick="selectMockCategory('mgmt',this)" data-cat="mgmt">
+        <div class="mock-cat-icon" style="color:#81c784">📋</div>
+        <div class="mock-cat-name" style="color:#81c784">マネジメント系</div>
+        <div class="mock-cat-detail">20問</div>
+      </div>
+    </div>
+    <button class="next-btn" onclick="startMockExam()" style="margin-top:20px;background:linear-gradient(135deg,#ab47bc,#7b1fa2)">試験開始</button>
+  </div>`;
+}
+function selectMockCategory(cat,el){
+  mockExamCategory=cat;
+  document.querySelectorAll('.mock-cat-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+async function startMockExam(){
+  const c=document.getElementById('mock-exam-content');
+  c.innerHTML='<div class="mock-exam-loading">問題を準備しています...</div>';
   try{
-    const files=[
-      'course/chapter1_stages1-4.json',
-      'course/chapter1_stages5-8.json',
-      'course/chapter1_stages9-11.json'
-    ];
-    console.log('ファイル読み込み中:', files);
-
-    const responses = await Promise.all(files.map(f=>fetch(f)));
-    console.log('fetch完了, ステータス:', responses.map(r => r.status));
-
-    if(!responses[0].ok||!responses[1].ok||!responses[2].ok) {
-      throw new Error(`Fetch failed: ${responses.map(r => r.status).join(', ')}`);
+    const techPool=[],stratPool=[],mgmtPool=[];
+    const regularChs=CHAPTERS.filter(ch=>!ch.isMockExam);
+    // 全チャプターのJSONを並列読み込み
+    const allFetches=[];
+    regularChs.forEach(ch=>{
+      ch.files.stages.forEach(f=>allFetches.push(fetch(f).then(r=>r.ok?r.json():null).then(d=>({domain:ch.domain,data:d}))));
+      if(ch.files.boss)allFetches.push(fetch(ch.files.boss).then(r=>r.ok?r.json():null).then(d=>({domain:ch.domain,data:d,isBoss:true})));
+    });
+    const results=await Promise.all(allFetches);
+    results.forEach(r=>{
+      if(!r||!r.data||!r.data.stages)return;
+      const pool=r.domain==='テクノロジ系'?techPool:r.domain==='ストラテジ系'?stratPool:mgmtPool;
+      r.data.stages.forEach(st=>{
+        if(r.isBoss&&st.questions){
+          st.questions.forEach(q=>pool.push({questionText:q.questionText,choices:q.choices,answer:q.answer,category:r.domain,source:q.id||''}));
+        }else{
+          if(st.mainQuestion){
+            const mq=st.mainQuestion;
+            pool.push({questionText:mq.originalText||mq.questionText||'',choices:mq.choices,answer:mq.answer,category:r.domain,source:mq.source||''});
+          }
+          if(st.practiceQuestions){
+            st.practiceQuestions.forEach(pq=>pool.push({questionText:pq.questionText,choices:pq.choices,answer:pq.answer,category:r.domain,source:pq.source||''}));
+          }
+        }
+      });
+    });
+    // シャッフル & 選出
+    const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+    shuffle(techPool);shuffle(stratPool);shuffle(mgmtPool);
+    let selected;
+    if(mockExamCategory==='tech'){
+      selected=techPool.slice(0,45);
+    }else if(mockExamCategory==='strat'){
+      selected=stratPool.slice(0,35);
+    }else if(mockExamCategory==='mgmt'){
+      selected=mgmtPool.slice(0,20);
+    }else{
+      selected=[
+        ...techPool.slice(0,MOCK_EXAM_RATIO.tech),
+        ...stratPool.slice(0,MOCK_EXAM_RATIO.strat),
+        ...mgmtPool.slice(0,MOCK_EXAM_RATIO.mgmt)
+      ];
     }
+    shuffle(selected);
+    mockExamQs=selected;
+    mockExamIndex=0;
+    mockExamAnswers=[];
+    renderMockExamQ();
+  }catch(e){
+    console.error('模擬試験データ読み込みエラー:',e);
+    c.innerHTML='<div class="mock-exam-loading" style="color:#f44">データの読み込みに失敗しました。<br><button class="next-btn" onclick="showScreen(\'screen-chapters\')">戻る</button></div>';
+  }
+}
 
-    const [d1,d2,d3]=await Promise.all(responses.map(r => r.json()));
-    console.log('JSONパース完了');
+function renderMockExamQ(){
+  if(mockExamIndex>=mockExamQs.length){renderMockExamResult();return;}
+  const q=mockExamQs[mockExamIndex];
+  const total=mockExamQs.length;
+  const pct=((mockExamIndex)/total*100).toFixed(0);
+  const c=document.getElementById('mock-exam-content');
+  // 選択肢シャッフル
+  const keys=Object.keys(q.choices);
+  const entries=keys.map(k=>({key:k,val:q.choices[k]}));
+  for(let i=entries.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[entries[i],entries[j]]=[entries[j],entries[i]];}
+  const correctVal=q.choices[q.answer];
+  let shuffledAnswer='';
+  entries.forEach((e,i)=>{if(e.val===correctVal)shuffledAnswer=keys[i];});
+  // 新しいキーをマッピング
+  const shuffledChoices={};
+  entries.forEach((e,i)=>{shuffledChoices[keys[i]]=e.val;});
+  c.innerHTML=`<div class="mock-exam-q">
+    <div class="mock-exam-header">
+      <span>問${mockExamIndex+1} / ${total}</span>
+      <span style="font-size:.7rem;padding:2px 8px;border-radius:10px;background:${q.category==='テクノロジ系'?'rgba(33,150,243,.2)':q.category==='ストラテジ系'?'rgba(255,152,0,.2)':'rgba(76,175,80,.2)'};color:${q.category==='テクノロジ系'?'#42a5f5':q.category==='ストラテジ系'?'#ffb74d':'#81c784'}">${q.category}</span>
+    </div>
+    <div class="mock-exam-progress"><div class="mock-exam-progress-fill" style="width:${pct}%"></div></div>
+    ${getTimerHtml('mock-timer')}
+    <div class="mock-exam-qtext">${q.questionText}</div>
+    <div class="mock-exam-choices" id="mock-choices">
+      ${keys.map(k=>`<div class="mock-exam-choice" onclick="selectMockAnswer(this,'${k}','${shuffledAnswer}')">${k}. ${shuffledChoices[k]}</div>`).join('')}
+    </div>
+  </div>`;
+  // タイマー開始
+  window._mockShuffledAnswer=shuffledAnswer;
+  const mFill=document.getElementById('mock-timer-fill'),mTxt=document.getElementById('mock-timer-text');
+  startQuestionTimer(Q_TIME_LIMIT,()=>onMockTimerExpire(),mFill,mTxt);
+}
 
-    COURSE_DATA=d1.stages.concat(d2.stages).concat(d3.stages);
-    console.log('COURSE_DATA設定完了:', COURSE_DATA.length, 'ステージ');
+function selectMockAnswer(el,selected,correct){
+  if(el.parentElement.querySelector('.selected'))return;
+  clearQuestionTimer();stopTimerSound();
+  el.classList.add('selected');
+  const isCorrect=selected===correct;
+  mockExamAnswers.push({qIndex:mockExamIndex,selected,correct,isCorrect,category:mockExamQs[mockExamIndex].category});
+  el.style.background=isCorrect?'rgba(76,175,80,.2)':'rgba(244,67,54,.2)';
+  el.style.borderColor=isCorrect?'#81c784':'#ff5252';
+  // 短いディレイで次の問題へ
+  setTimeout(()=>{mockExamIndex++;renderMockExamQ();},400);
+}
+function onMockTimerExpire(){
+  stopTimerSound();
+  // タイムアップ → 不正解扱い
+  const correct=window._mockShuffledAnswer||'';
+  mockExamAnswers.push({qIndex:mockExamIndex,selected:'',correct,isCorrect:false,category:mockExamQs[mockExamIndex].category});
+  // 選択肢を無効化&正解を表示
+  document.querySelectorAll('#mock-choices .mock-exam-choice').forEach(el=>{
+    el.style.pointerEvents='none';
+  });
+  playSfx('wrong');
+  setTimeout(()=>{mockExamIndex++;renderMockExamQ();},800);
+}
 
-    const bossResp=await fetch('course/chapter1_stage12_boss.json');
+function renderMockExamResult(){
+  clearQuestionTimer();stopTimerSound();
+  const total=mockExamAnswers.length;
+  const correctCount=mockExamAnswers.filter(a=>a.isCorrect).length;
+  const passLine=mockExamCategory==='all'?60:Math.ceil(total*0.6);
+  const pass=correctCount>=passLine;
+  const pct=total>0?Math.round(correctCount/total*100):0;
+  const techCorrect=mockExamAnswers.filter(a=>a.category==='テクノロジ系'&&a.isCorrect).length;
+  const techTotal=mockExamAnswers.filter(a=>a.category==='テクノロジ系').length;
+  const stratCorrect=mockExamAnswers.filter(a=>a.category==='ストラテジ系'&&a.isCorrect).length;
+  const stratTotal=mockExamAnswers.filter(a=>a.category==='ストラテジ系').length;
+  const mgmtCorrect=mockExamAnswers.filter(a=>a.category==='マネジメント系'&&a.isCorrect).length;
+  const mgmtTotal=mockExamAnswers.filter(a=>a.category==='マネジメント系').length;
+  const catLabel=mockExamCategory==='tech'?'テクノロジ系':mockExamCategory==='strat'?'ストラテジ系':mockExamCategory==='mgmt'?'マネジメント系':'総合';
+  const remaining=passLine-correctCount;
+  const failMsg=remaining>0?'あと'+remaining+'問…もう一度がんばろう！':'惜しい！もう一度挑戦しよう！';
+  // 分野別内訳（全問題モードのみ表示）
+  let breakdownHtml='';
+  if(mockExamCategory==='all'){
+    breakdownHtml=`<div class="result-breakdown">
+      <div class="breakdown-item">
+        <div class="breakdown-label" style="color:#42a5f5">テクノロジ系</div>
+        <div class="breakdown-score" style="color:${techTotal>0&&techCorrect/techTotal>=0.6?'#81c784':'#ff5252'}">${techCorrect} / ${techTotal}</div>
+      </div>
+      <div class="breakdown-item">
+        <div class="breakdown-label" style="color:#ffb74d">ストラテジ系</div>
+        <div class="breakdown-score" style="color:${stratTotal>0&&stratCorrect/stratTotal>=0.6?'#81c784':'#ff5252'}">${stratCorrect} / ${stratTotal}</div>
+      </div>
+      <div class="breakdown-item">
+        <div class="breakdown-label" style="color:#81c784">マネジメント系</div>
+        <div class="breakdown-score" style="color:${mgmtTotal>0&&mgmtCorrect/mgmtTotal>=0.6?'#81c784':'#ff5252'}">${mgmtCorrect} / ${mgmtTotal}</div>
+      </div>
+    </div>`;
+  }
+  const c=document.getElementById('mock-exam-content');
+  c.innerHTML=`<div class="mock-exam-result">
+    <h2>${pass?'合格':'不合格'}</h2>
+    <div style="font-size:.85rem;color:#aaa;margin-bottom:8px">${catLabel}（合格ライン: ${passLine}問 / 正答率60%）</div>
+    <div class="result-score" style="color:${pass?'#81c784':'#ff5252'}">${correctCount} / ${total}<span style="font-size:1rem;margin-left:8px">(${pct}%)</span></div>
+    <div class="${pass?'result-pass':'result-fail'}">${pass?'おめでとう！合格ラインを突破！':failMsg}</div>
+    ${breakdownHtml}
+    <div style="display:flex;gap:12px;justify-content:center;margin-top:24px;flex-wrap:wrap">
+      <button class="next-btn" onclick="renderMockExamStart()" style="background:linear-gradient(135deg,#ab47bc,#7b1fa2)">もう一度挑戦</button>
+      <button class="next-btn secondary" onclick="showScreen('screen-chapters')">章の選択に戻る</button>
+    </div>
+  </div>`;
+}
+
+/* ===== JSONファイルからチャプターデータ読み込み ===== */
+async function loadChapterData(chapterId){
+  const chapter=CHAPTERS.find(c=>c.id===chapterId);
+  if(!chapter)return;
+  COURSE_DATA=[];
+  BOSS_DATA={};
+  renderStageGrid();
+  try{
+    const responses=await Promise.all(chapter.files.stages.map(f=>fetch(f)));
+    if(responses.some(r=>!r.ok)){
+      throw new Error('Stage file load failed');
+    }
+    const stageData=await Promise.all(responses.map(r=>r.json()));
+    COURSE_DATA=stageData.flatMap(d=>d.stages);
+    // デモ版: ステージ1,2のみに絞る
+    if(IS_DEMO) COURSE_DATA=COURSE_DATA.filter(s=>s.stageId<=2);
+
+    const bossResp=await fetch(chapter.files.boss);
     if(bossResp.ok){
       const bossJSON=await bossResp.json();
       const bs=bossJSON.stages[0];
-      BOSS_DATA={stageId:bs.stageId,title:bs.title,isBossBattle:true,passingScore:bs.passingScore,bossName:bs.bossName,bossDescription:bs.bossDescription,questions:bs.questions,rewards:bs.rewards};
-      console.log('BOSS_DATA設定完了');
+      BOSS_DATA={stageId:bs.stageId,title:bs.title,isBossBattle:true,passingScore:bs.passingScore,bossName:bs.bossName,bossDescription:bs.bossDescription,questions:bs.questions,rewards:bs.rewards,bossSprite:bs.bossSprite||''};
     }
-    console.log('コースデータをJSONファイルから読み込みました（ふりがな付き）');
+    // 既存カードのcardChapterMapバックフィル
+    let mapUpdated=false;
+    COURSE_DATA.forEach(s=>{if(s.cardReward&&state.ownedCards.includes(s.cardReward.cardName)&&!state.cardChapterMap[s.cardReward.cardName]){state.cardChapterMap[s.cardReward.cardName]=chapterId;mapUpdated=true;}});
+    if(BOSS_DATA.rewards&&BOSS_DATA.rewards.bonusCard&&state.ownedCards.includes(BOSS_DATA.rewards.bonusCard.cardName)&&!state.cardChapterMap[BOSS_DATA.rewards.bonusCard.cardName]){state.cardChapterMap[BOSS_DATA.rewards.bonusCard.cardName]=chapterId;mapUpdated=true;}
+    if(mapUpdated)saveSaveData(state);
     renderStageGrid();
   }catch(e){
-    console.error('JSONファイル読み込みエラー詳細:', e);
-    // エラー時はデフォルトデータを設定
-    const grid = document.getElementById('stage-grid');
-    grid.innerHTML = '<div style="text-align:center; padding:50px; color:#f44; font-size:18px;">⚠️ データ読み込みエラー<br>コンソールを確認してください</div>';
+    console.error('チャプターデータ読み込みエラー:', e);
+    const grid=document.getElementById('stage-grid');
+    grid.innerHTML='<div style="text-align:center; padding:50px; color:#f44; font-size:18px;">データ読み込みエラー<br>コンソールを確認してください</div>';
   }
 }
 
 updateHeader();
-renderStageGrid(); // 初期ローディング表示
-loadCourseDataFromJSON();
+renderChapterGrid();
 </script>
 </body>
 </html>

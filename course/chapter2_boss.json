@@ -1,0 +1,246 @@
+{
+  "chapter": 2,
+  "stages": [
+    {
+      "stageId": 9,
+      "title": "章ボス: ネットワーク総合テスト",
+      "subtitle": "第2章の全範囲から出題！8問に挑戦しよう",
+      "category": "テクノロジ系",
+      "subcategory": "総合",
+      "estimatedMinutes": 20,
+      "isBossBattle": true,
+      "passingScore": 6,
+      "bossName": "ネットワイバーン",
+      "bossSprite": "ボス/character_monster_dragon_01_white.png",
+      "bossDescription": "ネットワークの知識で倒せ！6問以上正解で撃破！",
+      "questions": [
+        {
+          "id": "boss2-q1",
+          "relatedStage": 1,
+          "questionText": "インターネットでデータを送るとき，データを小さなかたまりに分割して送る方式を何というか。",
+          "choices": {
+            "ア": "ストリーミング",
+            "イ": "ブロードキャスト",
+            "ウ": "パケット交換",
+            "エ": "回線交換"
+          },
+          "answer": "ウ",
+          "shortExplanation": "インターネットではデータを「パケット」という小さなかたまりに分けて送るよ。手紙を小包に分けて届けるイメージだね。ステージ1で学んだね。",
+          "choiceAnalysis": [
+            {"choice": "ア", "verdict": "✗", "explanation": "ストリーミングは動画や音楽をダウンロードしながら再生する方式のこと。データの分割方式とは違うよ。"},
+            {"choice": "イ", "verdict": "✗", "explanation": "ブロードキャストはネットワーク上の全員にデータを一斉送信すること。分割して送る方式ではないね。"},
+            {"choice": "ウ", "verdict": "◎ 正解", "explanation": "パケット交換＝データを小さな「パケット（小包）」に分割して送る方式。インターネットの基本のしくみだよ！"},
+            {"choice": "エ", "verdict": "✗", "explanation": "回線交換は電話のように通信中ずっと回線を独占する方式。データを分割せずに送るので、パケット交換とは違うよ。"}
+          ],
+          "solvingStrategy": {
+            "steps": [
+              "「データを小さなかたまりに分割」がキーワード",
+              "パケット＝小包。データを小包に分けて送る＝パケット交換",
+              "回線交換は電話方式（回線を独占）、パケット交換はインターネット方式（分割して共有）"
+            ],
+            "trap": "「回線交換」と「パケット交換」を混同しやすい。電話＝回線交換、インターネット＝パケット交換と覚えよう！"
+          }
+        },
+        {
+          "id": "boss2-q2",
+          "relatedStage": 2,
+          "questionText": "インターネット上で「www.example.co.jp」のようなドメイン名をIPアドレスに変換するしくみを何というか。",
+          "choices": {
+            "ア": "DNS",
+            "イ": "DHCP",
+            "ウ": "HTTP",
+            "エ": "FTP"
+          },
+          "answer": "ア",
+          "shortExplanation": "DNS（Domain Name System）はドメイン名とIPアドレスを変換する「インターネットの電話帳」だよ。ステージ2で学んだね。",
+          "choiceAnalysis": [
+            {"choice": "ア", "verdict": "◎ 正解", "explanation": "DNS＝ドメイン名（名前）をIPアドレス（番号）に変換する電話帳のようなしくみ！"},
+            {"choice": "イ", "verdict": "✗", "explanation": "DHCPはコンピュータにIPアドレスを自動的に割り当てるしくみ。変換ではなく「配る」役割だよ。"},
+            {"choice": "ウ", "verdict": "✗", "explanation": "HTTPはWebページを見るための通信ルール（プロトコル）。名前と番号の変換とは違うよ。"},
+            {"choice": "エ", "verdict": "✗", "explanation": "FTPはファイルを転送するための通信ルール。ドメイン名の変換とは関係ないね。"}
+          ],
+          "solvingStrategy": {
+            "steps": [
+              "「ドメイン名→IPアドレスに変換」がキーワード",
+              "DNS = Domain Name System＝名前と番号を結びつける電話帳",
+              "DHCPは「IPアドレスを配る」、DNSは「名前と番号を変換する」と区別しよう"
+            ],
+            "trap": "DNSとDHCPを混同しやすい！DNS＝名前を番号に変換（電話帳）、DHCP＝番号を自動で配る（受付係）と覚えよう。"
+          }
+        },
+        {
+          "id": "boss2-q3",
+          "relatedStage": 3,
+          "questionText": "Webサイトで個人情報やクレジットカード情報を安全に送信するために，通信を暗号化するプロトコルはどれか。",
+          "choices": {
+            "ア": "HTTP",
+            "イ": "FTP",
+            "ウ": "SMTP",
+            "エ": "HTTPS（SSL/TLS）"
+          },
+          "answer": "エ",
+          "shortExplanation": "HTTPS＝HTTPにSSL/TLSの暗号化を加えた安全な通信。URLが「https://」で始まり、鍵マークが表示されるよ。ステージ3で学んだね。",
+          "choiceAnalysis": [
+            {"choice": "ア", "verdict": "✗", "explanation": "HTTPは暗号化なしの通信。データが丸見えなので、パスワードやカード情報を送るのは危険だよ。"},
+            {"choice": "イ", "verdict": "✗", "explanation": "FTPはファイル転送のプロトコル。Webサイトの安全な通信とは目的が違うよ。"},
+            {"choice": "ウ", "verdict": "✗", "explanation": "SMTPはメールを送信するためのプロトコル。Webサイトの暗号化通信ではないね。"},
+            {"choice": "エ", "verdict": "◎ 正解", "explanation": "HTTPS＝HTTP＋SSL/TLS（暗号化）。通信内容を暗号化して、のぞき見やなりすましを防ぐよ！"}
+          ],
+          "solvingStrategy": {
+            "steps": [
+              "「通信を暗号化」「安全に送信」がキーワード",
+              "HTTP＝暗号化なし、HTTPS＝暗号化あり（Sはsecureのs！）",
+              "SSL/TLSが暗号化の技術。HTTPSはこれを使って安全にしている"
+            ],
+            "trap": "HTTPとHTTPSの違いを覚えよう！末尾に「S」がつくだけで大違い。Sがあれば安全（Secure）、なければ暗号化されていないよ。"
+          }
+        },
+        {
+          "id": "boss2-q4",
+          "relatedStage": 4,
+          "questionText": "電子メールで，受信者以外には誰に送ったかわからないように同時送信したいとき，使う宛先欄はどれか。",
+          "choices": {
+            "ア": "TO",
+            "イ": "BCC",
+            "ウ": "CC",
+            "エ": "件名（Subject）"
+          },
+          "answer": "イ",
+          "shortExplanation": "BCC（Blind Carbon Copy）は「見えないコピー」。BCCに入れた人のアドレスは他の受信者には見えないよ。ステージ4で学んだね。",
+          "choiceAnalysis": [
+            {"choice": "ア", "verdict": "✗", "explanation": "TOは主な宛先。TOに入れたアドレスは全員に見えるので、隠すことはできないよ。"},
+            {"choice": "イ", "verdict": "◎ 正解", "explanation": "BCC＝Blind（見えない）Carbon Copy。BCCに入れたアドレスは他の受信者に表示されない！"},
+            {"choice": "ウ", "verdict": "✗", "explanation": "CC（Carbon Copy）はコピーを送る宛先。CCのアドレスは全員に見えてしまうよ。"},
+            {"choice": "エ", "verdict": "✗", "explanation": "件名（Subject）はメールのタイトルを書く欄。宛先を指定する場所ではないね。"}
+          ],
+          "solvingStrategy": {
+            "steps": [
+              "「受信者以外にはわからない」＝アドレスを隠したい",
+              "TO＝主な宛先（見える）、CC＝コピー（見える）、BCC＝見えないコピー",
+              "Blind＝見えない。BCCのBはBlindのB！"
+            ],
+            "trap": "CCとBCCの違いを混同しやすい！CC＝全員に見える、BCC＝他の人には見えないと覚えよう。Bがつくと「見えなくなる」よ！"
+          }
+        },
+        {
+          "id": "boss2-q5",
+          "relatedStage": 5,
+          "questionText": "無線LAN（Wi-Fi）の説明として，適切なものはどれか。",
+          "choices": {
+            "ア": "通信ケーブルを使ってコンピュータ同士を接続するネットワーク",
+            "イ": "Bluetooth専用の近距離通信規格のこと",
+            "ウ": "電波を使って，ケーブルなしでインターネットに接続できるしくみ",
+            "エ": "世界中のコンピュータをつなぐネットワーク全体のこと"
+          },
+          "answer": "ウ",
+          "shortExplanation": "Wi-Fi（無線LAN）は電波を使ってケーブルなしでネットワークに接続するしくみ。おうちやお店でよく使うよね。ステージ5で学んだね。",
+          "choiceAnalysis": [
+            {"choice": "ア", "verdict": "✗", "explanation": "ケーブルを使うのは有線LAN。Wi-Fiは「無線」なのでケーブルは使わないよ。"},
+            {"choice": "イ", "verdict": "✗", "explanation": "BluetoothはWi-Fiとは別の近距離無線通信。イヤホンやマウスの接続に使うよ。Wi-Fiとは違うね。"},
+            {"choice": "ウ", "verdict": "◎ 正解", "explanation": "Wi-Fi＝無線LAN。電波でケーブルなしにインターネットに接続できる便利なしくみだよ！"},
+            {"choice": "エ", "verdict": "✗", "explanation": "世界中のコンピュータをつなぐネットワーク全体は「インターネット」のこと。Wi-Fiはインターネットへの接続方法の一つだよ。"}
+          ],
+          "solvingStrategy": {
+            "steps": [
+              "Wi-Fi＝無線LAN＝ケーブルなしでネットワークに接続",
+              "「無線」がポイント。ケーブルを使うのは「有線LAN」",
+              "BluetoothやインターネットはWi-Fiとは別の概念"
+            ],
+            "trap": "Wi-Fi（無線LAN）とBluetooth、有線LANを混同しやすい。Wi-Fi＝無線でネット接続、Bluetooth＝近距離の機器接続、有線LAN＝ケーブル接続と区別しよう！"
+          }
+        },
+        {
+          "id": "boss2-q6",
+          "relatedStage": 6,
+          "questionText": "インターネット経由でソフトウェアの機能を利用できるクラウドサービスの形態はどれか。",
+          "choices": {
+            "ア": "IaaS",
+            "イ": "PaaS",
+            "ウ": "オンプレミス",
+            "エ": "SaaS"
+          },
+          "answer": "エ",
+          "shortExplanation": "SaaS（Software as a Service）はインターネット経由でソフトウェアをそのまま使えるサービス。GmailやGoogleドキュメントがSaaSの例だよ。ステージ6で学んだね。",
+          "choiceAnalysis": [
+            {"choice": "ア", "verdict": "✗", "explanation": "IaaS（Infrastructure as a Service）はサーバーやネットワークなどの「土台」を借りるサービス。ソフトウェアの利用ではないよ。"},
+            {"choice": "イ", "verdict": "✗", "explanation": "PaaS（Platform as a Service）はアプリを開発するための「環境」を借りるサービス。完成したソフトを使うSaaSとは違うよ。"},
+            {"choice": "ウ", "verdict": "✗", "explanation": "オンプレミスは自分の会社にサーバーを置いて運用する方式。クラウドサービスの反対の考え方だよ。"},
+            {"choice": "エ", "verdict": "◎ 正解", "explanation": "SaaS＝完成したソフトウェアをインターネットで使えるサービス。インストール不要で便利だよ！"}
+          ],
+          "solvingStrategy": {
+            "steps": [
+              "「ソフトウェアの機能を利用」がキーワード",
+              "SaaS＝Software（ソフトウェア）を使う、PaaS＝Platform（開発環境）を使う、IaaS＝Infrastructure（土台）を使う",
+              "ピザに例えると：SaaS＝出前ピザ（完成品）、PaaS＝ピザキット（材料＋レシピ付き）、IaaS＝キッチンを借りる"
+            ],
+            "trap": "SaaS・PaaS・IaaSの3つを混同しやすい！「S＝ソフトウェア、P＝プラットフォーム、I＝インフラ」の頭文字で覚えよう。"
+          }
+        },
+        {
+          "id": "boss2-q7",
+          "relatedStage": 7,
+          "questionText": "年齢や障がいの有無にかかわらず，できるだけ多くの人が利用できるように製品やサービスを設計する考え方を何というか。",
+          "choices": {
+            "ア": "ユニバーサルデザイン",
+            "イ": "バリアフリー",
+            "ウ": "ユーザビリティ",
+            "エ": "アクセシビリティ"
+          },
+          "answer": "ア",
+          "shortExplanation": "ユニバーサルデザイン＝「みんなが使いやすい」を最初から考えて設計すること。バリアフリーは障壁を後から取り除くことだよ。ステージ7で学んだね。",
+          "choiceAnalysis": [
+            {"choice": "ア", "verdict": "◎ 正解", "explanation": "ユニバーサルデザイン＝ユニバーサル（すべての人）のためのデザイン。最初からみんなが使えるように設計するよ！"},
+            {"choice": "イ", "verdict": "✗", "explanation": "バリアフリーは「バリア（障壁）をフリー（なくす）」こと。あとから障壁を取り除く考え方で、ユニバーサルデザインとは少し違うよ。"},
+            {"choice": "ウ", "verdict": "✗", "explanation": "ユーザビリティは「使いやすさ」のこと。大切な概念だけど、「すべての人のための設計」という意味ではないよ。"},
+            {"choice": "エ", "verdict": "✗", "explanation": "アクセシビリティは「利用しやすさ・到達しやすさ」のこと。ユニバーサルデザインと関連するけど、設計の考え方そのものではないよ。"}
+          ],
+          "solvingStrategy": {
+            "steps": [
+              "「年齢や障がいにかかわらず」「多くの人が利用できる」「設計する考え方」がキーワード",
+              "ユニバーサル＝すべての人。最初からみんなのために設計する＝ユニバーサルデザイン",
+              "バリアフリー＝障壁を後から取り除く。ユニバーサルデザイン＝最初からみんなのために作る"
+            ],
+            "trap": "ユニバーサルデザインとバリアフリーを混同しやすい！バリアフリー＝障壁を取り除く（後から対応）、ユニバーサルデザイン＝最初からみんなのために設計する、と区別しよう。"
+          }
+        },
+        {
+          "id": "boss2-q8",
+          "relatedStage": 8,
+          "questionText": "製品やサービスを利用したときに，ユーザーが感じる満足感や体験全体のことを何というか。",
+          "choices": {
+            "ア": "UI（ユーザーインターフェース）",
+            "イ": "UX（ユーザーエクスペリエンス）",
+            "ウ": "GUI（グラフィカルユーザーインターフェース）",
+            "エ": "CUI（キャラクターユーザーインターフェース）"
+          },
+          "answer": "イ",
+          "shortExplanation": "UX（User Experience）＝ユーザーが製品を使ったときに感じる「体験全体」のこと。UIは見た目や操作部分だけを指すよ。ステージ8で学んだね。",
+          "choiceAnalysis": [
+            {"choice": "ア", "verdict": "✗", "explanation": "UIはユーザーが触れる「見た目」や「操作部分」のこと。ボタンの配置や画面のデザインなど。体験全体ではないよ。"},
+            {"choice": "イ", "verdict": "◎ 正解", "explanation": "UX＝ユーザーの体験全体。使いやすさ、楽しさ、満足感など、使ったときに感じるすべてのことだよ！"},
+            {"choice": "ウ", "verdict": "✗", "explanation": "GUIはアイコンやボタンを使って操作する画面のこと。WindowsやスマホのホームがGUIの例。体験全体ではないね。"},
+            {"choice": "エ", "verdict": "✗", "explanation": "CUIは文字（コマンド）を入力して操作する方式。プログラマーが使う黒い画面のイメージだよ。"}
+          ],
+          "solvingStrategy": {
+            "steps": [
+              "「ユーザーが感じる満足感」「体験全体」がキーワード",
+              "UI＝見た目・操作部分（Interface＝接点）、UX＝体験全体（Experience＝体験）",
+              "UIはUXの一部。良いUIがあると良いUXにつながるよ"
+            ],
+            "trap": "UIとUXを混同しやすい！UI＝目に見える部分（ボタン・画面）、UX＝使ったときの体験全体（満足感・楽しさ）と覚えよう。"
+          }
+        }
+      ],
+      "rewards": {
+        "clearTitle": "ネットワークの冒険者",
+        "exp": 500,
+        "gold": 1000,
+        "bonusCard": {
+          "cardName": "ネットワイバーン撃破の証",
+          "rarity": 4,
+          "summary": "第2章「ネットワークの冒険」を制覇した証。ネットワークの基礎知識をマスターした！"
+        }
+      }
+    }
+  ]
+}

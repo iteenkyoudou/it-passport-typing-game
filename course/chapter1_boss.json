@@ -11,6 +11,7 @@
       "isBossBattle": true,
       "passingScore": 7,
       "bossName": "メカドラゴン",
+      "bossSprite": "ボス/character_monster_dragon_01_red.png",
       "bossDescription": "コンピュータの知識で倒せ！7問以上正解で撃破！",
       "questions": [
         {
