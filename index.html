@@ -2119,7 +2119,7 @@
 <body>
 
 <!-- イントロ画面 -->
-<div id="intro-screen">
+<div id="intro-screen" class="hidden">
   <div id="intro-text-container">
     <div id="intro-text"></div>
   </div>
@@ -4773,8 +4773,7 @@ async function initializeFromCloud() {
   }
 }
 
-// ページ読み込み時にイントロ待機画面を表示
-startIntro();
+// イントロ画面はスキップ（直接ダッシュボードを表示）
 
 // クラウドからデータを取得
 initializeFromCloud();
