@@ -2364,7 +2364,7 @@
   <!-- ===== 右サイドバー: 称号解放者一覧 ===== -->
   <div id="sidebar-right" class="sidebar">
     <div class="dashboard-card" id="title-list-card">
-      <h3>称号解放者一覧 <span class="title-list-subtitle">- 称号を最初に解放した者の名がここに刻まれる</span></h3>
+      <h3>称号解放者一覧 <span class="title-list-subtitle">- 称号を解放した者の名がここに刻まれる</span></h3>
       <div class="title-list" id="title-list-content"></div>
     </div>
   </div>
@@ -3380,23 +3380,19 @@ function endBossBattle(victory) {
   }
 }
 
-// ボス撃破時に即座に称号を保存（解放者名は仮）
+// ボス撃破時に即座に称号を保存（最新の解放者で更新）
 function unlockTitleImmediately(bossIndex) {
   const unlocked = getUnlockedTitles();
   const threshold = BOSS_THRESHOLDS[bossIndex];
   const key = String(threshold);
-
-  // まだ解放されていない場合のみ保存
-  if (!unlocked[key]) {
-    const titleInfo = TITLE_THRESHOLDS.find(t => t.min === threshold);
-    if (titleInfo) {
-      // 解放者名は仮で空文字、後でゲーム終了時に更新
-      unlocked[key] = {
-        name: titleInfo.name,
-        unlockedBy: getSavedPlayerName() || '???'
-      };
-      saveUnlockedTitles(unlocked);
-    }
+  const titleInfo = TITLE_THRESHOLDS.find(t => t.min === threshold);
+  if (titleInfo) {
+    // 常に最新の解放者で上書き
+    unlocked[key] = {
+      name: titleInfo.name,
+      unlockedBy: getSavedPlayerName() || '???'
+    };
+    saveUnlockedTitles(unlocked);
   }
 }
 
@@ -4603,16 +4599,13 @@ function unlockTitle(playerName) {
   const unlocked = getUnlockedTitles();
   let changed = false;
 
-  // 倒したボスに対応する称号の解放者名を更新
+  // 倒したボスに対応する称号の解放者名を最新プレイヤーで更新
   defeatedBosses.forEach(bossIndex => {
     const threshold = BOSS_THRESHOLDS[bossIndex]; // 10, 20, 30...
     const key = String(threshold);
     if (unlocked[key]) {
-      // 解放者名が仮（???）または空の場合、正しい名前で更新
-      if (!unlocked[key].unlockedBy || unlocked[key].unlockedBy === '???') {
-        unlocked[key].unlockedBy = playerName || '';
-        changed = true;
-      }
+      unlocked[key].unlockedBy = playerName || '';
+      changed = true;
     }
   });
 
