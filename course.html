@@ -916,20 +916,58 @@ button{cursor:pointer;font-family:inherit}
 .badge-name{font-size:.85rem;font-weight:bold;color:#fff;margin-bottom:2px}
 .badge-desc{font-size:.7rem;color:#aaa;line-height:1.3}
 @media(max-width:768px){.badge-row{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}.badge-item{padding:10px 6px}}
+/* ===== アカウントモーダル: タブ・エラー・スピナー ===== */
+.account-tabs{display:flex;gap:0;margin-bottom:20px;border-bottom:2px solid #333}
+.account-tab{
+  flex:1;padding:10px;font-size:.9rem;font-weight:bold;
+  background:transparent;border:none;color:#888;
+  cursor:pointer;transition:all .2s;border-bottom:2px solid transparent;margin-bottom:-2px;
+}
+.account-tab.active{color:#ffd700;border-bottom-color:#ffd700}
+.account-tab:hover{color:#ffd700}
+.account-panel.hidden{display:none}
+.account-error{
+  margin-top:12px;padding:8px 12px;font-size:.85rem;
+  color:#ff6b6b;background:rgba(255,107,107,.1);
+  border:1px solid rgba(255,107,107,.3);border-radius:6px;text-align:center;
+}
+.account-error.hidden{display:none}
+.account-loading{
+  display:inline-block;width:16px;height:16px;
+  border:2px solid #000;border-top:2px solid transparent;
+  border-radius:50%;animation:accountSpin .6s linear infinite;
+  margin-right:6px;vertical-align:middle;
+}
+@keyframes accountSpin{to{transform:rotate(360deg)}}
 </style>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
-<!-- アカウント名入力モーダル -->
+<!-- アカウントモーダル -->
 <div class="account-modal" id="account-modal">
   <div class="account-modal-content">
-    <div class="account-modal-title">アカウント名を入力</div>
-    <div class="account-modal-desc">
-      学習データを保存するためのアカウント名を入力してください。<br>
-      好きな名前で登録できます。
+    <div class="account-modal-title">アカウント</div>
+    <div class="account-tabs">
+      <button class="account-tab active" id="tab-login" onclick="switchAccountTab('login')">ログイン</button>
+      <button class="account-tab" id="tab-create" onclick="switchAccountTab('create')">新規作成</button>
     </div>
-    <input type="text" class="account-input" id="account-input" placeholder="アカウント名を入力" maxlength="20" />
-    <button class="account-login-btn" id="account-login-btn">ログイン</button>
+    <!-- ログインパネル -->
+    <div class="account-panel" id="panel-login">
+      <div class="account-modal-desc">登録済みのアカウント名を入力してください。</div>
+      <input type="text" class="account-input" id="login-input" placeholder="アカウント名" maxlength="20" />
+      <button class="account-login-btn" id="login-btn">ログイン</button>
+      <div class="account-error hidden" id="login-error"></div>
+    </div>
+    <!-- 新規作成パネル -->
+    <div class="account-panel hidden" id="panel-create">
+      <div class="account-modal-desc">新しいアカウント名を入力してください。<br>好きな名前で登録できます。</div>
+      <input type="text" class="account-input" id="create-input" placeholder="新しいアカウント名" maxlength="20" />
+      <button class="account-login-btn" id="create-btn">アカウント作成</button>
+      <div class="account-error hidden" id="create-error"></div>
+    </div>
   </div>
 </div>
 
@@ -1107,6 +1145,19 @@ button{cursor:pointer;font-family:inherit}
 /* ===== デモモード判定 ===== */
 const IS_DEMO = new URLSearchParams(location.search).has('demo');
 
+/* ===== Firebase初期化 ===== */
+const firebaseConfig = {
+  apiKey: "AIzaSyB50ZX_dGaQoau4XUdopaFm2hy4hMRiqpA",
+  authDomain: "it-passport-typing-game.firebaseapp.com",
+  projectId: "it-passport-typing-game",
+  storageBucket: "it-passport-typing-game.firebasestorage.app",
+  messagingSenderId: "854167549178",
+  appId: "1:854167549178:web:ddd8f78da8025a7454c543",
+  measurementId: "G-V4020ES7EZ"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
 /* ===== アカウント管理 ===== */
 const ACCOUNT_KEY = 'course_accountName';
 
@@ -1164,6 +1215,60 @@ function migrateSaveData(data) {
   return data;
 }
 
+/* ===== Firebase クラウド同期 ===== */
+// クラウドからセーブデータを読み込み
+async function loadSaveDataFromCloud(accountName) {
+  try {
+    const doc = await db.collection('course_users').doc(accountName).get();
+    if (doc.exists) {
+      const data = doc.data();
+      delete data.createdAt;
+      delete data.updatedAt;
+      return migrateSaveData(data);
+    }
+    return null;
+  } catch (error) {
+    console.error('クラウドからのデータ読み込みエラー:', error);
+    return null;
+  }
+}
+
+// クラウドにセーブデータを保存
+async function saveSaveDataToCloud(accountName, data) {
+  try {
+    const saveData = Object.assign({}, data);
+    saveData.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+    await db.collection('course_users').doc(accountName).set(saveData, { merge: true });
+  } catch (error) {
+    console.error('クラウドへのデータ保存エラー:', error);
+  }
+}
+
+// アカウントがクラウドに存在するか確認
+async function checkAccountExists(accountName) {
+  try {
+    const doc = await db.collection('course_users').doc(accountName).get();
+    return doc.exists;
+  } catch (error) {
+    console.error('アカウント確認エラー:', error);
+    return false;
+  }
+}
+
+// クラウドに新規アカウントを作成
+async function createAccountInCloud(accountName) {
+  try {
+    const defaultData = getDefaultSaveData();
+    defaultData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+    defaultData.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+    await db.collection('course_users').doc(accountName).set(defaultData);
+    return true;
+  } catch (error) {
+    console.error('アカウント作成エラー:', error);
+    return false;
+  }
+}
+
 // 現在の章の進捗を取得するヘルパー
 function chapterState() {
   if (!currentChapter) return { clearedStages: [], bossCleared: false };
@@ -1195,39 +1300,158 @@ function loadSaveData() {
   }
 }
 
-// セーブデータ保存
+// セーブデータ保存（localStorage + クラウド）
+let _cloudSaveTimer = null;
 function saveSaveData(data) {
   localStorage.setItem(getSaveDataKey(), JSON.stringify(data));
+  const accountName = getAccountName();
+  if (accountName && !IS_DEMO) {
+    clearTimeout(_cloudSaveTimer);
+    _cloudSaveTimer = setTimeout(() => {
+      saveSaveDataToCloud(accountName, data);
+    }, 2000);
+  }
 }
 
-// ログイン処理
-function handleLogin() {
-  const input = document.getElementById('account-input');
+// タブ切り替え
+function switchAccountTab(tab) {
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-create').classList.toggle('active', tab === 'create');
+  document.getElementById('panel-login').classList.toggle('hidden', tab !== 'login');
+  document.getElementById('panel-create').classList.toggle('hidden', tab !== 'create');
+  document.getElementById('login-error').classList.add('hidden');
+  document.getElementById('create-error').classList.add('hidden');
+}
+
+// ログイン処理（既存アカウント）
+async function handleLogin() {
+  const input = document.getElementById('login-input');
   const accountName = input.value.trim();
+  const errorEl = document.getElementById('login-error');
+  const btn = document.getElementById('login-btn');
 
   if (!accountName) {
-    alert('アカウント名を入力してください');
+    errorEl.textContent = 'アカウント名を入力してください';
+    errorEl.classList.remove('hidden');
     return;
   }
 
-  // アカウント名を保存（この後 getSaveDataKey() がアカウント別キーを返す）
-  setAccountName(accountName);
+  // デモ版: Firestoreチェックをスキップ、localStorageのみ
+  if (IS_DEMO) {
+    setAccountName(accountName);
+    state = loadSaveData();
+    completeLogin();
+    return;
+  }
 
-  // アカウント固有のセーブデータを読み込み
-  state = loadSaveData();
+  btn.disabled = true;
+  btn.innerHTML = '<span class="account-loading"></span>ログイン中...';
+  errorEl.classList.add('hidden');
 
-  // モーダルを閉じる
+  try {
+    const exists = await checkAccountExists(accountName);
+    if (!exists) {
+      errorEl.textContent = 'このアカウント名は登録されていません。新規作成タブからアカウントを作成してください。';
+      errorEl.classList.remove('hidden');
+      btn.disabled = false;
+      btn.textContent = 'ログイン';
+      return;
+    }
+
+    const cloudData = await loadSaveDataFromCloud(accountName);
+    setAccountName(accountName);
+
+    if (cloudData) {
+      state = cloudData;
+      localStorage.setItem(getSaveDataKey(), JSON.stringify(state));
+    } else {
+      state = loadSaveData();
+    }
+
+    completeLogin();
+  } catch (error) {
+    console.error('ログインエラー:', error);
+    errorEl.textContent = '通信エラーが発生しました。もう一度お試しください。';
+    errorEl.classList.remove('hidden');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'ログイン';
+  }
+}
+
+// 新規アカウント作成処理
+async function handleCreateAccount() {
+  const input = document.getElementById('create-input');
+  const accountName = input.value.trim();
+  const errorEl = document.getElementById('create-error');
+  const btn = document.getElementById('create-btn');
+
+  if (!accountName) {
+    errorEl.textContent = 'アカウント名を入力してください';
+    errorEl.classList.remove('hidden');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="account-loading"></span>作成中...';
+  errorEl.classList.add('hidden');
+
+  try {
+    const exists = await checkAccountExists(accountName);
+    if (exists) {
+      errorEl.textContent = 'このアカウント名は既に使われています。別の名前を入力するか、ログインタブからログインしてください。';
+      errorEl.classList.remove('hidden');
+      btn.disabled = false;
+      btn.textContent = 'アカウント作成';
+      return;
+    }
+
+    const success = await createAccountInCloud(accountName);
+    if (!success) {
+      errorEl.textContent = 'アカウントの作成に失敗しました。もう一度お試しください。';
+      errorEl.classList.remove('hidden');
+      btn.disabled = false;
+      btn.textContent = 'アカウント作成';
+      return;
+    }
+
+    setAccountName(accountName);
+
+    // ローカルに既存データがあればマイグレーション
+    const existingLocalData = localStorage.getItem('course_saveData_' + accountName);
+    if (existingLocalData) {
+      try {
+        state = migrateSaveData(JSON.parse(existingLocalData));
+        await saveSaveDataToCloud(accountName, state);
+      } catch (e) {
+        state = getDefaultSaveData();
+      }
+    } else {
+      state = getDefaultSaveData();
+    }
+    localStorage.setItem(getSaveDataKey(), JSON.stringify(state));
+
+    completeLogin();
+  } catch (error) {
+    console.error('アカウント作成エラー:', error);
+    errorEl.textContent = '通信エラーが発生しました。もう一度お試しください。';
+    errorEl.classList.remove('hidden');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'アカウント作成';
+  }
+}
+
+// ログイン/作成後の共通処理
+function completeLogin() {
   document.getElementById('account-modal').classList.add('hidden');
-
-  // 表示を更新
   updateAccountDisplay();
-  if(typeof updateHeader==='function') updateHeader();
+  if (typeof updateHeader === 'function') updateHeader();
   updatePlayTimeDisplay();
 
-  // デモ版: チャプター選択をスキップし第1章に直行
-  if(IS_DEMO){
+  if (IS_DEMO) {
     selectChapter(1);
-  }else{
+  } else {
     showScreen('screen-chapters');
   }
 }
@@ -1235,24 +1459,26 @@ function handleLogin() {
 // アカウント情報表示更新
 function updateAccountDisplay() {
   const accountName = getAccountName();
-  const saveData = loadSaveData();
-
   document.getElementById('sp-account-name').textContent = accountName || 'ゲスト';
-  document.getElementById('sp-account-title').textContent = saveData.currentTitle || '駆け出しの学び手';
+  document.getElementById('sp-account-title').textContent = (state && state.currentTitle) || '駆け出しの学び手';
 }
 
 // ログアウト処理
 function handleLogout() {
-  // 現在のデータを保存してからログアウト
+  const accountName = getAccountName();
+  if (accountName && !IS_DEMO) {
+    clearTimeout(_cloudSaveTimer);
+    saveSaveDataToCloud(accountName, state);
+  }
   saveState();
-  // アカウント名をクリア
   localStorage.removeItem(ACCOUNT_KEY);
-  // stateをデフォルトにリセット
   state = getDefaultSaveData();
-  // ログインモーダルを表示
   document.getElementById('account-modal').classList.remove('hidden');
-  document.getElementById('account-input').value = '';
-  // サイドパネル表示をリセット
+  document.getElementById('login-input').value = '';
+  document.getElementById('create-input').value = '';
+  document.getElementById('login-error').classList.add('hidden');
+  document.getElementById('create-error').classList.add('hidden');
+  switchAccountTab('login');
   updateAccountDisplay();
   updatePlayTimeDisplay();
 }
@@ -1293,18 +1519,28 @@ document.addEventListener('visibilitychange',()=>{
 });
 
 // ページ読み込み時の処理
+// ページ離脱時にクラウドへ強制保存
+window.addEventListener('beforeunload', () => {
+  const accountName = getAccountName();
+  if (accountName && !IS_DEMO && typeof state !== 'undefined') {
+    clearTimeout(_cloudSaveTimer);
+    saveSaveDataToCloud(accountName, state);
+  }
+});
+
 window.addEventListener('DOMContentLoaded', () => {
   // デモ版: モーダル・サイドバー・UIの表示を変更
   if(IS_DEMO){
     document.querySelector('.account-modal-title').textContent='デモ版 - アカウント名を入力';
-    document.querySelector('.account-modal-desc').innerHTML='ステージ1・ステージ2・ボス戦が体験できます。<br>アカウント名を入力してプレイしてください。';
+    // デモ版ではタブを非表示にし、ログインパネルのみ表示
+    const tabsEl=document.querySelector('.account-tabs');
+    if(tabsEl)tabsEl.style.display='none';
+    document.querySelector('#panel-login .account-modal-desc').innerHTML='ステージ1・ステージ2・ボス戦が体験できます。<br>アカウント名を入力してプレイしてください。';
+    document.getElementById('login-btn').textContent='プレイ開始';
     document.title='【デモ版】ITパスポート対策講座';
-    // ヘッダーにデモ版表示
     document.querySelector('.app-title').textContent='【デモ版】ITパスポート対策講座';
-    // 「章の選択に戻る」ボタンを非表示
     const backBtn=document.querySelector('.chapter-back-btn');
     if(backBtn)backBtn.style.display='none';
-    // カード図鑑・実績バッジボタンを非表示
     document.querySelectorAll('#screen-map .next-btn.secondary').forEach(b=>b.style.display='none');
   }
 
@@ -1314,7 +1550,24 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('account-modal').classList.remove('hidden');
   } else {
     document.getElementById('account-modal').classList.add('hidden');
-    updateAccountDisplay();
+    // 既存アカウント: クラウドからデータ読み込みを試行
+    if (!IS_DEMO) {
+      loadSaveDataFromCloud(accountName).then(cloudData => {
+        if (cloudData) {
+          state = cloudData;
+          localStorage.setItem(getSaveDataKey(), JSON.stringify(state));
+        }
+        updateAccountDisplay();
+        if (typeof updateHeader === 'function') updateHeader();
+        updatePlayTimeDisplay();
+      }).catch(() => {
+        updateAccountDisplay();
+        if (typeof updateHeader === 'function') updateHeader();
+        updatePlayTimeDisplay();
+      });
+    } else {
+      updateAccountDisplay();
+    }
     if(IS_DEMO){
       selectChapter(1);
     }else{
@@ -1326,12 +1579,16 @@ window.addEventListener('DOMContentLoaded', () => {
   updatePlayTimeDisplay();
   startPlayTimeTracker();
 
-  // ログインボタンのイベント
-  document.getElementById('account-login-btn').addEventListener('click', handleLogin);
+  // ログイン・新規作成ボタンのイベント
+  document.getElementById('login-btn').addEventListener('click', handleLogin);
+  document.getElementById('create-btn').addEventListener('click', handleCreateAccount);
 
-  // Enterキーでログイン
-  document.getElementById('account-input').addEventListener('keypress', (e) => {
+  // Enterキーでログイン/作成
+  document.getElementById('login-input').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') handleLogin();
+  });
+  document.getElementById('create-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') handleCreateAccount();
   });
 });
 
