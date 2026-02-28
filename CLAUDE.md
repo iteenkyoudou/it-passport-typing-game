@@ -13,10 +13,11 @@
 - ITパスポート試験の学習用Webアプリ（静的サイト）
 - 2画面構成: index.html（タイピングゲーム）、course.html（コースモード）
 - Firebase Firestore（ランキング・称号）+ localStorage（セーブデータ）
-- 詳細仕様: docs/ ディレクトリ参照
+- 詳細仕様: 99_仕様/ ディレクトリ参照
 
 ## 重要な注意事項
 
 - course.htmlの `state` データ構造は変更しない（既存セーブデータ破損防止）
-- Firestoreバックアップ手順: docs/04_firestore_backup.md 参照
+- Firestoreバックアップ手順: 99_仕様/Firestoreバックアップ手順.md 参照
 - テスト用コード（defaultState の gold:5000, clearedStages全開放, loadState の強制リセット）は本番リリース前に修正が必要
+- デバッグコマンド `debugSkipTo(n)` （index.html末尾）は本番リリース前にコメントアウトすること。デバッグ時はコメントを外すだけで復活可能

@@ -12,9 +12,9 @@
 
 ## 2. Firestoreのデータ構造
 
-コレクション `game_data` に2つのドキュメントが存在する。
+### game_data コレクション（index.html用）
 
-### game_data/rankings
+#### game_data/rankings
 ゴールド獲得量順のランキング（Top10）。
 
 ```json
@@ -34,8 +34,8 @@
 }
 ```
 
-### game_data/unlocked_titles
-称号の解放状態と最初の解放者。
+#### game_data/unlocked_titles
+称号の解放状態と最新の解放者。
 
 ```json
 {
@@ -50,11 +50,16 @@
     "70":  { "name": "ITマスター",     "unlockedBy": "RTX5090" },
     "80":  { "name": "IT博士",         "unlockedBy": "RTX5090" },
     "90":  { "name": "ITゴッド",       "unlockedBy": "RTX5090" },
-    "100": { "name": "IT伝説王",       "unlockedBy": "RTX5090" }
+    "100": { "name": "IT伝説王",       "unlockedBy": "RTX5090" },
+    "130": { "name": "IT創世神",       "unlockedBy": "RTX5090" }
   },
   "updatedAt": "Timestamp"
 }
 ```
+
+### course_users コレクション（course.html用）
+
+ドキュメントID = アカウント名。各ドキュメントにセーブデータを格納。
 
 ## 3. スクリプト一覧
 

@@ -2051,6 +2051,20 @@
       from { box-shadow: 0 0 8px rgba(255,215,0,0.2); }
       to { box-shadow: 0 0 20px rgba(255,215,0,0.5); }
     }
+    .title-badge.rank-god {
+      background: linear-gradient(135deg, rgba(255,0,0,0.15), rgba(255,165,0,0.15), rgba(255,255,0,0.15), rgba(0,255,0,0.15), rgba(0,0,255,0.15), rgba(128,0,255,0.15));
+      border: 2px solid transparent;
+      border-image: linear-gradient(135deg, #ff0000, #ff8c00, #ffd700, #00ff88, #00bfff, #8b00ff) 1;
+      color: #fff;
+      text-shadow: 0 0 8px rgba(255,215,0,0.8), 0 0 16px rgba(255,0,128,0.6), 0 0 24px rgba(0,191,255,0.4);
+      animation: godGlow 3s ease-in-out infinite alternate;
+    }
+    @keyframes godGlow {
+      0% { box-shadow: 0 0 10px rgba(255,0,0,0.4), 0 0 20px rgba(255,215,0,0.2); }
+      33% { box-shadow: 0 0 10px rgba(0,255,128,0.4), 0 0 20px rgba(0,191,255,0.2); }
+      66% { box-shadow: 0 0 10px rgba(0,0,255,0.4), 0 0 20px rgba(128,0,255,0.2); }
+      100% { box-shadow: 0 0 10px rgba(255,0,128,0.4), 0 0 20px rgba(255,215,0,0.2); }
+    }
     .title-sub {
       font-size: 0.8rem;
       color: #888;
@@ -2571,72 +2585,76 @@ const ROMAJI_MAP = {
   '財務諸表':'zaimushohyou','事業計画':'jigyoukeikaku','経営方針':'keieihoushin','業務報告':'gyoumuhoukoku',
   '個人情報':'kojinjouhou','著作権':'chosakuken','不正アクセス':'fuseiakusesu','特許':'tokkyo',
   '特許権':'tokkyoken','商標権':'shouhyouken','意匠権':'ishouken','実用新案権':'jitsuyoushinanken',
-  'ライセンス':'raisensu','リース':'riisu','レンタル':'rentaru','サブスク':'sabusuku',
+  'ライセンス':'raisensu','リース':'ri-su','レンタル':'rentaru','サブスク':'sabusuku',
   '守秘':'shuhi','説明':'setsumei','報告':'houkoku','管理':'kanri',
   'コンプライアンス':'konpuraiansu','ガバナンス':'gabanansu','アカウンタビリティ':'akauntabirithi','マネジメント':'manejimento',
-  'コーポレートガバナンス':'koporeetogabanansu','リスクマネジメント':'risukumanejimento',
-  'ファイブフォース':'faibufoosu',
-  'ベンチマーキング':'benchimaakingu','ブレインストーミング':'bureinnsutoomingu','リエンジニアリング':'rienjiniaringu',
-  'アウトソーシング':'autosooshingu','インソーシング':'insooshingu','オフショア':'ofushoa',
-  'イノベーション':'inobeeshon','インキュベーション':'inkyubeeshon','マイグレーション':'maigreeshon','オプティマイゼーション':'oputimaizeeshon',
+  'コーポレートガバナンス':'ko-pore-togabanansu','リスクマネジメント':'risukumanejimento',
+  'ファイブフォース':'faibufo-su',
+  'ベンチマーキング':'benchima-kingu','ブレインストーミング':'bureinnsto-mingu','リエンジニアリング':'rienjiniaringu',
+  'アウトソーシング':'autoso-shingu','インソーシング':'inso-shingu','オフショア':'ofushoa',
+  'イノベーション':'inobe-shon','インキュベーション':'inkyube-shon','マイグレーション':'maigure-shon','オプティマイゼーション':'oputimaize-shon',
   'IT戦略':'itsenryaku','IT予算':'ityosan','IT投資':'ittoushi','IT基盤':'itkiban',
-  'ネットワーク':'nettowaku','スケール':'sukeeru','レバレッジ':'rebarejji','シナジー':'shinajii',
-  '技術のSカーブ':'gijutsunoesukabu',
-  'ベンチャーキャピタル':'benchaakyapitaru','クラウドファンディング':'kuraudofandingu','エンジェル投資':'enjerutoushi',
-  'マーケティングミックス':'maketingumikkusu','マーケティングリサーチ':'maketingurisaachi',
-  'ポートフォリオ':'pootoforio','リスク':'risuku','プロジェクト':'purojekuto','タレント':'tarento',
-  'プロダクトライフサイクル':'purodakutoraifusaikuru','バリューチェーン':'baryuucheen','サプライチェーン':'sapuraicheen','ビジネスモデル':'bijinesumoderu',
+  'ネットワーク':'nettowa-ku','スケール':'suke-ru','レバレッジ':'rebarejji','シナジー':'shinaji-',
+  '技術のSカーブ':'gijutsunoesuka-bu',
+  'ベンチャーキャピタル':'bencha-kyapitaru','クラウドファンディング':'kuraudofandingu','エンジェル投資':'enjerutoushi',
+  'マーケティングミックス':'ma-ketingumikkusu','マーケティングリサーチ':'ma-ketingurisa-chi',
+  'ポートフォリオ':'po-toforio','リスク':'risuku','プロジェクト':'purojekuto','タレント':'tarento',
+  'プロダクトライフサイクル':'purodakutoraifusaikuru','バリューチェーン':'baryu-che-n','サプライチェーン':'sapuraiche-n','ビジネスモデル':'bijinesumoderu',
   // マネジメント系
-  'アローダイアグラム':'aroodaiaguramu','ガントチャート':'gantochaato','フローチャート':'furoochaato',
-  'クリティカル':'kuritikaru','ベスト':'besuto','ショート':'shooto','メイン':'mein',
-  'ガント':'ganto','パレート':'pareeto','レーダー':'reedaa','フロー':'furoo',
-  'ウォーターフォール':'wootaafooru','アジャイル':'ajairu','スパイラル':'supairaru','プロトタイプ':'purototaipu',
+  'アローダイアグラム':'aro-daiaguramu','ガントチャート':'gantocha-to','フローチャート':'furo-cha-to',
+  'クリティカル':'kuritikaru','ベスト':'besuto','ショート':'sho-to','メイン':'mein',
+  'ガント':'ganto','パレート':'pare-to','レーダー':'re-da-','フロー':'furo-',
+  'ウォーターフォール':'uxo-ta-fo-ru','アジャイル':'ajairu','スパイラル':'supairaru','プロトタイプ':'purototaipu',
   'プロトタイピング':'purototaipingu',
-  'テスト':'tesuto','レビュー':'rebyuu','監査':'kansa','設計':'sekkei',
+  'テスト':'tesuto','レビュー':'rebyu-','監査':'kansa','設計':'sekkei',
   '単体':'tantai','結合':'ketsugou','システム':'shisutemu','受入':'ukeire',
   '運用':'unyou','開発':'kaihatsu','企画':'kikaku',
   '可用性':'kayousei','安全性':'anzensei','信頼性':'shinraisei','透明性':'toumeisei',
   '問題':'mondai','インシデント':'inshidento','変更':'henkou','構成':'kousei',
-  'サービスデスク':'saabisudesuku','ヘルプデスク':'herupudesuku','コールセンター':'koorusentaa','サポートセンター':'sapotosentaa',
+  'サービスデスク':'sa-bisudesuku','ヘルプデスク':'herupudesuku','コールセンター':'ko-rusenta-','サポートセンター':'sapo-tosenta-',
   'プロジェクト憲章':'purojekutokenshou','要件定義書':'youkenteigisho','設計書':'sekkeisho','仕様書':'shiyousho',
-  'ステークホルダー':'suteekuhorudaa','シェアホルダー':'sheahorudaa','プロジェクトマネージャー':'purojekutomanejaa','スポンサー':'suponsaa',
-  'クラッシング':'kurasshingu','ファストトラッキング':'fasutotorakkingu','リスケジュール':'risukejuuru','バッファ':'baffa',
+  'ステークホルダー':'sute-kuhoruda-','シェアホルダー':'sheahoruda-','プロジェクトマネージャー':'purojekutomane-ja-','スポンサー':'suponsa-',
+  'クラッシング':'kurasshingu','ファストトラッキング':'fasutotorakkingu','リスケジュール':'risukeju-ru','バッファ':'baffa',
   'タイムボックス':'taimubokkusu','スプリント':'supurinto',
   // テクノロジ系
-  'ビット':'bitto','バイト':'baito','ワード':'waado','ニブル':'niburu','ピクセル':'pikuseru',
-  'デバイスドライバ':'debaisudoraiba','ファームウェア':'faamuwea','ミドルウェア':'midoruwea','アプリケーション':'apurikeeshon',
-  'プロトコル':'purotokoru','アルゴリズム':'arugorizumu','インターフェース':'intaafeisu','アーキテクチャ':'aakitekucha',
-  'ファイアウォール':'faiawooru','ウイルス対策':'uirusutaisaku','プロキシ':'purokishi',
-  'マルウェア':'maruwea','フリーウェア':'furiiwea',
-  'フィッシング':'fisshingu','スパム':'supamu','ブルートフォース':'buruutofoosu',
-  'ソーシャルエンジニアリング':'soosharuenjiniaringu',
+  'ビット':'bitto','バイト':'baito','ワード':'wa-do','ニブル':'niburu','ピクセル':'pikuseru',
+  'デバイスドライバ':'debaisudoraiba','ファームウェア':'fa-muwea','ミドルウェア':'midoruwea','アプリケーション':'apurike-shon',
+  'プロトコル':'purotokoru','アルゴリズム':'arugorizumu','インターフェース':'inta-fe-su','アーキテクチャ':'a-kitekucha',
+  'ファイアウォール':'faiauxo-ru','ウイルス対策':'uirusutaisaku','プロキシ':'purokishi',
+  'マルウェア':'maruwea','フリーウェア':'furi-wea',
+  'フィッシング':'fisshingu','スパム':'supamu','ブルートフォース':'buru-tofo-su',
+  'ソーシャルエンジニアリング':'so-sharuenjiniaringu',
   'ランサムウェア':'ransamuwea','スパイウェア':'supaiwea','アドウェア':'adowea',
-  'トロイの木馬':'toroinomokuba','キーロガー':'kiirogaa',
+  'トロイの木馬':'toroinomokuba','キーロガー':'ki-roga-',
   'SQLインジェクション':'sqlinjekushon',
-  'クロスサイトスクリプティング':'kurosusaitosukuriputingu','バッファオーバーフロー':'baffaoobaafuroo',
-  'ワーム':'waamu',
+  'クロスサイトスクリプティング':'kurosusaitosukuriputingu','バッファオーバーフロー':'baffao-ba-furo-',
+  'ワーム':'wa-mu',
   '多要素':'tayouso','二段階':'nidankai','生体':'seitai','ワンタイム':'wantaimu',
   '暗号化':'angouka','圧縮':'asshuku','変換':'henkan','符号化':'fugouka',
   '共通鍵':'kyoutsuukagi','公開鍵':'koukaikagi','秘密鍵':'himitsukagi','ハイブリッド':'haiburiddo',
   'デジタル署名':'dejitarushomei','電子透かし':'denshisukashi','ハッシュ関数':'hasshukansuu','SSL証明書':'sslshoumeisho',
-  'データベース':'deetabeesu','スプレッドシート':'supureddoshiito','ファイルサーバ':'fairusaaba',
-  'リレーショナル':'rireeshonaru','階層型':'kaisougata','ネットワーク型':'nettowaakugata','オブジェクト指向':'obujekutoshikou',
-  '主キー':'shukii','外部キー':'gaibukii','候補キー':'kohokii','複合キー':'fukugoukii',
+  'データベース':'de-tabe-su','スプレッドシート':'supureddoshi-to','ファイルサーバ':'fairusa-ba',
+  'リレーショナル':'rire-shonaru','階層型':'kaisougata','ネットワーク型':'nettowa-kugata','オブジェクト指向':'obujekutoshikou',
+  '主キー':'shuki-','外部キー':'gaibuki-','候補キー':'kohoki-','複合キー':'fukugouki-',
   '正規化':'seikika','最適化':'saitekika','標準化':'hyoujunka','構造化':'kouzouka',
-  'リカバリ':'rikabari','バックアップ':'bakkuappu','リストア':'risutoa','ロールバック':'roorubakku',
+  'リカバリ':'rikabari','バックアップ':'bakkuappu','リストア':'risutoa','ロールバック':'ro-rubakku',
   'バグ':'bagu','ログ':'rogu','パッチ':'pacchi','デバッグ':'debaggu',
-  'パレート図':'pareetozu',
-  'クラウド':'kuraudo','エッジ':'ejji','グリッド':'guriddo','オンプレミス':'onpuremisu','マネージド':'manejido',
+  'パレート図':'pare-tozu',
+  'クラウド':'kuraudo','エッジ':'ejji','グリッド':'guriddo','オンプレミス':'onpuremisu','マネージド':'mane-jido',
   '機械学習':'kikaigakushuu','深層学習':'shinsougakushuu','自然言語処理':'shizengengoshori','画像認識':'gazouninshiki',
-  'ディープラーニング':'diipuraaningu','強化学習':'kyoukagakushuu','教師あり学習':'kyoushiarigakushuu',
-  'ビッグデータ':'biggudeta','メタデータ':'metadeeta','オープンデータ':'oopundeeta','マスタデータ':'masutadeeta',
-  'ブロックチェーン':'burokkucheen',
+  'ディープラーニング':'di-pura-ningu','強化学習':'kyoukagakushuu','教師あり学習':'kyoushiarigakushuu',
+  'ビッグデータ':'biggude-ta','メタデータ':'metade-ta','オープンデータ':'o-punde-ta','マスタデータ':'masutade-ta',
+  'ブロックチェーン':'burokkuche-n',
   '利用':'riyou','削除':'sakujo',
   '仮想化':'kasouka'
 };
 
 function normalizeRomaji(str) {
   let s = str.toLowerCase().replace(/\s+/g, '');
+  // ハイフンを直前の母音に変換（長音符ー対応: sa- → saa）
+  s = s.replace(/([aiueo])-/g, '$1$1');
+  // IME小文字入力の正規化（uxo → wo, uxi → wi 等）
+  s = s.replace(/uxo/g, 'wo').replace(/uxi/g, 'wi').replace(/uxe/g, 'we').replace(/uxa/g, 'wa');
   // 代替ローマ字の正規化（長い置換から先に）
   s = s.replace(/sya/g,'sha').replace(/syu/g,'shu').replace(/syo/g,'sho');
   s = s.replace(/tya/g,'cha').replace(/tyu/g,'chu').replace(/tyo/g,'cho');
@@ -2962,6 +2980,8 @@ function usePotionFromSlot() {
 
 // ---------- アイテムドロップシステム ----------
 function tryDropItem() {
+  // ラスボス戦中はアイテムドロップ無効
+  if (isFinalBoss) return;
   console.log('tryDropItem called, potionStock:', potionStock, 'watchStock:', watchStock);
   // アイテムドロップ判定
   if (Math.random() >= ITEM_DROP_CHANCE) {
@@ -3311,6 +3331,16 @@ let currentBossIndex = -1;
 let bossBattleStartQuestion = 0;
 let defeatedBosses = []; // ゲーム中に倒したボスのインデックスを記録
 
+// ---------- ラスボス（ITかぐや）システム ----------
+let isFinalBoss = false;
+let defeatedFinalBoss = false;
+let finalBossQuestions = [];
+let finalBossIndex = 0;       // ラスボス戦の現在の問題インデックス
+let finalBossDamageCount = 0;  // ラスボスに与えたダメージ（正解数）
+const FINAL_BOSS_HP = 20;
+const FINAL_BOSS_NAME = 'ITかぐや';
+const FINAL_BOSS_IMAGE = 'ボス/ラスボス.png';
+
 function isBossQuestion(questionNumber) {
   if (!BOSS_THRESHOLDS.includes(questionNumber)) return false;
   // 既に倒したボスは出現しない
@@ -3359,7 +3389,9 @@ function showBossUI() {
 
 function updateBossHpBar() {
   const bossHpBar = document.getElementById('boss-hp-bar');
-  const hpPercent = ((BOSS_HP_REQUIRED - bossDamageCount) / BOSS_HP_REQUIRED) * 100;
+  const maxHp = isFinalBoss ? FINAL_BOSS_HP : BOSS_HP_REQUIRED;
+  const damage = isFinalBoss ? finalBossDamageCount : bossDamageCount;
+  const hpPercent = ((maxHp - damage) / maxHp) * 100;
   bossHpBar.style.width = Math.max(0, hpPercent) + '%';
 }
 
@@ -3370,18 +3402,78 @@ function hideBossUI() {
 
 function endBossBattle(victory) {
   const defeatedBossIndex = currentBossIndex;
+  const wasFinalBoss = isFinalBoss;
   isBossBattle = false;
   currentBossIndex = -1;
+  // ボスバトルタイトルを通常に戻す
+  document.getElementById('boss-battle-title').textContent = '⚔️ BOSS BATTLE ⚔️';
   hideBossUI();
   if (victory) {
     defeatMonster();
-    // 倒したボスを記録
-    defeatedBosses.push(defeatedBossIndex);
-    // 称号を即座に仮保存（解放者名は後で更新）
-    unlockTitleImmediately(defeatedBossIndex);
-    // 称号獲得演出を表示
-    showTitleUnlockEffect(defeatedBossIndex);
+    if (wasFinalBoss) {
+      // ラスボス撃破 → IT創世神の称号を解放
+      unlockFinalBossTitle();
+      showFinalBossTitleUnlockEffect();
+    } else {
+      // 倒したボスを記録
+      defeatedBosses.push(defeatedBossIndex);
+      // 称号を即座に仮保存（解放者名は後で更新）
+      unlockTitleImmediately(defeatedBossIndex);
+      // 称号獲得演出を表示
+      showTitleUnlockEffect(defeatedBossIndex);
+    }
   }
+}
+
+// ラスボス撃破時の称号解放
+function unlockFinalBossTitle() {
+  const unlocked = getUnlockedTitles();
+  const key = '130';
+  unlocked[key] = {
+    name: 'IT創世神',
+    unlockedBy: getSavedPlayerName() || '???'
+  };
+  saveUnlockedTitles(unlocked);
+}
+
+// ラスボス撃破時の称号獲得演出
+function showFinalBossTitleUnlockEffect() {
+  const overlay = document.getElementById('title-unlock-overlay');
+  const titleName = document.getElementById('title-unlock-name');
+  const particles = document.getElementById('title-unlock-particles');
+
+  titleName.textContent = 'IT創世神';
+
+  particles.innerHTML = '';
+
+  // 虹色パーティクルを生成（ラスボス用の豪華版）
+  const colors = ['#ff0000', '#ff8c00', '#ffd700', '#00ff88', '#00bfff', '#8b00ff', '#ff00ff'];
+  for (let i = 0; i < 50; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'title-particle';
+    particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+    particle.style.setProperty('--tx', (Math.random() - 0.5) * 500 + 'px');
+    particle.style.setProperty('--ty', (Math.random() - 0.5) * 500 + 'px');
+    particle.style.animationDelay = Math.random() * 0.5 + 's';
+    particles.appendChild(particle);
+  }
+
+  const sparkles = ['✨', '⭐', '🌟', '💫', '🎉', '🏆', '👑', '🌈'];
+  for (let i = 0; i < 20; i++) {
+    const sparkle = document.createElement('div');
+    sparkle.className = 'title-sparkle';
+    sparkle.textContent = sparkles[Math.floor(Math.random() * sparkles.length)];
+    sparkle.style.setProperty('--tx', (Math.random() - 0.5) * 400 + 'px');
+    sparkle.style.setProperty('--ty', (Math.random() - 0.5) * 400 - 50 + 'px');
+    sparkle.style.animationDelay = Math.random() * 0.5 + 's';
+    particles.appendChild(sparkle);
+  }
+
+  overlay.style.display = 'flex';
+
+  setTimeout(() => {
+    overlay.style.display = 'none';
+  }, 4000); // ラスボスは4秒間表示
 }
 
 // ボス撃破時に即座に称号を保存（最新の解放者で更新）
@@ -3448,6 +3540,51 @@ function showTitleUnlockEffect(bossIndex) {
 function onBossMiss() {
   // 間違えてもボスの体力は回復しない
   // （累計ダメージはそのまま維持）
+}
+
+// ---------- ラスボス戦開始 ----------
+function startFinalBossBattle() {
+  isFinalBoss = true;
+  defeatedFinalBoss = false;
+  finalBossDamageCount = 0;
+
+  // ALL_QUESTIONSからランダム20問を選出
+  finalBossQuestions = shuffle([...ALL_QUESTIONS]).slice(0, FINAL_BOSS_HP);
+  questions = finalBossQuestions;
+  currentIndex = 0;
+  qTotal.textContent = questions.length;
+
+  // ボスUI表示（FINAL BOSS演出）
+  isBossBattle = true;
+  currentBossIndex = -99; // 特別なインデックス（通常ボスと区別）
+  bossDamageCount = 0;
+
+  const bossUI = document.getElementById('boss-battle-ui');
+  const bossName = document.getElementById('boss-name');
+  const bossHpBar = document.getElementById('boss-hp-bar');
+  const bossTitle = document.getElementById('boss-battle-title');
+
+  bossTitle.textContent = '⚔️ FINAL BOSS ⚔️';
+  bossUI.style.display = 'block';
+  bossName.textContent = FINAL_BOSS_NAME;
+  bossHpBar.style.width = '100%';
+
+  bossUI.className = '';
+  void bossUI.offsetWidth;
+  bossUI.className = 'show';
+
+  // ボス画像表示
+  monsterDefeated = false;
+  monsterImg.src = FINAL_BOSS_IMAGE;
+  monsterImg.style.display = '';
+  monsterImg.style.opacity = '1';
+  monsterImg.style.transform = 'scale(1.3)';
+  monsterImg.className = 'appear';
+  damageEffect.className = '';
+  damageNumber.className = '';
+  damageNumber.textContent = '';
+
+  showQuestion();
 }
 
 // ---------- お金ドロップ演出 ----------
@@ -3769,10 +3906,10 @@ function handleTimeout() {
     if (isDead) {
       showMissionGameOver('HP消滅');
     } else {
-      showNextButton();
+      setTimeout(() => showNextButton(), 1000);
     }
   } else {
-    showNextButton();
+    setTimeout(() => showNextButton(), 1000);
   }
 }
 
@@ -3794,6 +3931,11 @@ function startGame() {
   correctCount = 0;
   wrongCount = 0;
   defeatedBosses = []; // 倒したボスをリセット
+  isFinalBoss = false;
+  defeatedFinalBoss = false;
+  finalBossQuestions = [];
+  finalBossIndex = 0;
+  finalBossDamageCount = 0;
   resetBgm();
   resetHp();
 
@@ -3868,13 +4010,17 @@ function showQuestion() {
   startTimerSound();
 
   // ボス戦判定（本気モードで、問題番号が節目に達した場合）
-  const questionNumber = currentIndex + 1; // 現在の問題番号（1始まり）
-  if (gameMode === 'mission' && isBossQuestion(questionNumber) && !isBossBattle) {
-    const bossIndex = getBossIndex(questionNumber);
-    startBossBattle(bossIndex);
-  } else if (!isBossBattle) {
-    // 通常モンスター登場
-    showMonster();
+  if (isFinalBoss) {
+    // ラスボス戦中はモンスター表示を変更しない（ボスが常に表示）
+  } else {
+    const questionNumber = currentIndex + 1; // 現在の問題番号（1始まり）
+    if (gameMode === 'mission' && isBossQuestion(questionNumber) && !isBossBattle) {
+      const bossIndex = getBossIndex(questionNumber);
+      startBossBattle(bossIndex);
+    } else if (!isBossBattle) {
+      // 通常モンスター登場
+      showMonster();
+    }
   }
 
   typingInput.focus();
@@ -3980,7 +4126,30 @@ function handleCorrect(q) {
   });
 
   // ボス戦中の処理
-  if (isBossBattle) {
+  if (isFinalBoss && isBossBattle) {
+    // ラスボス戦
+    finalBossDamageCount++;
+    bossDamageCount = finalBossDamageCount;
+    updateBossHpBar();
+
+    if (finalBossDamageCount >= FINAL_BOSS_HP) {
+      // ラスボス撃破！
+      feedback.textContent = `${FINAL_BOSS_NAME}を撃破！ 新たなる称号を手に入れた！`;
+      defeatedFinalBoss = true;
+      endBossBattle(true);
+      dropMoney();
+      dropMoney();
+      dropMoney(); // ラスボスボーナス
+      showExplanation(q);
+      showNextButton();
+    } else {
+      // まだ続く
+      feedback.textContent = `正解！ あと${FINAL_BOSS_HP - finalBossDamageCount}問！`;
+      showDamageEffect();
+      showExplanation(q);
+      showNextButton();
+    }
+  } else if (isBossBattle) {
     bossDamageCount++;
     updateBossHpBar();
 
@@ -4027,7 +4196,10 @@ function handleWrong(q, wrongAnswer) {
   wrongCount++;
 
   // ボス戦中でも体力は回復しない（戦闘は継続）
-  if (isBossBattle) {
+  if (isFinalBoss && isBossBattle) {
+    onBossMiss();
+    feedback.textContent = `正解は「${q.answer}」 あと${FINAL_BOSS_HP - finalBossDamageCount}問！`;
+  } else if (isBossBattle) {
     onBossMiss();
     feedback.textContent = `正解は「${q.answer}」 あと${BOSS_HP_REQUIRED - bossDamageCount}問！`;
   } else {
@@ -4058,10 +4230,10 @@ function handleWrong(q, wrongAnswer) {
     if (isDead) {
       showMissionGameOver('HP消滅');
     } else {
-      showNextButton();
+      setTimeout(() => showNextButton(), 1000);
     }
   } else {
-    showNextButton();
+    setTimeout(() => showNextButton(), 1000);
   }
 }
 
@@ -4072,11 +4244,22 @@ function showExplanation(q) {
 
 // ---------- 本気モード ゲームオーバー ----------
 function showMissionGameOver(reason) {
-  const reasonText = reason === 'HP消滅'
-    ? `第${currentIndex + 1}問でHPが0に！`
-    : `第${currentIndex + 1}問で敗北！`;
-  goReason.textContent = reasonText;
+  const questionLabel = isFinalBoss
+    ? `ラスボス戦 第${currentIndex + 1}問でHPが0に！`
+    : (reason === 'HP消滅' ? `第${currentIndex + 1}問でHPが0に！` : `第${currentIndex + 1}問で敗北！`);
+  goReason.textContent = questionLabel;
 
+  // ラスボス戦中にゲームオーバーの場合、ボスUIをクリーンアップ
+  if (isFinalBoss) {
+    isBossBattle = false;
+    hideBossUI();
+    document.getElementById('boss-battle-title').textContent = '⚔️ BOSS BATTLE ⚔️';
+    isFinalBoss = false;
+    defeatedFinalBoss = true; // ラスボス戦終了フラグ（再突入防止）
+  }
+
+  stopTimer();
+  typingInput.disabled = true;
   gameOverOverlay.style.display = 'flex';
 
   // 2秒後にリザルト画面へ
@@ -4108,7 +4291,18 @@ function proceedToNext() {
   hideNextButton();
   currentIndex++;
   if (currentIndex >= questions.length) {
-    if (gameMode === 'mission') {
+    if (gameMode === 'mission' && !isFinalBoss && !defeatedFinalBoss) {
+      // 130問すべて出題完了 → ラスボス戦開始
+      startFinalBossBattle();
+    } else if (gameMode === 'mission') {
+      // ラスボス戦が終了（撃破 or 未撃破）→ リザルトへ
+      if (isFinalBoss && !defeatedFinalBoss) {
+        // ラスボス未撃破で20問終了 → ボスUI非表示
+        isBossBattle = false;
+        hideBossUI();
+        document.getElementById('boss-battle-title').textContent = '⚔️ BOSS BATTLE ⚔️';
+      }
+      isFinalBoss = false;
       showMissionResult();
     } else {
       showResult();
@@ -4159,6 +4353,7 @@ function showResult() {
 
 // ---------- 称号システム ----------
 function getMissionTitle(streak) {
+  if (streak >= 130) return { name: 'IT創世神',       css: 'rank-god',      desc: 'ITかぐやを撃破！ 創世の力を手に入れた！' };
   if (streak >= 100) return { name: 'IT伝説王',       css: 'rank-legend',   desc: '全問制覇！ 伝説に名を刻んだ！' };
   if (streak >= 90)  return { name: 'ITゴッド',        css: 'rank-legend',   desc: 'あと少しで伝説だ！' };
   if (streak >= 80)  return { name: 'IT博士',          css: 'rank-master',   desc: '誰もが認めるIT博士！' };
@@ -4182,14 +4377,17 @@ function showMissionResult() {
   resetBgm();
 
   // レコード作成（名前はまだ未設定）
+  // ラスボス撃破時はstreakに+20（ボーナス）を反映
+  const totalQuestions = defeatedFinalBoss ? 130 + FINAL_BOSS_HP : questions.length;
   const record = {
     streak: correctCount,
-    total: questions.length,
+    total: totalQuestions,
     category: getSelectedCategory(),
     date: new Date().toISOString(),
     name: '',
     gold: totalGold,
-    wrongCount: wrongCount
+    wrongCount: wrongCount,
+    defeatedFinalBoss: defeatedFinalBoss
   };
 
   // 名前入力画面を表示 → 入力後にリザルト画面へ
@@ -4202,10 +4400,13 @@ function showMissionResultScreen(record) {
   resultScreen.style.display = 'block';
 
   const isAllClear = record.streak === record.total;
+  const isFinalBossCleared = record.defeatedFinalBoss === true;
 
   // 次の称号への案内メッセージ
   let msg = '';
-  if (isAllClear) {
+  if (isFinalBossCleared) {
+    msg = 'ITかぐやを撃破！ 君こそがIT創世神だ！';
+  } else if (isAllClear) {
     msg = '全問制覇おめでとう！ 君はIT伝説王だ！';
   } else {
     const nextThresholds = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
@@ -4265,7 +4466,7 @@ function showMissionResultScreen(record) {
   const wrongNum = record.wrongCount || 0;
 
   resultScreen.innerHTML = `
-    <h2 class="mission-result-header">${isAllClear ? 'ALL CLEAR!' : 'RESULT'}</h2>
+    <h2 class="mission-result-header">${isFinalBossCleared ? 'PERFECT CLEAR!' : isAllClear ? 'ALL CLEAR!' : 'RESULT'}</h2>
     <div class="mission-streak">
       ${streakCount}<span class="streak-label">問正解 / 全${totalCount}問</span>
     </div>
@@ -4508,7 +4709,8 @@ function getColorForCss(css) {
     'rank-platinum': '#00d2ff',
     'rank-diamond': '#b9f2ff',
     'rank-master': '#ffb74d',
-    'rank-legend': '#ffd700'
+    'rank-legend': '#ffd700',
+    'rank-god': '#ff69b4'
   };
   return map[css] || '#ccc';
 }
@@ -4526,11 +4728,13 @@ const TITLE_THRESHOLDS = [
   { min: 70,  name: 'ITマスター',      css: 'rank-master' },
   { min: 80,  name: 'IT博士',          css: 'rank-master' },
   { min: 90,  name: 'ITゴッド',        css: 'rank-legend' },
-  { min: 100, name: 'IT伝説王',       css: 'rank-legend' }
+  { min: 100, name: 'IT伝説王',       css: 'rank-legend' },
+  { min: 130, name: 'IT創世神',       css: 'rank-god' }
 ];
 
 // クラウドから取得した称号データをキャッシュ
 let cachedCloudTitles = null;
+let cloudTitlesLoaded = false;
 
 function getUnlockedTitles() {
   // キャッシュがあればそれを返す（クラウドからロード済み）
@@ -4573,6 +4777,7 @@ async function loadUnlockedTitlesFromCloud() {
         cachedCloudTitles = {};
       }
     }
+    cloudTitlesLoaded = true;
     return cachedCloudTitles;
   } catch (error) {
     console.error('称号データのクラウド読み込みエラー:', error);
@@ -4583,6 +4788,7 @@ async function loadUnlockedTitlesFromCloud() {
     } catch {
       cachedCloudTitles = {};
     }
+    cloudTitlesLoaded = true;
     return cachedCloudTitles;
   }
 }
@@ -4613,6 +4819,12 @@ function unlockTitle(playerName) {
     }
   });
 
+  // ラスボス撃破時の称号も解放者名を更新
+  if (defeatedFinalBoss && unlocked['130']) {
+    unlocked['130'].unlockedBy = playerName || '';
+    changed = true;
+  }
+
   if (changed) {
     saveUnlockedTitles(unlocked);
   }
@@ -4625,7 +4837,10 @@ function updateTitleList() {
   // かけだしタイパー（0問）は常に解放済み
   if (!unlocked['0']) {
     unlocked['0'] = { name: 'かけだしタイパー', unlockedBy: '' };
-    saveUnlockedTitles(unlocked);
+    // クラウドデータ読み込み前は表示用にローカルのみ保存（クラウドデータ上書き防止）
+    if (cloudTitlesLoaded) {
+      saveUnlockedTitles(unlocked);
+    }
   }
 
   let html = `<table>
@@ -4922,6 +5137,74 @@ async function initializeFromCloud() {
 
 // クラウドからデータを取得
 initializeFromCloud();
+
+// ---------- デバッグ用コマンド ----------
+// ブラウザコンソールから debugSkipTo(130) で指定問目まで全問正解扱いでスキップ
+function debugSkipTo(targetQ) {
+  if (typeof targetQ !== 'number' || targetQ < 1) {
+    console.error('使い方: debugSkipTo(130) — 1以上の数値を指定');
+    return;
+  }
+
+  // 本気モードで強制開始
+  gameMode = 'mission';
+  const pool = getFilteredQuestions(getSelectedCategory());
+  questions = shuffle(pool);
+
+  const skipTo = Math.min(targetQ, questions.length);
+
+  currentIndex = 0;
+  score = 0;
+  totalGold = 0;
+  correctCount = 0;
+  wrongCount = 0;
+  defeatedBosses = [];
+  isFinalBoss = false;
+  defeatedFinalBoss = false;
+  finalBossQuestions = [];
+  finalBossIndex = 0;
+  finalBossDamageCount = 0;
+  resetBgm();
+  resetHp();
+
+  // 画面切り替え
+  startScreen.classList.add('hidden');
+  resultScreen.style.display = 'none';
+  gameScreen.classList.remove('hidden');
+  searchSidePanel.style.display = 'flex';
+  document.body.classList.add('panel-open');
+  showHpBar();
+
+  // skipTo問目まで全問正解扱いでスキップ
+  for (let i = 0; i < skipTo; i++) {
+    score += 100;
+    correctCount++;
+    totalGold += Math.floor(Math.random() * 900) + 100;
+
+    // ボス撃破もシミュレート
+    const qNum = i + 1;
+    const bossIdx = BOSS_THRESHOLDS.indexOf(qNum);
+    if (bossIdx !== -1) {
+      defeatedBosses.push(bossIdx);
+      unlockTitleImmediately(bossIdx);
+    }
+  }
+
+  currentIndex = skipTo;
+  qTotal.textContent = questions.length;
+  goldVal.textContent = totalGold.toLocaleString();
+
+  console.log(`✅ デバッグ: ${skipTo}問目まで全問正解でスキップしました`);
+  console.log(`   correctCount=${correctCount}, totalGold=${totalGold}, HP=${playerHp}`);
+
+  if (currentIndex >= questions.length) {
+    // 全問完了 → ラスボス戦開始
+    console.log('🎮 ラスボス戦を開始します...');
+    startFinalBossBattle();
+  } else {
+    showQuestion();
+  }
+}
 </script>
 
 </body>
