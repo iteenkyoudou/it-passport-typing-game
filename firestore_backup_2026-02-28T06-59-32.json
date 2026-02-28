@@ -1,0 +1,584 @@
+{
+  "projectId": "it-passport-typing-game",
+  "backupDate": "2026-02-28T06:59:31.915Z",
+  "documents": {
+    "game_data/rankings": {
+      "_path": "game_data/rankings",
+      "_rawFields": {
+        "records": {
+          "arrayValue": {
+            "values": [
+              {
+                "mapValue": {
+                  "fields": {
+                    "total": {
+                      "integerValue": "130"
+                    },
+                    "streak": {
+                      "integerValue": "97"
+                    },
+                    "name": {
+                      "stringValue": "RTX5090"
+                    },
+                    "wrongCount": {
+                      "integerValue": "6"
+                    },
+                    "gold": {
+                      "integerValue": "46188"
+                    },
+                    "category": {
+                      "stringValue": "all"
+                    },
+                    "date": {
+                      "stringValue": "2026-02-21T10:21:01.973Z"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "wrongCount": {
+                      "integerValue": "10"
+                    },
+                    "name": {
+                      "stringValue": "ろくさま"
+                    },
+                    "streak": {
+                      "integerValue": "52"
+                    },
+                    "gold": {
+                      "integerValue": "28360"
+                    },
+                    "date": {
+                      "stringValue": "2026-02-20T00:59:05.157Z"
+                    },
+                    "category": {
+                      "stringValue": "テクノロジ系"
+                    },
+                    "total": {
+                      "integerValue": "62"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "category": {
+                      "stringValue": "all"
+                    },
+                    "date": {
+                      "stringValue": "2026-02-21T10:11:41.592Z"
+                    },
+                    "gold": {
+                      "integerValue": "17091"
+                    },
+                    "name": {
+                      "stringValue": "あ"
+                    },
+                    "streak": {
+                      "integerValue": "33"
+                    },
+                    "wrongCount": {
+                      "integerValue": "3"
+                    },
+                    "total": {
+                      "integerValue": "130"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "date": {
+                      "stringValue": "2026-02-20T01:16:14.955Z"
+                    },
+                    "category": {
+                      "stringValue": "all"
+                    },
+                    "gold": {
+                      "integerValue": "16481"
+                    },
+                    "wrongCount": {
+                      "integerValue": "11"
+                    },
+                    "streak": {
+                      "integerValue": "32"
+                    },
+                    "name": {
+                      "stringValue": "ろくさま"
+                    },
+                    "total": {
+                      "integerValue": "130"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "total": {
+                      "integerValue": "62"
+                    },
+                    "date": {
+                      "stringValue": "2026-02-20T00:46:34.426Z"
+                    },
+                    "category": {
+                      "stringValue": "テクノロジ系"
+                    },
+                    "gold": {
+                      "integerValue": "15701"
+                    },
+                    "name": {
+                      "stringValue": "6"
+                    },
+                    "streak": {
+                      "integerValue": "37"
+                    },
+                    "wrongCount": {
+                      "integerValue": "19"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "total": {
+                      "integerValue": "130"
+                    },
+                    "streak": {
+                      "integerValue": "30"
+                    },
+                    "name": {
+                      "stringValue": ""
+                    },
+                    "wrongCount": {
+                      "integerValue": "3"
+                    },
+                    "gold": {
+                      "integerValue": "14111"
+                    },
+                    "category": {
+                      "stringValue": "all"
+                    },
+                    "date": {
+                      "stringValue": "2026-02-21T09:58:38.960Z"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "category": {
+                      "stringValue": "all"
+                    },
+                    "date": {
+                      "stringValue": "2026-02-21T09:29:19.892Z"
+                    },
+                    "gold": {
+                      "integerValue": "11402"
+                    },
+                    "streak": {
+                      "integerValue": "27"
+                    },
+                    "name": {
+                      "stringValue": "あ"
+                    },
+                    "wrongCount": {
+                      "integerValue": "4"
+                    },
+                    "total": {
+                      "integerValue": "130"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "gold": {
+                      "integerValue": "11166"
+                    },
+                    "date": {
+                      "stringValue": "2026-02-21T09:45:29.791Z"
+                    },
+                    "category": {
+                      "stringValue": "all"
+                    },
+                    "streak": {
+                      "integerValue": "16"
+                    },
+                    "name": {
+                      "stringValue": "あ"
+                    },
+                    "wrongCount": {
+                      "integerValue": "3"
+                    },
+                    "total": {
+                      "integerValue": "130"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "total": {
+                      "integerValue": "130"
+                    },
+                    "wrongCount": {
+                      "integerValue": "9"
+                    },
+                    "streak": {
+                      "integerValue": "23"
+                    },
+                    "name": {
+                      "stringValue": "ろくさま"
+                    },
+                    "date": {
+                      "stringValue": "2026-02-20T01:08:24.106Z"
+                    },
+                    "category": {
+                      "stringValue": "all"
+                    },
+                    "gold": {
+                      "integerValue": "10217"
+                    }
+                  }
+                }
+              },
+              {
+                "mapValue": {
+                  "fields": {
+                    "total": {
+                      "integerValue": "130"
+                    },
+                    "gold": {
+                      "integerValue": "8886"
+                    },
+                    "date": {
+                      "stringValue": "2026-02-21T10:03:52.446Z"
+                    },
+                    "category": {
+                      "stringValue": "all"
+                    },
+                    "streak": {
+                      "integerValue": "25"
+                    },
+                    "name": {
+                      "stringValue": "あ"
+                    },
+                    "wrongCount": {
+                      "integerValue": "4"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "updatedAt": {
+          "timestampValue": "2026-02-22T02:00:57.511Z"
+        }
+      },
+      "data": {
+        "records": [
+          {
+            "total": 130,
+            "streak": 97,
+            "name": "RTX5090",
+            "wrongCount": 6,
+            "gold": 46188,
+            "category": "all",
+            "date": "2026-02-21T10:21:01.973Z"
+          },
+          {
+            "wrongCount": 10,
+            "name": "ろくさま",
+            "streak": 52,
+            "gold": 28360,
+            "date": "2026-02-20T00:59:05.157Z",
+            "category": "テクノロジ系",
+            "total": 62
+          },
+          {
+            "category": "all",
+            "date": "2026-02-21T10:11:41.592Z",
+            "gold": 17091,
+            "name": "あ",
+            "streak": 33,
+            "wrongCount": 3,
+            "total": 130
+          },
+          {
+            "date": "2026-02-20T01:16:14.955Z",
+            "category": "all",
+            "gold": 16481,
+            "wrongCount": 11,
+            "streak": 32,
+            "name": "ろくさま",
+            "total": 130
+          },
+          {
+            "total": 62,
+            "date": "2026-02-20T00:46:34.426Z",
+            "category": "テクノロジ系",
+            "gold": 15701,
+            "name": "6",
+            "streak": 37,
+            "wrongCount": 19
+          },
+          {
+            "total": 130,
+            "streak": 30,
+            "name": "",
+            "wrongCount": 3,
+            "gold": 14111,
+            "category": "all",
+            "date": "2026-02-21T09:58:38.960Z"
+          },
+          {
+            "category": "all",
+            "date": "2026-02-21T09:29:19.892Z",
+            "gold": 11402,
+            "streak": 27,
+            "name": "あ",
+            "wrongCount": 4,
+            "total": 130
+          },
+          {
+            "gold": 11166,
+            "date": "2026-02-21T09:45:29.791Z",
+            "category": "all",
+            "streak": 16,
+            "name": "あ",
+            "wrongCount": 3,
+            "total": 130
+          },
+          {
+            "total": 130,
+            "wrongCount": 9,
+            "streak": 23,
+            "name": "ろくさま",
+            "date": "2026-02-20T01:08:24.106Z",
+            "category": "all",
+            "gold": 10217
+          },
+          {
+            "total": 130,
+            "gold": 8886,
+            "date": "2026-02-21T10:03:52.446Z",
+            "category": "all",
+            "streak": 25,
+            "name": "あ",
+            "wrongCount": 4
+          }
+        ],
+        "updatedAt": "2026-02-22T02:00:57.511Z"
+      },
+      "createTime": "2026-02-19T05:53:13.304338Z",
+      "updateTime": "2026-02-22T02:00:57.566383Z"
+    },
+    "game_data/unlocked_titles": {
+      "_path": "game_data/unlocked_titles",
+      "_rawFields": {
+        "updatedAt": {
+          "timestampValue": "2026-02-28T06:24:46.383Z"
+        },
+        "titles": {
+          "mapValue": {
+            "fields": {
+              "0": {
+                "mapValue": {
+                  "fields": {
+                    "name": {
+                      "stringValue": "かけだしタイパー"
+                    },
+                    "unlockedBy": {
+                      "stringValue": ""
+                    }
+                  }
+                }
+              },
+              "10": {
+                "mapValue": {
+                  "fields": {
+                    "unlockedBy": {
+                      "stringValue": "RTX5090"
+                    },
+                    "name": {
+                      "stringValue": "IT見習い"
+                    }
+                  }
+                }
+              },
+              "20": {
+                "mapValue": {
+                  "fields": {
+                    "name": {
+                      "stringValue": "IT冒険者"
+                    },
+                    "unlockedBy": {
+                      "stringValue": "RTX5090"
+                    }
+                  }
+                }
+              },
+              "30": {
+                "mapValue": {
+                  "fields": {
+                    "name": {
+                      "stringValue": "IT騎士"
+                    },
+                    "unlockedBy": {
+                      "stringValue": "RTX5090"
+                    }
+                  }
+                }
+              },
+              "40": {
+                "mapValue": {
+                  "fields": {
+                    "unlockedBy": {
+                      "stringValue": "RTX5090"
+                    },
+                    "name": {
+                      "stringValue": "IT勇者"
+                    }
+                  }
+                }
+              },
+              "50": {
+                "mapValue": {
+                  "fields": {
+                    "unlockedBy": {
+                      "stringValue": "RTX5090"
+                    },
+                    "name": {
+                      "stringValue": "IT魔法使い"
+                    }
+                  }
+                }
+              },
+              "60": {
+                "mapValue": {
+                  "fields": {
+                    "unlockedBy": {
+                      "stringValue": "RTX5090"
+                    },
+                    "name": {
+                      "stringValue": "IT賢者"
+                    }
+                  }
+                }
+              },
+              "70": {
+                "mapValue": {
+                  "fields": {
+                    "unlockedBy": {
+                      "stringValue": "RTX5090"
+                    },
+                    "name": {
+                      "stringValue": "ITマスター"
+                    }
+                  }
+                }
+              },
+              "80": {
+                "mapValue": {
+                  "fields": {
+                    "unlockedBy": {
+                      "stringValue": "RTX5090"
+                    },
+                    "name": {
+                      "stringValue": "IT博士"
+                    }
+                  }
+                }
+              },
+              "90": {
+                "mapValue": {
+                  "fields": {
+                    "unlockedBy": {
+                      "stringValue": "RTX5090"
+                    },
+                    "name": {
+                      "stringValue": "ITゴッド"
+                    }
+                  }
+                }
+              },
+              "100": {
+                "mapValue": {
+                  "fields": {
+                    "unlockedBy": {
+                      "stringValue": "RTX5090"
+                    },
+                    "name": {
+                      "stringValue": "IT伝説王"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "data": {
+        "updatedAt": "2026-02-28T06:24:46.383Z",
+        "titles": {
+          "0": {
+            "name": "かけだしタイパー",
+            "unlockedBy": ""
+          },
+          "10": {
+            "unlockedBy": "RTX5090",
+            "name": "IT見習い"
+          },
+          "20": {
+            "name": "IT冒険者",
+            "unlockedBy": "RTX5090"
+          },
+          "30": {
+            "name": "IT騎士",
+            "unlockedBy": "RTX5090"
+          },
+          "40": {
+            "unlockedBy": "RTX5090",
+            "name": "IT勇者"
+          },
+          "50": {
+            "unlockedBy": "RTX5090",
+            "name": "IT魔法使い"
+          },
+          "60": {
+            "unlockedBy": "RTX5090",
+            "name": "IT賢者"
+          },
+          "70": {
+            "unlockedBy": "RTX5090",
+            "name": "ITマスター"
+          },
+          "80": {
+            "unlockedBy": "RTX5090",
+            "name": "IT博士"
+          },
+          "90": {
+            "unlockedBy": "RTX5090",
+            "name": "ITゴッド"
+          },
+          "100": {
+            "unlockedBy": "RTX5090",
+            "name": "IT伝説王"
+          }
+        }
+      },
+      "createTime": "2026-02-15T00:28:25.344497Z",
+      "updateTime": "2026-02-28T06:24:46.457354Z"
+    }
+  }
+}

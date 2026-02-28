@@ -1596,6 +1596,7 @@ window.addEventListener('DOMContentLoaded', () => {
 let COURSE_DATA = [];
 let BOSS_DATA = {};
 let currentChapter = null;
+const _chapterPqCache = {}; /* chapterId -> practiceQuestions[] */
 
 /* ===== チャプター定義 ===== */
 const CHAPTERS = [
@@ -1867,7 +1868,7 @@ function skipTypewriter(){if(twSkipFn){twSkipFn();return true;}return false;}
 
 /* ===== DQ風レベル計算 ===== */
 const MAX_LEVEL=999;
-function expForLevel(lv){return Math.floor(45+lv*0.28);}
+function expForLevel(lv){return Math.floor(4+0.25*lv+0.002*lv*lv);}
 const CHAPTER_EXP_MULT=[0.5,0.7,0.9,1.0,1.2,1.4,1.6,1.8];
 function chapterExpMult(){const id=currentChapter?currentChapter.id:1;return CHAPTER_EXP_MULT[id-1]||1.0;}
 function calcLevel(totalExp){
@@ -2226,6 +2227,22 @@ function retryStep(){renderLearnStep();}
 document.addEventListener('keydown',(e)=>{
   if(e.code==='Space'&&document.querySelector('#screen-learn.active')){
     e.preventDefault();revealNext(null);
+  }
+  /* デバッグ: Ctrl+Shift+D で全章・全ステージ解放 */
+  if(e.ctrlKey&&e.shiftKey&&e.code==='KeyD'){
+    e.preventDefault();
+    CHAPTERS.forEach(ch=>{
+      if(!state.chapters[ch.id])state.chapters[ch.id]={clearedStages:[],bossCleared:false};
+      const stageIds=ch.stageCount?Array.from({length:ch.stageCount},(_,i)=>i+1):[];
+      state.chapters[ch.id].clearedStages=stageIds;
+      state.chapters[ch.id].bossCleared=true;
+    });
+    state.gold=9999;
+    state.exp=Math.max(state.exp,5000);
+    saveState();
+    if(currentChapter)renderStageGrid();
+    console.log('%c[DEBUG] 全章全ステージ解放！gold=9999, exp='+state.exp,'color:#0f0;font-weight:bold');
+    alert('DEBUG: 全章全ステージ解放しました');
   }
 });
 
@@ -3148,12 +3165,32 @@ function confirmBossStart(){
   document.getElementById('modal-cancel').onclick=()=>{playSfx('select');overlay.remove()};
   document.getElementById('modal-go').onclick=()=>{playSfx('confirm');overlay.remove();startBoss()};
 }
-function startBoss(){
+async function startBoss(){
   bossQIndex=0;bossCorrect=0;bossCombo=0;bossItemsUsedThisFight=false;
   const exitPanel=document.getElementById('boss-exit-confirm');if(exitPanel)exitPanel.style.display='none';
   bossBag=state.inventory.slice();
-  /* 章内ステージの practiceQuestions を収集 */
+  /* 現在章＋過去章の practiceQuestions を累積収集 */
   const pool=[];
+  const chId=currentChapter.id;
+  /* 過去章をキャッシュ経由でロード */
+  const prevChapters=CHAPTERS.filter(c=>c.id<chId&&c.files&&c.files.stages.length>0);
+  const toLoad=prevChapters.filter(c=>!_chapterPqCache[c.id]);
+  if(toLoad.length>0){
+    try{
+      const fetches=toLoad.flatMap(c=>c.files.stages.map(f=>fetch(f).then(r=>r.ok?r.json():null).then(d=>({chId:c.id,data:d}))));
+      const results=await Promise.all(fetches);
+      const byChapter={};
+      results.forEach(r=>{if(!r.data)return;if(!byChapter[r.chId])byChapter[r.chId]=[];r.data.stages.forEach(s=>{if(s.practiceQuestions)s.practiceQuestions.forEach(pq=>byChapter[r.chId].push(pq));});});
+      toLoad.forEach(c=>{_chapterPqCache[c.id]=byChapter[c.id]||[];});
+    }catch(e){console.error('過去章ロードエラー:',e);}
+  }
+  /* 過去章のpracticeQuestionsをプールに追加 */
+  prevChapters.forEach(c=>{
+    if(_chapterPqCache[c.id])_chapterPqCache[c.id].forEach(pq=>{
+      pool.push({questionText:pq.questionText,choices:pq.choices,answer:pq.answer,shortExplanation:pq.shortExplanation,choiceAnalysis:pq.choiceAnalysis,solvingStrategy:pq.solvingStrategy});
+    });
+  });
+  /* 現在章のpracticeQuestions（COURSE_DATAから取得） */
   COURSE_DATA.forEach(st=>{
     if(st.practiceQuestions){
       st.practiceQuestions.forEach(pq=>{
@@ -3163,7 +3200,9 @@ function startBoss(){
   });
   if(pool.length===0&&BOSS_DATA.questions)BOSS_DATA.questions.forEach(q=>pool.push(q));
   for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
-  const cnt=Math.min(currentChapter.id+2,pool.length);
+  const cnt=chId>=9
+    ?Math.min(12+Math.floor(Math.random()*4),pool.length)
+    :Math.min(chId+2,pool.length);
   bossActiveQs=pool.slice(0,cnt);
   document.getElementById('boss-title').textContent=BOSS_DATA.bossName;
   /* VS演出 */
