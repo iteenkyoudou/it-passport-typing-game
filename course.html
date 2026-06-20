@@ -1318,7 +1318,8 @@ function getDefaultSaveData() {
     achievements: [],
     usedItemTypes: [],
     playTime: 0,
-    cardChapterMap: {}
+    cardChapterMap: {},
+    ng2: { chapters: {} }
   };
 }
 
@@ -1341,6 +1342,13 @@ function migrateSaveData(data) {
   if(!data.cardChapterMap)data.cardChapterMap={};
   Object.keys(data.chapters||{}).forEach(chId=>{
     if(!data.chapters[chId].midbossCleared)data.chapters[chId].midbossCleared=[];
+  });
+  // 2週目データのマイグレーション
+  if(!data.ng2)data.ng2={chapters:{}};
+  if(!data.ng2.chapters)data.ng2.chapters={};
+  Object.keys(data.ng2.chapters).forEach(chId=>{
+    if(!data.ng2.chapters[chId].hintLevels)data.ng2.chapters[chId].hintLevels={};
+    if(!data.ng2.chapters[chId].rounds)data.ng2.chapters[chId].rounds=1;
   });
   return data;
 }
@@ -1965,6 +1973,38 @@ function trackItemUse(itemId){
 /* ===== 状態管理 ===== */
 let state=loadState();
 function defaultState(){return getDefaultSaveData()}
+
+/* ===== 2週目モード ===== */
+// 現在のランを示すフラグ。'ng1'（1週目）または'ng2'（2週目）
+let currentRun='ng1';
+
+// 全8章のボスを全員撃破しているか確認する
+function isNg2Unlocked(){
+  // 模擬試験(id:9)を除く8章すべてのボスクリア確認
+  const mainChapters=CHAPTERS.filter(ch=>!ch.isMockExam&&ch.id<=8);
+  return mainChapters.length>0&&mainChapters.every(ch=>{
+    const cs=state.chapters[ch.id];
+    return cs&&cs.bossCleared;
+  });
+}
+
+// 2週目の章ステートを返す（なければ初期化）
+function ng2ChapterState(){
+  if(!currentChapter)return{clearedStages2:[],bossCleared2:false,hintLevels:{},rounds:1};
+  const cid=currentChapter.id;
+  if(!state.ng2)state.ng2={chapters:{}};
+  if(!state.ng2.chapters[cid])state.ng2.chapters[cid]={clearedStages2:[],bossCleared2:false,hintLevels:{},rounds:1};
+  if(!state.ng2.chapters[cid].hintLevels)state.ng2.chapters[cid].hintLevels={};
+  if(!state.ng2.chapters[cid].rounds)state.ng2.chapters[cid].rounds=1;
+  return state.ng2.chapters[cid];
+}
+
+// 現在ステージの2週目ヒントレベルを返す（ng1 や未設定は 0）
+function currentNg2HintLevel(){
+  if(currentRun!=='ng2'||!currentStage)return 0;
+  const ng2cs=ng2ChapterState();
+  return ng2cs.hintLevels[currentStage.stageId]||0;
+}
 function loadState(){
   return loadSaveData();
 }
@@ -2197,15 +2237,40 @@ function renderStageGrid(){
     return;
   }
 
+  // 2週目トグルの表示（解放済みの場合のみ）
+  const ng2Unlocked=isNg2Unlocked();
+  if(ng2Unlocked){
+    const ng2csPreview=ng2ChapterState();
+    const rounds=ng2csPreview.rounds||1;
+    const toggleDiv=document.createElement('div');
+    toggleDiv.style.cssText='display:flex;flex-direction:column;gap:8px;margin-bottom:16px;align-items:center';
+    toggleDiv.innerHTML=`
+      <div style="display:flex;gap:8px;justify-content:center">
+        <button id="ng2-btn-ng1" class="next-btn${currentRun==='ng1'?'':' secondary'}" style="min-width:130px;padding:8px 16px;font-size:.9rem" onclick="switchRun('ng1')">1周目</button>
+        <button id="ng2-btn-ng2" class="next-btn${currentRun==='ng2'?'':' secondary'}" style="min-width:130px;padding:8px 16px;font-size:.9rem;${currentRun==='ng2'?'background:#7b1fa2':''}" onclick="switchRun('ng2')">★2周目（チャレンジ）</button>
+      </div>
+      ${currentRun==='ng2'?`<div style="color:#ce93d8;font-size:.8rem">2周目チャレンジ ${rounds}回目</div>`:''}`;
+    grid.appendChild(toggleDiv);
+  }else if(currentRun==='ng2'){
+    // 解放条件が満たされていなければng1に戻す
+    currentRun='ng1';
+  }
+
   const cs=chapterState();
+  const ng2cs=ng2Unlocked?ng2ChapterState():null;
   const midbosses=currentChapter.midbosses||[];
   COURSE_DATA.forEach((st,i)=>{
     const unlocked=IS_DEMO?true:(i===0||cs.clearedStages.includes(COURSE_DATA[i-1].stageId));
-    const cleared=cs.clearedStages.includes(st.stageId);
+    // 1週目のクリア状態（ベース）と2週目のクリア状態を切り替えて表示
+    const cleared1=cs.clearedStages.includes(st.stageId);
+    const cleared2=ng2cs&&ng2cs.clearedStages2&&ng2cs.clearedStages2.includes(st.stageId);
+    const cleared=currentRun==='ng2'?cleared2:cleared1;
+    // 2週目では「1週目クリア済み」が解放条件
+    const effectiveUnlocked=currentRun==='ng2'?cleared1:unlocked;
     const c=document.createElement('div');
-    c.className='stage-card'+(unlocked?'':' locked')+(cleared?' cleared':'');
+    c.className='stage-card'+(effectiveUnlocked?'':' locked')+(cleared?' cleared':'');
     c.innerHTML=`<div class="stage-num">Stage ${st.stageId}</div><div class="stage-name">${st.title}</div><div class="stage-sub">${st.subtitle}</div><div class="stage-category">${st.subcategory}</div>`;
-    if(unlocked)c.onclick=()=>startStage(st.stageId);
+    if(effectiveUnlocked)c.onclick=()=>startStage(st.stageId);
     grid.appendChild(c);
     /* 中ボスカード: このステージがcheckpointAtのものを挿入 */
     midbosses.filter(mb=>mb.checkpointAt===st.stageId).forEach(mb=>{
@@ -2220,11 +2285,63 @@ function renderStageGrid(){
   });
   const bu=IS_DEMO?true:cs.clearedStages.length>=currentChapter.stageCount;
   const bossStageNum=IS_DEMO?COURSE_DATA.length+1:currentChapter.stageCount+1;
+  const bossCleared1=cs.bossCleared;
+  const bossCleared2=ng2cs&&ng2cs.bossCleared2;
+  const bossCleared=currentRun==='ng2'?bossCleared2:bossCleared1;
   const bc=document.createElement('div');
-  bc.className='stage-card boss'+(bu?'':' locked')+(cs.bossCleared?' cleared':'');
+  bc.className='stage-card boss'+(bu?'':' locked')+(bossCleared?' cleared':'');
   bc.innerHTML=`<div class="stage-num">Stage ${bossStageNum}</div><div class="stage-name">${BOSS_DATA.bossName||'???'}</div><div class="stage-sub">${BOSS_DATA.bossDescription||''}</div><div class="stage-category" style="color:#ff5252">BOSS</div>`;
   if(bu)bc.onclick=()=>showBossPrep();
   grid.appendChild(bc);
+
+  // 2週目で通常ステージを全クリア済みなら「もう一周」ボタンを表示
+  if(currentRun==='ng2'&&ng2cs){
+    const ng2StageCount=currentChapter.stageCount||COURSE_DATA.length;
+    const ng2AllStageClear=(ng2cs.clearedStages2||[]).length>=ng2StageCount;
+    if(ng2AllStageClear){
+      const newRoundDiv=document.createElement('div');
+      newRoundDiv.style.cssText='margin-top:20px;text-align:center';
+      newRoundDiv.innerHTML=`<button class="next-btn" style="background:#7b1fa2;min-width:200px;font-size:1rem" onclick="confirmNg2NewRound()">🔄 もう一周（ヒントをロックし直す）</button>`;
+      grid.appendChild(newRoundDiv);
+    }
+  }
+}
+
+function switchRun(run){
+  playSfx('select');
+  currentRun=run;
+  renderStageGrid();
+}
+
+// 「もう一周」確認モーダルを表示
+function confirmNg2NewRound(){
+  playSfx('select');
+  const ng2cs=ng2ChapterState();
+  const nextRound=(ng2cs.rounds||1)+1;
+  const overlay=document.createElement('div');
+  overlay.className='modal-overlay';
+  overlay.innerHTML=`<div class="modal-box">
+    <div style="font-size:1.5rem;margin-bottom:8px">🔄</div>
+    <h3>もう一周する？</h3>
+    <div style="color:#ce93d8;font-size:.9rem;margin:8px 0">${nextRound}周目にチャレンジ！</div>
+    <div class="modal-note" style="color:#aaa;font-size:.85rem">ヒントが全部ロックされて<br>Stage 1 からやり直しになるよ。<br>いいかな？</div>
+    <div class="modal-btns">
+      <button class="modal-btn-back" onclick="this.closest('.modal-overlay').remove();playSfx('select')">やめる</button>
+      <button class="modal-btn-go" onclick="this.closest('.modal-overlay').remove();ng2NewRound()">はじめる！</button>
+    </div>
+  </div>`;
+  document.body.appendChild(overlay);
+}
+
+// 2週目周回リセット実行（clearedStages2・hintLevels をリセット、bossCleared2 は保持）
+function ng2NewRound(){
+  playSfx('confirm');
+  const ng2cs=ng2ChapterState();
+  ng2cs.clearedStages2=[];
+  ng2cs.hintLevels={};
+  ng2cs.rounds=(ng2cs.rounds||1)+1;
+  saveState();
+  renderStageGrid();
 }
 
 /* ===== 問題タイマー（60秒制限） ===== */
@@ -2266,6 +2383,8 @@ function getTimerHtml(id){return `<div class="q-timer" id="${id}"><div class="q-
 let currentStage=null,learnStep=0;
 const PRACTICE_COUNT=4; // 1回のプレイで出題する練習問題数
 let currentLearnSteps=[];
+// 2週目: ステージ内の全問正解フラグ（startStage でリセット）
+let ng2AllCorrect=true;
 let currentStepNames={};
 
 function startStage(id){
@@ -2273,6 +2392,8 @@ function startStage(id){
   currentStage=COURSE_DATA.find(s=>s.stageId===id);
   if(!currentStage)return;
   learnStep=0;practiceFirstTryCount=0;
+  // 2週目の全問正解フラグをリセット
+  ng2AllCorrect=true;
 
   // 練習問題をシャッフルしてPRACTICE_COUNT問を選出
   const allPrac=currentStage.practiceQuestions||[];
@@ -2643,25 +2764,31 @@ function renderIntegratedQuestion(c,mq){
   const analysisMap={};
   if(mq.choiceAnalysis)mq.choiceAnalysis.forEach(a=>{analysisMap[mq.choices[a.choice]]=a;});
 
+  // 2週目モード：hintLevelに応じて段階的に補助を表示（1週目は常に全表示）
+  const isNg2Mode=currentRun==='ng2';
+  const mqHintLevel=isNg2Mode?currentNg2HintLevel():4; // 1週目はlv4相当（全表示）
+
   let choicesHtml='';
   origKeys.forEach(k=>{
     if(!shuffledChoices[k])return;
     const hintId='hint-main-'+k;
     const analysis=analysisMap[shuffledChoices[k]];
     const hintText=analysis?analysis.explanation:'';
+    // Lv4以上で選択肢ヒントボタン表示
+    const showChoiceHint=mqHintLevel>=4;
     choicesHtml+=`<div class="choice-item" id="ci-${k}">
       <div class="choice-main" onclick="selectMain('${k}','${shuffledAnswer}')">
         <span class="choice-label">${k}.</span>
         <span class="choice-text">${shuffledChoices[k]}</span>
-        <button class="choice-hint-btn" onclick="toggleHint(event,'${hintId}')">ヒント</button>
+        ${showChoiceHint?`<button class="choice-hint-btn" onclick="toggleHint(event,'${hintId}')">ヒント</button>`:''}
       </div>
-      <div class="choice-hint" id="${hintId}" data-hint="${hintText.replace(/"/g,'&quot;')}"></div>
+      ${showChoiceHint?`<div class="choice-hint" id="${hintId}" data-hint="${hintText.replace(/"/g,'&quot;')}"></div>`:''}
     </div>`;
   });
 
   let html=`<div class="section-card">
     <span class="step-badge step-question">Step ${learnStep+1}</span>
-    <div class="section-title question-title">過去問に挑戦しよう</div>
+    <div class="section-title question-title">過去問に挑戦しよう${isNg2Mode?' <span style="color:#ce93d8;font-size:.75rem;font-weight:normal;margin-left:8px">★2周目 Lv'+mqHintLevel+'</span>':''}</div>
 
     <!-- ブロック1: 問題文（自動表示・タイプライター、モバイルでスティッキー） -->
     <div class="reveal-block revealed sticky-q">
@@ -2669,16 +2796,16 @@ function renderIntegratedQuestion(c,mq){
       <div class="q-text" data-tw="${mq.originalText.replace(/"/g,'&quot;')}"></div>
     </div>
 
-    <!-- ブロック2: この問題は何を聞いている？ -->
-    <div class="reveal-block">
+    <!-- ブロック2: この問題は何を聞いている？（2週目Lv1以上で表示） -->
+    ${mqHintLevel>=1?`<div class="reveal-block">
       <div class="question-guide">
         <div class="question-guide-title">この問題は何を聞いている？</div>
         <div class="question-guide-text" data-tw="${mq.questionExplained.replace(/"/g,'&quot;')}"></div>
       </div>
-    </div>
+    </div>`:''}
 
-    <!-- ブロック3: ことば復習 -->
-    <div class="reveal-block">
+    <!-- ブロック3: ことば復習（2週目Lv2以上で表示） -->
+    ${mqHintLevel>=2?`<div class="reveal-block">
       <div class="accordion">
         <div class="accordion-header" onclick="toggleAcc(this)">
           <span class="acc-icon">▶</span>
@@ -2692,20 +2819,20 @@ function renderIntegratedQuestion(c,mq){
           </div>`).join('')}
         </div>
       </div>
-    </div>
+    </div>`:''}
 
     <!-- ブロック4: 選択肢（回答を待つ） -->
     <div class="reveal-block" data-wait="answer" data-timer="main">
       ${getTimerHtml('main-timer')}
       <div style="margin-top:8px;margin-bottom:8px;font-size:.9rem;color:#ffd700;font-weight:bold">さあ、答えを選ぼう！</div>
-      <div class="strategy-hint-wrap">
+      ${mqHintLevel>=3?`<div class="strategy-hint-wrap">
         <button class="strategy-hint-btn" onclick="toggleStrategyHint(this)">
           <span class="strategy-hint-icon">▶</span> 考え方のヒント
         </button>
         <div class="strategy-hint-body" id="strategy-hint-body">
           <ol class="strategy-steps" id="strategy-hint-steps"></ol>
         </div>
-      </div>
+      </div>`:''}
       <div id="main-choices">${choicesHtml}</div>
       <div class="answer-confirm" id="answer-confirm">
         <div class="confirm-text">この答えでいい？</div>
@@ -2851,6 +2978,7 @@ function confirmAnswer(){
     setTimeout(()=>{revealNext();},300);
   }else{
     /* === 不正解: 解説を読んでリトライ === */
+    if(currentRun==='ng2')ng2AllCorrect=false;
     playSfx('wrong');
     banner.textContent='不正解…解説を読んでもう一度挑戦しよう！';
     const confirmBlock=document.getElementById('rb-confirm');
@@ -2891,6 +3019,7 @@ function retryMainQuestion(){
 
 function onMainTimerExpire(){
   stopTimerSound();
+  if(currentRun==='ng2')ng2AllCorrect=false;
   playSfx('wrong');
   // 確認ダイアログを非表示
   const conf=document.getElementById('answer-confirm');if(conf)conf.style.display='none';
@@ -2968,6 +3097,10 @@ function renderPractice(c,pq,num){
   const analysisMap={};
   if(pq.choiceAnalysis)pq.choiceAnalysis.forEach(a=>{analysisMap[pq.choices[a.choice]]=a;});
 
+  // 2週目モード：hintLevelに応じて段階的に補助を表示（1週目は常に全表示）
+  const isNg2Mode=currentRun==='ng2';
+  const pqHintLevel=isNg2Mode?currentNg2HintLevel():4; // 1週目はlv4相当（全表示）
+
   /* === 選択肢HTML === */
   let choicesHtml='';
   origKeys.forEach(k=>{
@@ -2975,18 +3108,20 @@ function renderPractice(c,pq,num){
     const a=analysisMap[shuffled[k].text];
     const hintId=uid+'-hint-'+k;
     const hintText=a?a.explanation:'';
+    // Lv4以上で選択肢ヒントボタン表示
+    const showChoiceHint=pqHintLevel>=4&&!!hintText;
     choicesHtml+=`<div class="choice-item" id="${uid}-ci-${k}" data-key="${k}">
       <div class="choice-main" onclick="selectPractice('${uid}','${k}')">
         <span class="choice-label">${k}.</span>
         <span class="choice-text">${shuffled[k].text}</span>
-        ${hintText?`<button class="choice-hint-btn" onclick="event.stopPropagation();toggleHint(event,'${hintId}')">ヒント</button>`:''}
+        ${showChoiceHint?`<button class="choice-hint-btn" onclick="event.stopPropagation();toggleHint(event,'${hintId}')">ヒント</button>`:''}
       </div>
-      ${hintText?`<div class="choice-hint" id="${hintId}" data-hint="${hintText.replace(/"/g,'&quot;')}"></div>`:''}
+      ${showChoiceHint?`<div class="choice-hint" id="${hintId}" data-hint="${hintText.replace(/"/g,'&quot;')}"></div>`:''}
     </div>`;
   });
 
-  /* === この問題は何を聞いている？ === */
-  const qExpHtml=pq.questionExplained?`
+  /* === この問題は何を聞いている？（2週目Lv1以上で表示） === */
+  const qExpHtml=(pqHintLevel>=1&&pq.questionExplained)?`
     <div class="reveal-block">
       <div class="question-guide">
         <div class="question-guide-title">この問題は何を聞いている？</div>
@@ -2994,32 +3129,8 @@ function renderPractice(c,pq,num){
       </div>
     </div>`:'';
 
-  /* === 考え方のヒント === */
-  const stratHtml=pq.solvingStrategy?`
-      <div class="strategy-hint-wrap">
-        <button class="strategy-hint-btn" onclick="togglePqStrategy(this,'${uid}')">
-          <span class="strategy-hint-icon">▶</span> 考え方のヒント
-        </button>
-        <div class="strategy-hint-body" id="${uid}-strat-body">
-          <ol class="strategy-steps" id="${uid}-strat-steps"></ol>
-        </div>
-      </div>`:'';
-
-  div.innerHTML=`<div class="section-card">
-    <span class="step-badge step-practice">Step ${learnStep+1}</span>
-    <div class="section-title practice-title">練習問題 ${num}</div>
-
-    <!-- ブロック1: 問題文（モバイルでスティッキー） -->
-    <div class="reveal-block revealed sticky-q">
-      <div class="q-source">${pq.source}</div>
-      <div class="q-text" data-tw="${pq.questionText.replace(/"/g,'&quot;')}"></div>
-    </div>
-
-    <!-- ブロック2: この問題は何を聞いている？ -->
-    ${qExpHtml}
-
-    <!-- ブロック3: ことば復習 -->
-    <div class="reveal-block">
+  /* === ことば復習アコーディオン（2週目Lv2以上で表示） === */
+  const wordAccHtml=pqHintLevel>=2?`<div class="reveal-block">
       <div class="accordion">
         <div class="accordion-header" onclick="toggleAcc(this)">
           <span class="acc-icon">▶</span>
@@ -3033,7 +3144,34 @@ function renderPractice(c,pq,num){
           </div>`).join('')}
         </div>
       </div>
+    </div>`:'';
+
+  /* === 考え方のヒント（2週目Lv3以上で表示） === */
+  const stratHtml=(pqHintLevel>=3&&pq.solvingStrategy)?`
+      <div class="strategy-hint-wrap">
+        <button class="strategy-hint-btn" onclick="togglePqStrategy(this,'${uid}')">
+          <span class="strategy-hint-icon">▶</span> 考え方のヒント
+        </button>
+        <div class="strategy-hint-body" id="${uid}-strat-body">
+          <ol class="strategy-steps" id="${uid}-strat-steps"></ol>
+        </div>
+      </div>`:'';
+
+  div.innerHTML=`<div class="section-card">
+    <span class="step-badge step-practice">Step ${learnStep+1}</span>
+    <div class="section-title practice-title">練習問題 ${num}${isNg2Mode?' <span style="color:#ce93d8;font-size:.75rem;font-weight:normal;margin-left:8px">★2周目 Lv'+pqHintLevel+'</span>':''}</div>
+
+    <!-- ブロック1: 問題文（モバイルでスティッキー） -->
+    <div class="reveal-block revealed sticky-q">
+      <div class="q-source">${pq.source}</div>
+      <div class="q-text" data-tw="${pq.questionText.replace(/"/g,'&quot;')}"></div>
     </div>
+
+    <!-- ブロック2: この問題は何を聞いている？（2週目では非表示） -->
+    ${qExpHtml}
+
+    <!-- ブロック3: ことば復習（2週目では非表示） -->
+    ${wordAccHtml}
 
     <!-- ブロック4: 選択肢（回答を待つ） -->
     <div class="reveal-block" data-wait="answer" data-timer="${uid}">
@@ -3144,6 +3282,7 @@ function confirmPractice(uid){
     setTimeout(()=>revealNext(),300);
   }else{
     ps.retried=true;
+    if(currentRun==='ng2')ng2AllCorrect=false;
     /* === 不正解: 解説を読んでリトライ === */
     playSfx('hit');
     banner.textContent='不正解…解説を読んでもう一度挑戦しよう！';
@@ -3192,6 +3331,7 @@ function retryPractice(uid){
 function onPracticeTimerExpire(uid){
   stopTimerSound();
   const ps=_pqState[uid];if(!ps)return;
+  if(currentRun==='ng2')ng2AllCorrect=false;
   playSfx('wrong');
   // 確認ダイアログを非表示
   const conf=document.getElementById(uid+'-confirm');if(conf)conf.style.display='none';
@@ -3221,6 +3361,67 @@ function onPracticeTimerExpire(uid){
 function renderReward(c,stage){
   const cr=stage.cardReward;
   const cs=chapterState();
+  // 2週目クリア/不合格判定（1週目の clearedStages は変更しない）
+  if(currentRun==='ng2'){
+    const ng2cs=ng2ChapterState();
+    if(!ng2cs.clearedStages2)ng2cs.clearedStages2=[];
+    if(!ng2cs.hintLevels)ng2cs.hintLevels={};
+    const stars='★'.repeat(cr.rarity)+'☆'.repeat(5-cr.rarity);
+    const div=document.createElement('div');
+    revealPaused=false;
+    if(ng2AllCorrect){
+      // === 全問正解: クリア ===
+      if(!ng2cs.clearedStages2.includes(stage.stageId)){
+        ng2cs.clearedStages2.push(stage.stageId);
+        saveState();
+      }
+      playSfx('victory');
+      div.innerHTML=`<div class="section-card">
+        <span class="step-badge step-reward">Step ${learnStep+1}</span>
+        <div class="reveal-block revealed">
+          <div class="section-title reward-title" data-tw="★2周目クリア！完璧！"></div>
+        </div>
+        <div class="reveal-block">
+          <div class="reward-card">
+            <div class="reward-rarity">${stars}</div>
+            <div class="reward-card-name">${cr.cardName}</div>
+            <div style="color:#ce93d8;font-size:.85rem;margin-top:4px">2周目クリア記録に残しました</div>
+          </div>
+        </div>
+        <div class="reveal-block">
+          <button class="next-btn" onclick="showScreen('screen-map')">ステージ選択に戻る</button>
+        </div>
+      </div>`;
+    }else{
+      // === 不合格: hintLevel を +1（上限4）して保存 ===
+      const cur=ng2cs.hintLevels[stage.stageId]||0;
+      const next=Math.min(cur+1,4);
+      ng2cs.hintLevels[stage.stageId]=next;
+      saveState();
+      playSfx('wrong');
+      div.innerHTML=`<div class="section-card">
+        <span class="step-badge step-reward">Step ${learnStep+1}</span>
+        <div class="reveal-block revealed">
+          <div class="section-title" style="color:#ef9a9a">クリアできなかった…</div>
+        </div>
+        <div class="reveal-block">
+          <div style="background:rgba(206,147,216,.1);border:1px solid #7b1fa2;border-radius:8px;padding:12px;margin-top:8px;text-align:center">
+            <div style="color:#ce93d8;font-size:1rem;font-weight:bold;margin-bottom:6px">ヒントが1つ開放されたよ！</div>
+            <div style="color:#aaa;font-size:.85rem">ヒントレベル: ${cur} → <span style="color:#ffd700;font-weight:bold">${next}</span></div>
+          </div>
+        </div>
+        <div class="reveal-block">
+          <button class="next-btn" style="margin-top:8px" onclick="retryNg2Stage()">もう一度挑戦する（ヒント開放）</button>
+          <button class="next-btn secondary" style="margin-top:8px" onclick="showScreen('screen-map')">ステージ選択に戻る</button>
+        </div>
+      </div>`;
+    }
+    c.appendChild(div);
+    updateTapIndicator();
+    const firstTw=div.querySelector('.reveal-block.revealed [data-tw]');
+    if(firstTw){typewriter(firstTw,firstTw.dataset.tw,35);}
+    return;
+  }
   const isNew=!cs.clearedStages.includes(stage.stageId);
   if(isNew){
     cs.clearedStages.push(stage.stageId);state.exp+=Math.floor(cr.exp*chapterExpMult());state.gold+=cr.gold;
@@ -3274,6 +3475,13 @@ function renderReward(c,stage){
   }
 }
 
+// 2週目不合格後のやり直し：hintLevel据え置きで同ステージを最初からやり直す
+function retryNg2Stage(){
+  playSfx('confirm');
+  if(!currentStage)return;
+  startStage(currentStage.stageId);
+}
+
 /* ===== ショップ & アイテム ===== */
 function getMaxInventory(){
   const ch=state.chapters||{};
@@ -3302,6 +3510,18 @@ function showBossPrep(){
 }
 function renderBossPrep(){
   const c=document.getElementById('boss-prep-content');
+  // 2週目ではショップ・持ち物スロット・購入/売却を非表示
+  const isNg2Mode=currentRun==='ng2';
+  if(isNg2Mode){
+    c.innerHTML=`
+      ${getBossSpriteLg('boss-sprite-anim')}
+      <div style="text-align:center;font-size:1.2rem;font-weight:bold;color:#ff5252;margin-bottom:8px">${BOSS_DATA.bossName}</div>
+      <div style="text-align:center;color:#ce93d8;font-size:.9rem;margin-bottom:8px">★2周目（チャレンジ）</div>
+      <div class="shop-warning">ボス戦ではミスは許されない！<br><span style="color:#ce93d8">2周目はアイテムなしで挑め！</span></div>
+      <button class="next-btn" style="margin-top:16px" onclick="confirmBossStart()">バトル開始！</button>
+      <button class="next-btn secondary" style="margin-top:8px" onclick="showScreen('screen-map')">やめる</button>`;
+    return;
+  }
   const bagHtml=state.inventory.length>0
     ?state.inventory.map((id,i)=>{const it=SHOP_ITEMS.find(s=>s.id===id);return`<div class="boss-bag-item"><img src="${it.icon}" class="boss-bag-item-icon"> ${it.name} <span style="color:#888;font-size:.7rem;cursor:pointer" onclick="removeItem(${i})">[売却+${it.price}G]</span></div>`}).join('')
     :'<div class="boss-bag-empty">アイテムなし</div>';
@@ -3748,8 +3968,8 @@ function selBoss(el,key,ans){
     playSfx('wrong');
     /* 反撃演出 */
     triggerBossCounterattack();
-    /* いのちのいしチェック */
-    const stoneIdx=bossBag.indexOf('life_stone');
+    /* いのちのいしチェック（2週目では発動しない） */
+    const stoneIdx=currentRun!=='ng2'?bossBag.indexOf('life_stone'):-1;
     if(stoneIdx!==-1){
       playSfx('buff');
       bossBag.splice(stoneIdx,1);
@@ -3905,7 +4125,14 @@ function renderBossResult(c){
     playSfx('victory');
     const rw=BOSS_DATA.rewards,total=bossActiveQs.length;
     const oldMax=getMaxInventory();
-    const cs=chapterState();if(!cs.bossCleared){cs.bossCleared=true;state.exp+=Math.floor(rw.exp*chapterExpMult());state.gold+=rw.gold;if(!state.ownedCards.includes(rw.bonusCard.cardName))state.ownedCards.push(rw.bonusCard.cardName);if(currentChapter)state.cardChapterMap[rw.bonusCard.cardName]=currentChapter.id;saveState()}
+    const cs=chapterState();
+    // 2週目ボスクリアは別フィールドに記録し、EXP/GOLD付与もスキップしない（報酬は通常通り）
+    if(currentRun==='ng2'){
+      const ng2cs=ng2ChapterState();
+      if(!ng2cs.bossCleared2){ng2cs.bossCleared2=true;state.exp+=Math.floor(rw.exp*chapterExpMult());state.gold+=rw.gold;saveState();}
+    }else{
+      if(!cs.bossCleared){cs.bossCleared=true;state.exp+=Math.floor(rw.exp*chapterExpMult());state.gold+=rw.gold;if(!state.ownedCards.includes(rw.bonusCard.cardName))state.ownedCards.push(rw.bonusCard.cardName);if(currentChapter)state.cardChapterMap[rw.bonusCard.cardName]=currentChapter.id;saveState();}
+    }
     const newMax=getMaxInventory();
     /* 実績チェック */
     unlockAchievement('first_boss');
