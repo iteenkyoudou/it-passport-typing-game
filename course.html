@@ -407,6 +407,12 @@ button{cursor:pointer;font-family:inherit}
 .step-badge.step-knowledge{background:#111;color:#ffd700;border:1px solid #555}
 .step-badge.step-practice{background:#111;color:#ffb74d;border:1px solid #555}
 .step-badge.step-reward{background:#111;color:#ff5252;border:1px solid #ff5252}
+/* ===== 2周目バッジ（HUD常時表示・ステージ/ボスタイトル併記） ===== */
+.ng2-badge{display:inline-block;font-size:.7rem;font-weight:bold;padding:3px 10px;border-radius:12px;margin-left:8px;background:#7b1fa2;color:#fff;vertical-align:middle}
+.sp-ng2-badge{background:linear-gradient(135deg,#7b1fa2,#4a148c);color:#fff;text-align:center;padding:6px 8px;border-radius:8px;font-size:.75rem;font-weight:bold;letter-spacing:.5px;border:1px solid #c084fc}
+.sp-master-badge{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#3a1a00;text-align:center;padding:6px 8px;border-radius:8px;font-size:.75rem;font-weight:bold;letter-spacing:.5px;border:1px solid #ffe082}
+.weak-list-btn{display:block;width:100%;background:#111;border:2px solid #ff8c42;color:#ffb74d;border-radius:10px;padding:10px 14px;font-size:.85rem;font-weight:bold;text-align:center;cursor:pointer;margin-bottom:14px}
+.weak-list-btn:hover{background:#1a1a1a}
 .question-guide{background:#111;border:1px solid #555;border-radius:8px;padding:14px;margin-bottom:14px}
 .question-guide-title{font-size:.85rem;font-weight:bold;color:#ffb74d;margin-bottom:8px}
 .question-guide-text{font-size:.88rem;color:#ddd;line-height:1.8;white-space:pre-line}
@@ -1075,6 +1081,14 @@ button{cursor:pointer;font-family:inherit}
     <button class="sp-logout-btn" onclick="handleLogout()">ログアウト</button>
   </div>
 
+  <div class="sp-section" id="sp-master-badge-area" style="display:none">
+    <div class="sp-master-badge">🎓 マスター認定</div>
+  </div>
+
+  <div class="sp-section" id="sp-ng2-badge-area" style="display:none">
+    <div class="sp-ng2-badge" id="sp-ng2-badge-text">★2周目チャレンジ中</div>
+  </div>
+
   <div class="sp-section" id="sp-level-area">
     <div class="sp-level-label">LEVEL</div>
     <div class="sp-level-num" id="sp-level">1</div>
@@ -1319,7 +1333,8 @@ function getDefaultSaveData() {
     usedItemTypes: [],
     playTime: 0,
     cardChapterMap: {},
-    ng2: { chapters: {} }
+    ng2: { chapters: {} },
+    missedQuestions: {}
   };
 }
 
@@ -1350,6 +1365,8 @@ function migrateSaveData(data) {
     if(!data.ng2.chapters[chId].hintLevels)data.ng2.chapters[chId].hintLevels={};
     if(!data.ng2.chapters[chId].rounds)data.ng2.chapters[chId].rounds=1;
   });
+  // にがて（ミス問題）記録のマイグレーション
+  if(!data.missedQuestions)data.missedQuestions={};
   return data;
 }
 
@@ -1914,7 +1931,8 @@ const ACHIEVEMENTS=[
   {id:'level_200',name:'二百の高み',desc:'レベル200に到達した',icon:'☀️',cat:'レベル'},
   {id:'gold_1000',name:'千金持ち',desc:'ゴールドを1000以上所持した',icon:'💰',cat:'ゴールド'},
   {id:'gold_5000',name:'大富豪',desc:'ゴールドを5000以上所持した',icon:'💎',cat:'ゴールド'},
-  {id:'first_midboss',name:'中間突破者',desc:'中ボスを初めて撃破した',icon:'🧚',cat:'ボス'}
+  {id:'first_midboss',name:'中間突破者',desc:'中ボスを初めて撃破した',icon:'🧚',cat:'ボス'},
+  {id:'ng2_master',name:'マスター認定',desc:'2週目で全8章のボスを撃破した',icon:'🎓',cat:'2週目'}
 ];
 let practiceFirstTryCount=0;
 let bossItemsUsedThisFight=false;
@@ -1986,6 +2004,19 @@ function isNg2Unlocked(){
     const cs=state.chapters[ch.id];
     return cs&&cs.bossCleared;
   });
+}
+
+// 2週目マスター認定：模擬試験章を除く全8章で2週目ボス(bossCleared2)を撃破しているか
+function isNg2MasterCertified(){
+  const mainChapters=CHAPTERS.filter(ch=>!ch.isMockExam&&ch.id<=8);
+  return mainChapters.length>0&&mainChapters.every(ch=>{
+    const c=state.ng2&&state.ng2.chapters&&state.ng2.chapters[ch.id];
+    return c&&c.bossCleared2;
+  });
+}
+// マスター認定を満たしたら実績として解除（unlockAchievement側で多重解除は防止済み）
+function checkNg2MasterCertification(){
+  if(isNg2MasterCertified())unlockAchievement('ng2_master');
 }
 
 // 2週目の章ステートを返す（なければ初期化）
@@ -2133,6 +2164,28 @@ function updateHeader(){
   state.level=info.level;
   // サイドパネル更新
   const el=id=>document.getElementById(id);
+  // 2周目バッジ（HUD常時表示。1週目では非表示のまま＝現状維持）
+  const ng2BadgeArea=el('sp-ng2-badge-area');
+  if(ng2BadgeArea){
+    if(currentRun==='ng2'){
+      ng2BadgeArea.style.display='block';
+      const ng2cs=ng2ChapterState();
+      const r=ng2cs.rounds||1;
+      el('sp-ng2-badge-text').textContent=r>1?`★2周目チャレンジ中（${r}周目）`:'★2周目チャレンジ中';
+    }else{
+      ng2BadgeArea.style.display='none';
+    }
+  }
+  // マスター認定バッジ（HUD常時表示。未認定では非表示のまま＝現状維持）
+  const masterBadgeArea=el('sp-master-badge-area');
+  if(masterBadgeArea){
+    if(isNg2MasterCertified()){
+      masterBadgeArea.style.display='block';
+      checkNg2MasterCertification();
+    }else{
+      masterBadgeArea.style.display='none';
+    }
+  }
   el('sp-level').textContent=state.level;
   el('sp-exp').textContent=state.exp;
   el('sp-gold').textContent=state.gold;
@@ -2237,6 +2290,16 @@ function renderStageGrid(){
     return;
   }
 
+  // にがて復習の入口（この章にミス問題が残っていれば表示）
+  const weakCount=getWeakItemsForCurrentChapter().length;
+  if(weakCount>0){
+    const weakBtn=document.createElement('button');
+    weakBtn.className='weak-list-btn';
+    weakBtn.textContent=`🎯 にがて復習に挑戦（この章：のこり${weakCount}問）`;
+    weakBtn.onclick=startWeakListReview;
+    grid.appendChild(weakBtn);
+  }
+
   // 2週目トグルの表示（解放済みの場合のみ）
   const ng2Unlocked=isNg2Unlocked();
   if(ng2Unlocked){
@@ -2299,9 +2362,12 @@ function renderStageGrid(){
     const ng2StageCount=currentChapter.stageCount||COURSE_DATA.length;
     const ng2AllStageClear=(ng2cs.clearedStages2||[]).length>=ng2StageCount;
     if(ng2AllStageClear){
+      const masterMode=isNg2MasterCertified();
       const newRoundDiv=document.createElement('div');
       newRoundDiv.style.cssText='margin-top:20px;text-align:center';
-      newRoundDiv.innerHTML=`<button class="next-btn" style="background:#7b1fa2;min-width:200px;font-size:1rem" onclick="confirmNg2NewRound()">🔄 もう一周（ヒントをロックし直す）</button>`;
+      newRoundDiv.innerHTML=masterMode
+        ?`<button class="next-btn" style="background:linear-gradient(135deg,#ffd700,#ff8c00);color:#3a1a00;min-width:220px;font-size:1rem" onclick="confirmNg2NewRound()">🏅 スコアアタックに挑戦</button>`
+        :`<button class="next-btn" style="background:#7b1fa2;min-width:200px;font-size:1rem" onclick="confirmNg2NewRound()">🔄 もう一周（ヒントをロックし直す）</button>`;
       grid.appendChild(newRoundDiv);
     }
   }
@@ -2309,8 +2375,32 @@ function renderStageGrid(){
 
 function switchRun(run){
   playSfx('select');
+  const enteringNg2=(run==='ng2'&&currentRun!=='ng2');
   currentRun=run;
   renderStageGrid();
+  updateHeader();
+  // 「ここから2周目！」演出：初めて2周目に切り替えたときだけ表示（実績通知と同じ演出パターンを流用）
+  if(enteringNg2){
+    if(!state.ng2)state.ng2={chapters:{}};
+    if(!state.ng2.introShown){
+      state.ng2.introShown=true;
+      saveState();
+      showNg2StartNotification();
+    }
+  }
+}
+// 2周目突入演出（showAchievementNotificationと同じ.achievement-notify演出を流用）
+function showNg2StartNotification(){
+  playSfx('victory');
+  const ov=document.createElement('div');ov.className='achievement-notify';
+  ov.innerHTML=`<div class="achievement-notify-box">
+    <div class="achievement-notify-icon">🔄</div>
+    <div class="achievement-notify-label">2周目チャレンジ開始！</div>
+    <div class="achievement-notify-name">ここから2周目！</div>
+    <div class="achievement-notify-desc">ヒントなしで挑戦だ！間違えると次の挑戦でヒントが1つ開放されるよ</div>
+  </div>`;
+  document.body.appendChild(ov);
+  setTimeout(()=>{ov.classList.add('fade-out');setTimeout(()=>ov.remove(),600)},2800);
 }
 
 // 「もう一周」確認モーダルを表示
@@ -2318,13 +2408,14 @@ function confirmNg2NewRound(){
   playSfx('select');
   const ng2cs=ng2ChapterState();
   const nextRound=(ng2cs.rounds||1)+1;
+  const masterMode=isNg2MasterCertified();
   const overlay=document.createElement('div');
   overlay.className='modal-overlay';
   overlay.innerHTML=`<div class="modal-box">
-    <div style="font-size:1.5rem;margin-bottom:8px">🔄</div>
-    <h3>もう一周する？</h3>
+    <div style="font-size:1.5rem;margin-bottom:8px">${masterMode?'🏅':'🔄'}</div>
+    <h3>${masterMode?'スコアアタックに挑戦する？':'もう一周する？'}</h3>
     <div style="color:#ce93d8;font-size:.9rem;margin:8px 0">${nextRound}周目にチャレンジ！</div>
-    <div class="modal-note" style="color:#aaa;font-size:.85rem">ヒントが全部ロックされて<br>Stage 1 からやり直しになるよ。<br>いいかな？</div>
+    <div class="modal-note" style="color:#aaa;font-size:.85rem">${masterMode?'マスター認定ずみ！<br>自己ベストを目指して、Stage 1 から<br>ヒントなしで挑戦しよう。':'ヒントが全部ロックされて<br>Stage 1 からやり直しになるよ。<br>いいかな？'}</div>
     <div class="modal-btns">
       <button class="modal-btn-back" onclick="this.closest('.modal-overlay').remove();playSfx('select')">やめる</button>
       <button class="modal-btn-go" onclick="this.closest('.modal-overlay').remove();ng2NewRound()">はじめる！</button>
@@ -2387,6 +2478,59 @@ let currentLearnSteps=[];
 let ng2AllCorrect=true;
 let currentStepNames={};
 
+/* ===== にがて（ミス問題）追跡 ===== */
+// このステージ挑戦中にミスしたqid（startStageでリセット。ステージ直後の復習ラウンドで使用）
+let sessionMissedQids=[];
+let sessionReviewDone=false;
+// 復習ラウンド（ステージ直後 or にがてリストからの単独復習）共通の状態
+let isReviewMode=false;
+let reviewQueue=[];
+let reviewIndex=0;
+let reviewReturnScreen='screen-map';
+
+// ミスを永続記録（章・周回を問わず）。同じqidの多重記録はしない
+function recordMiss(qid){
+  if(!qid)return;
+  if(!state.missedQuestions)state.missedQuestions={};
+  if(!state.missedQuestions[qid]){
+    const parts=qid.split('-');
+    state.missedQuestions[qid]={chapterId:parseInt(parts[0],10),stageId:parseInt(parts[1],10),correctCount:0};
+    saveState();
+  }
+  if(sessionMissedQids.indexOf(qid)===-1)sessionMissedQids.push(qid);
+}
+// 復習ラウンドでの正解を記録。2回正解（連続でなくて可）でにがてリストを卒業
+function markMissCorrect(qid){
+  if(!qid||!state.missedQuestions||!state.missedQuestions[qid])return;
+  state.missedQuestions[qid].correctCount=(state.missedQuestions[qid].correctCount||0)+1;
+  if(state.missedQuestions[qid].correctCount>=2){
+    delete state.missedQuestions[qid];
+    showWeakGraduateToast();
+  }
+  saveState();
+}
+// 過去問(mainQuestion)を練習問題(practiceQuestions)と同じ形に整形して復習ラウンドで再利用する
+function normalizeForReview(q,sourceStage){
+  if(q.questionText!==undefined)return {...q,_sourceStage:sourceStage}; // 既に練習問題形式
+  return {
+    source:q.source,questionText:q.originalText,choices:q.choices,answer:q.answer,
+    shortExplanation:q.questionExplained||'',questionExplained:q.questionExplained,
+    choiceAnalysis:q.choiceAnalysis,solvingStrategy:q.solvingStrategy,_qid:q._qid,_sourceStage:sourceStage
+  };
+}
+function showWeakGraduateToast(){
+  playSfx('victory');
+  const ov=document.createElement('div');ov.className='achievement-notify';
+  ov.innerHTML=`<div class="achievement-notify-box">
+    <div class="achievement-notify-icon">🎓</div>
+    <div class="achievement-notify-label">にがて卒業！</div>
+    <div class="achievement-notify-name">この問題はもう だいじょうぶ！</div>
+    <div class="achievement-notify-desc">にがてリストから 外れたよ</div>
+  </div>`;
+  document.body.appendChild(ov);
+  setTimeout(()=>{ov.classList.add('fade-out');setTimeout(()=>ov.remove(),600)},2800);
+}
+
 function startStage(id){
   playSfx('confirm');
   currentStage=COURSE_DATA.find(s=>s.stageId===id);
@@ -2394,6 +2538,8 @@ function startStage(id){
   learnStep=0;practiceFirstTryCount=0;
   // 2週目の全問正解フラグをリセット
   ng2AllCorrect=true;
+  // にがて追跡もステージ挑戦ごとにリセット
+  sessionMissedQids=[];sessionReviewDone=false;isReviewMode=false;
 
   // 練習問題をシャッフルしてPRACTICE_COUNT問を選出
   const allPrac=currentStage.practiceQuestions||[];
@@ -2410,10 +2556,20 @@ function startStage(id){
     pracSteps.push(key);
     pracNames[key]='練習問題'+circled[i];
   });
-  currentLearnSteps=['vocab','question','knowledge',...pracSteps,'reward'];
+  // 3周目以降（2週目のroundsが2以上）は「過去問＋練習問題」の出題順をシャッフル。1周目・2週目(1回目)は従来どおりの並び
+  const normalContentOrder=['question','knowledge',...pracSteps];
+  let contentOrder=normalContentOrder;
+  if(currentRun==='ng2'){
+    const ng2csForOrder=ng2ChapterState();
+    if((ng2csForOrder.rounds||1)>=2){
+      contentOrder=[...normalContentOrder];
+      for(let i=contentOrder.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[contentOrder[i],contentOrder[j]]=[contentOrder[j],contentOrder[i]];}
+    }
+  }
+  currentLearnSteps=['vocab',...contentOrder,'reward'];
   currentStepNames={vocab:'ことばを知ろう',question:'問題に挑戦',knowledge:'知識を広げよう',...pracNames,reward:'カード獲得'};
 
-  document.getElementById('learn-title').textContent=`Stage ${id}: ${currentStage.title}`;
+  document.getElementById('learn-title').innerHTML=`Stage ${id}: ${currentStage.title}${currentRun==='ng2'?'<span class="ng2-badge">★2周目</span>':''}`;
   document.getElementById('learn-sub').textContent=currentStage.subtitle;
   showScreen('screen-learn');
   renderLearnStep();
@@ -2443,8 +2599,92 @@ function renderLearnStep(){
 function nextStep(){
   playSfx('confirm');
   learnStep++;
-  if(learnStep>=currentLearnSteps.length){showScreen('screen-map');return}
+  if(learnStep>=currentLearnSteps.length){
+    // ステージ本編が終わった直後、ミスした問題があればその場で復習ラウンドを挟む
+    if(!isReviewMode&&sessionMissedQids.length>0&&!sessionReviewDone){
+      sessionReviewDone=true;
+      startStageEndReview();
+      return;
+    }
+    showScreen('screen-map');
+    return;
+  }
   renderLearnStep();
+}
+
+/* ===== にがて復習ラウンド（ステージ直後 / にがてリストから単独） ===== */
+function startStageEndReview(){
+  isReviewMode=true;
+  const items=[];
+  sessionMissedQids.forEach(qid=>{
+    if(currentStage.mainQuestion&&currentStage.mainQuestion._qid===qid){
+      items.push(normalizeForReview(currentStage.mainQuestion,currentStage));
+    }else{
+      const p=(currentStage.practiceQuestions||[]).find(pq=>pq._qid===qid);
+      if(p)items.push(normalizeForReview(p,currentStage));
+    }
+  });
+  if(items.length===0){showScreen('screen-map');return;}
+  reviewQueue=items;reviewIndex=0;reviewReturnScreen='screen-map';
+  document.getElementById('learn-title').textContent='📝 にがて問題を 復習しよう';
+  document.getElementById('learn-sub').textContent='さっき まちがえた もんだいだけ、もう一度！';
+  renderReviewStep();
+}
+
+// にがてリストから、いまの章のミス問題をまとめて復習する（章選択後のステージ一覧画面から入る）
+function getWeakItemsForCurrentChapter(){
+  if(!currentChapter||!state.missedQuestions)return[];
+  const items=[];
+  Object.keys(state.missedQuestions).forEach(qid=>{
+    const m=state.missedQuestions[qid];
+    if(m.chapterId!==currentChapter.id)return;
+    for(const s of COURSE_DATA){
+      if(s.mainQuestion&&s.mainQuestion._qid===qid){items.push(normalizeForReview(s.mainQuestion,s));return;}
+      const p=(s.practiceQuestions||[]).find(pq=>pq._qid===qid);
+      if(p){items.push(normalizeForReview(p,s));return;}
+    }
+  });
+  return items;
+}
+function startWeakListReview(){
+  const items=getWeakItemsForCurrentChapter();
+  if(items.length===0)return;
+  isReviewMode=true;
+  reviewQueue=items;reviewIndex=0;reviewReturnScreen='screen-map';
+  showScreen('screen-learn');
+  document.getElementById('learn-title').textContent='🎯 にがて復習';
+  document.getElementById('learn-sub').textContent=`この章の にがて問題 ${items.length}問`;
+  renderReviewStep();
+}
+
+function renderReviewStep(){
+  const c=document.getElementById('learn-content');
+  c.innerHTML='';
+  if(reviewIndex>=reviewQueue.length){finishReview();return;}
+  const item=reviewQueue[reviewIndex];
+  if(item._sourceStage)currentStage=item._sourceStage;
+  const pct=Math.round((reviewIndex/reviewQueue.length)*100);
+  document.getElementById('learn-progress').style.width=pct+'%';
+  document.getElementById('learn-progress-label').textContent=`にがて復習 ${reviewIndex+1}/${reviewQueue.length}`;
+  renderPractice(c,item,reviewIndex+1,{
+    uid:'rv-'+reviewIndex,
+    forceFullHint:true,
+    titleLabel:`にがて復習 ${reviewIndex+1}/${reviewQueue.length}`,
+    doneLabel:(reviewIndex+1<reviewQueue.length)?'つぎの にがて問題へ →':'にがて復習を おわる →',
+    onDone:'reviewNextStep()',
+    onRetry:'retryReviewStep()'
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+// 「もう一度読む」: reviewIndexは進めず、同じ問題を再描画するだけ
+function retryReviewStep(){renderReviewStep();}
+function reviewNextStep(){playSfx('confirm');reviewIndex++;renderReviewStep();}
+function finishReview(){
+  isReviewMode=false;
+  const ret=reviewReturnScreen||'screen-map';
+  reviewQueue=[];reviewIndex=0;
+  showScreen(ret);
+  if(ret==='screen-map')renderStageGrid();
 }
 
 /* ===== アコーディオン開閉 ===== */
@@ -2979,6 +3219,7 @@ function confirmAnswer(){
   }else{
     /* === 不正解: 解説を読んでリトライ === */
     if(currentRun==='ng2')ng2AllCorrect=false;
+    if(currentStage&&currentStage.mainQuestion)recordMiss(currentStage.mainQuestion._qid);
     playSfx('wrong');
     banner.textContent='不正解…解説を読んでもう一度挑戦しよう！';
     const confirmBlock=document.getElementById('rb-confirm');
@@ -3020,6 +3261,7 @@ function retryMainQuestion(){
 function onMainTimerExpire(){
   stopTimerSound();
   if(currentRun==='ng2')ng2AllCorrect=false;
+  if(currentStage&&currentStage.mainQuestion)recordMiss(currentStage.mainQuestion._qid);
   playSfx('wrong');
   // 確認ダイアログを非表示
   const conf=document.getElementById('answer-confirm');if(conf)conf.style.display='none';
@@ -3079,9 +3321,10 @@ function renderKnowledge(c,rk){
 
 /* ===== 練習問題 ===== */
 const _pqState={};
-function renderPractice(c,pq,num){
+function renderPractice(c,pq,num,opts){
+  opts=opts||{};
   revealPaused=false;
-  const uid='pq-'+num;
+  const uid=opts.uid||('pq-'+num);
   const div=document.createElement('div');
 
   /* === 選択肢シャッフル（ラベルはア〜エ固定、中身を入れ替え） === */
@@ -3091,15 +3334,15 @@ function renderPractice(c,pq,num){
   const shuffled={};let newAnswer=pq.answer;
   const ansText=pq.choices[pq.answer];
   origKeys.forEach((k,i)=>{if(i<vals.length){shuffled[k]=vals[i];if(vals[i].text===ansText)newAnswer=k;}});
-  _pqState[uid]={answer:newAnswer,pendingKey:null,retried:false};
+  _pqState[uid]={answer:newAnswer,pendingKey:null,retried:false,qid:pq._qid};
 
   /* === choiceAnalysis をシャッフル後のラベルにマッピング === */
   const analysisMap={};
   if(pq.choiceAnalysis)pq.choiceAnalysis.forEach(a=>{analysisMap[pq.choices[a.choice]]=a;});
 
-  // 2週目モード：hintLevelに応じて段階的に補助を表示（1週目は常に全表示）
-  const isNg2Mode=currentRun==='ng2';
-  const pqHintLevel=isNg2Mode?currentNg2HintLevel():4; // 1週目はlv4相当（全表示）
+  // 2週目モード：hintLevelに応じて段階的に補助を表示（1週目は常に全表示）。復習ラウンドは常にヒント全開放
+  const isNg2Mode=currentRun==='ng2'&&!opts.forceFullHint;
+  const pqHintLevel=opts.forceFullHint?4:(isNg2Mode?currentNg2HintLevel():4); // 1週目・復習ラウンドはlv4相当（全表示）
 
   /* === 選択肢HTML === */
   let choicesHtml='';
@@ -3159,7 +3402,7 @@ function renderPractice(c,pq,num){
 
   div.innerHTML=`<div class="section-card">
     <span class="step-badge step-practice">Step ${learnStep+1}</span>
-    <div class="section-title practice-title">練習問題 ${num}${isNg2Mode?' <span style="color:#ce93d8;font-size:.75rem;font-weight:normal;margin-left:8px">★2周目 Lv'+pqHintLevel+'</span>':''}</div>
+    <div class="section-title practice-title">${opts.titleLabel||('練習問題 '+num)}${isNg2Mode?' <span style="color:#ce93d8;font-size:.75rem;font-weight:normal;margin-left:8px">★2周目 Lv'+pqHintLevel+'</span>':''}</div>
 
     <!-- ブロック1: 問題文（モバイルでスティッキー） -->
     <div class="reveal-block revealed sticky-q">
@@ -3197,9 +3440,9 @@ function renderPractice(c,pq,num){
     <!-- ブロック6: 理解度確認 -->
     <div class="reveal-block" id="${uid}-done-block">
       <div class="confirm-box">
-        <div class="confirm-text">${num<2?'理解できた？もう1問やってみよう！':'理解できた？カードを獲得しよう！'}</div>
-        <button class="confirm-btn confirm-yes" onclick="nextStep()">${num<2?'次の練習問題へ →':'カード獲得へ →'}</button>
-        <button class="confirm-btn confirm-retry" onclick="retryStep()">もう一度読む</button>
+        <div class="confirm-text">${opts.doneLabel?'理解できた？':(num<2?'理解できた？もう1問やってみよう！':'理解できた？カードを獲得しよう！')}</div>
+        <button class="confirm-btn confirm-yes" onclick="${opts.onDone||'nextStep()'}">${opts.doneLabel||(num<2?'次の練習問題へ →':'カード獲得へ →')}</button>
+        <button class="confirm-btn confirm-retry" onclick="${opts.onRetry||'retryStep()'}">もう一度読む</button>
       </div>
     </div>
   </div>`;
@@ -3269,9 +3512,13 @@ function confirmPractice(uid){
     /* === 正解 === */
     playSfx('correct');
     banner.textContent='正解！';
-    if(!ps.retried)practiceFirstTryCount++;
-    const pracTotal=currentStage&&currentStage.selectedPracticeQuestions?currentStage.selectedPracticeQuestions.length:PRACTICE_COUNT;
-    if(practiceFirstTryCount>=pracTotal)unlockAchievement('practice_perfect');
+    if(!isReviewMode){
+      if(!ps.retried)practiceFirstTryCount++;
+      const pracTotal=currentStage&&currentStage.selectedPracticeQuestions?currentStage.selectedPracticeQuestions.length:PRACTICE_COUNT;
+      if(practiceFirstTryCount>=pracTotal)unlockAchievement('practice_perfect');
+    }else if(ps.qid){
+      markMissCorrect(ps.qid);
+    }
     const ci=document.getElementById(uid+'-ci-'+ans);
     if(ci){const r=ci.getBoundingClientRect();gainTapExp(r.left+r.width/2,r.top+r.height/2,15);}
     const expEl=document.getElementById(uid+'-exp');
@@ -3283,6 +3530,7 @@ function confirmPractice(uid){
   }else{
     ps.retried=true;
     if(currentRun==='ng2')ng2AllCorrect=false;
+    if(ps.qid)recordMiss(ps.qid);
     /* === 不正解: 解説を読んでリトライ === */
     playSfx('hit');
     banner.textContent='不正解…解説を読んでもう一度挑戦しよう！';
@@ -3332,6 +3580,7 @@ function onPracticeTimerExpire(uid){
   stopTimerSound();
   const ps=_pqState[uid];if(!ps)return;
   if(currentRun==='ng2')ng2AllCorrect=false;
+  if(ps.qid)recordMiss(ps.qid);
   playSfx('wrong');
   // 確認ダイアログを非表示
   const conf=document.getElementById(uid+'-confirm');if(conf)conf.style.display='none';
@@ -3600,7 +3849,7 @@ async function startBoss(){
     ?Math.min(12+Math.floor(Math.random()*4),pool.length)
     :Math.min(chId+2,pool.length);
   bossActiveQs=pool.slice(0,cnt);
-  document.getElementById('boss-title').textContent=BOSS_DATA.bossName;
+  document.getElementById('boss-title').innerHTML=`${BOSS_DATA.bossName}${currentRun==='ng2'?'<span class="ng2-badge">★2周目</span>':''}`;
   /* VS演出 */
   showBossVsIntro(()=>{
     showScreen('screen-boss');
@@ -4129,7 +4378,7 @@ function renderBossResult(c){
     // 2週目ボスクリアは別フィールドに記録し、EXP/GOLD付与もスキップしない（報酬は通常通り）
     if(currentRun==='ng2'){
       const ng2cs=ng2ChapterState();
-      if(!ng2cs.bossCleared2){ng2cs.bossCleared2=true;state.exp+=Math.floor(rw.exp*chapterExpMult());state.gold+=rw.gold;saveState();}
+      if(!ng2cs.bossCleared2){ng2cs.bossCleared2=true;state.exp+=Math.floor(rw.exp*chapterExpMult());state.gold+=rw.gold;saveState();checkNg2MasterCertification();}
     }else{
       if(!cs.bossCleared){cs.bossCleared=true;state.exp+=Math.floor(rw.exp*chapterExpMult());state.gold+=rw.gold;if(!state.ownedCards.includes(rw.bonusCard.cardName))state.ownedCards.push(rw.bonusCard.cardName);if(currentChapter)state.cardChapterMap[rw.bonusCard.cardName]=currentChapter.id;saveState();}
     }
@@ -4708,6 +4957,11 @@ async function loadChapterData(chapterId){
     COURSE_DATA=stageData.flatMap(d=>d.stages);
     // デモ版: ステージ1,2のみに絞る
     if(IS_DEMO) COURSE_DATA=COURSE_DATA.filter(s=>s.stageId<=2);
+    // にがて（ミス問題）追跡用に、章内で一意なqidを各問題に付与
+    COURSE_DATA.forEach(s=>{
+      if(s.mainQuestion)s.mainQuestion._qid=chapterId+'-'+s.stageId+'-m';
+      (s.practiceQuestions||[]).forEach((p,i)=>{p._qid=chapterId+'-'+s.stageId+'-p'+i;});
+    });
 
     const bossResp=await fetch(chapter.files.boss);
     if(bossResp.ok){
